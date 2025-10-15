@@ -25,7 +25,7 @@ El objetivo principal es ofrecer una herramienta rápida, privada y fácil de us
 
 ## 🗺️ Hoja de Ruta (Roadmap)
 
-Este es el plan de desarrollo actual, gestionado a través de nuestro [tablero Kanban del proyecto]([enlace a tu tablero de GitHub Projects]).
+Este es el plan de desarrollo actual, gestionado a través de nuestro [tablero Kanban del proyecto](https://github.com/users/AlvaroPavon/projects/2).
 
 -   [ ] **(MVP)** Formulario de entrada de datos y validaciones.
 -   [ ] **(MVP)** Lógica para guardar y recuperar registros del almacenamiento local.
