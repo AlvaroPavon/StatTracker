@@ -21,7 +21,7 @@ El objetivo principal es ofrecer una herramienta rápida, privada y fácil de us
 ## 🛠️ Tecnologías Utilizadas
 
 * **Frontend:** [ HTML5, CSS3, JavaScript]
-* **Almacenamiento:** [Ej: LocalStorage API del navegador]
+* **Almacenamiento:** [ LocalStorage API del navegador]
 
 ## 🗺️ Hoja de Ruta (Roadmap)
 
