@@ -1,16 +1,17 @@
 <?php
-// 1. Iniciar la sesión ANTES de cualquier salida HTML
+// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
+require 'db.php';
+
+// 2. Iniciar la sesión
 session_start();
 
-// 2. Refinamiento: Redirigir si el usuario ya está logueado
+// 3. Refinamiento: Redirigir si el usuario ya está logueado
 if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
     exit; // Detener la ejecución del script
 }
 
-// 3. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
-// Genera un token aleatorio y único y lo guarda en la sesión.
-// hash_equals() previene ataques de temporización al comparar tokens.
+// 4. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -19,93 +20,110 @@ $csrf_token = $_SESSION['csrf_token'];
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login y Registro - StatTracker</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Login - StatTracker</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4A90E2", // Professional Blue
+              "secondary": "#50E3C2", // Encouraging Green
+              "background-light": "#F8F9FA", // Off-white
+              "background-dark": "#1F2937", // A suitable dark background
+              "text-light": "#4A4A4A", // Dark Gray
+              "text-dark": "#E5E7EB", // Light Gray for dark mode
+              "border-light": "#E1E8ED", // Light Gray Border
+              "border-dark": "#374151" // Dark mode border
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; padding: 20px; }
-        .form-box { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: 320px; box-sizing: border-box; }
-        h2 { text-align: center; margin-top: 0; margin-bottom: 25px; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
-        .form-group input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 600; }
-        .btn:hover { background-color: #0056b3; }
-        .message { padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; font-size: 14px; }
-        .message.error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
-        .message.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
     </style>
 </head>
-<body>
-
-    <div class="container">
-        
-        <div class="form-box">
-            <h2>Registro</h2>
-            
-            <?php 
-            if (isset($_GET['reg_error'])): ?>
-                <div class="message error">
-                    <?php echo htmlspecialchars($_GET['reg_error']); ?>
-                </div>
-            <?php endif; ?>
-
-            <form action="register.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                
-                <div class="form-group">
-                    <label for="reg_nombre">Nombre:</label>
-                    <input type="text" id="reg_nombre" name="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg_apellidos">Apellidos:</label>
-                    <input type="text" id="reg_apellidos" name="apellidos" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg_email">Email (será tu login):</label>
-                    <input type="email" id="reg_email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg_password">Contraseña:</label>
-                    <input type="password" id="reg_password" name="password" required minlength="8">
-                </div>
-                <button type="submit" class="btn">Registrarse</button>
-            </form>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
+<div class="w-full max-w-md">
+    <div class="flex flex-col items-center mb-8">
+        <div class="flex items-center gap-3 p-2">
+            <span class="material-symbols-outlined text-primary text-5xl">scale</span>
+            <h1 class="text-3xl font-bold leading-tight tracking-tight text-text-light dark:text-text-dark">StatTracker</h1>
         </div>
-
-        <div class="form-box">
-            <h2>Login</h2>
-
-            <?php 
-            if (isset($_GET['login_error'])): ?>
-                <div class="message error">
-                    <?php echo htmlspecialchars($_GET['login_error']); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php 
-            if (isset($_GET['success'])): ?>
-                <div class="message success">
-                    <?php echo htmlspecialchars($_GET['success']); ?>
-                </div>
-            <?php endif; ?>
-
-            <form action="login.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                
-                <div class="form-group">
-                    <label for="login_email">Email:</label>
-                    <input type="email" id="login_email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login_password">Contraseña:</label>
-                    <input type="password" id="login_password" name="password" required>
-                </div>
-                <button type="submit" class="btn">Iniciar Sesión</button>
-            </form>
-        </div>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">¡Bienvenido! Por favor, inicia sesión.</p>
     </div>
+    
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg">
+        
+        <?php 
+        // --- INICIO BLOQUE DE MENSAJES ---
+        if (isset($_GET['login_error'])): ?>
+            <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert">
+                <?php echo htmlspecialchars($_GET['login_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php 
+        if (isset($_GET['success'])): ?>
+            <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-300" role="alert">
+                <?php echo htmlspecialchars($_GET['success']); ?>
+            </div>
+        <?php endif; 
+        // --- FIN BLOQUE DE MENSAJES ---
+        ?>
+
+        <form class="flex flex-col gap-6" action="login.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+            
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Email</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal" 
+                       placeholder="you@example.com" 
+                       type="email" 
+                       name="email"
+                       id="login_email"
+                       required />
+            </label>
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal" 
+                       placeholder="••••••••" 
+                       type="password"
+                       name="password"
+                       id="login_password"
+                       required />
+            </label>
+            
+            <button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark"
+                    type="submit">
+                <span>Iniciar Sesión</span>
+            </button>
+        </form>
+    </div>
+    <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600 dark:text-gray-400">¿No tienes una cuenta? <a class="font-medium text-primary hover:underline" href="register_page.php">Regístrate ahora</a></p>
+    </div>
+</div>
+</div>
 
 </body>
 </html>

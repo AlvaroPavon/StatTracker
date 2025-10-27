@@ -36,9 +36,13 @@ $user_id = $_SESSION['user_id'];
 
 try {
     // 7. Refinamiento de Seguridad: Sentencia Preparada
-    $sql = "SELECT fecha_registro, imc FROM metricas 
+    
+    // ----- INICIO DE LA MODIFICACIÓN -----
+    // Ahora seleccionamos también el 'id' de la métrica
+    $sql = "SELECT id, fecha_registro, imc, peso, altura FROM metricas 
             WHERE user_id = :user_id 
-            ORDER BY fecha_registro ASC";
+            ORDER BY fecha_registro DESC";
+    // ----- FIN DE LA MODIFICACIÓN -----
             
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['user_id' => $user_id]);
