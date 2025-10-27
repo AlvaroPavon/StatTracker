@@ -16,15 +16,27 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // 5. REFINAMIENTO (CSRF): Validar el token enviado por 'fetch'
-// PHP convierte el header 'X-CSRF-TOKEN' a 'HTTP_X_CSRF_TOKEN' en $_SERVER
-$token_enviado = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''; // Usar '??' por si no se envía
 
+// getallheaders() es más robusto que $_SERVER para leer encabezados
+$headers = getallheaders();
+$token_enviado = '';
+
+// Buscar el token (insensible a mayúsculas/minúsculas)
+if (isset($headers['X-CSRF-TOKEN'])) {
+    $token_enviado = $headers['X-CSRF-TOKEN'];
+} else if (isset($headers['x-csrf-token'])) {
+    // Algunos navegadores/proxies pueden enviarlo en minúsculas
+    $token_enviado = $headers['x-csrf-token'];
+}
+
+// Validar el token
 if (empty($token_enviado) || !hash_equals($_SESSION['csrf_token'], $token_enviado)) {
     // Si el token no coincide, es un ataque CSRF
     http_response_code(403); // Forbidden
     echo json_encode(['error' => 'Error de seguridad (Token CSRF inválido)']);
     exit;
 }
+
 
 // 6. Obtener el ID del usuario de la sesión de forma segura
 $user_id = $_SESSION['user_id'];
