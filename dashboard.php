@@ -20,7 +20,6 @@ if (empty($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-// ----- INICIO DE MODIFICACIÓN -----
 // 6. Obtener datos del usuario (nombre y foto) para la barra lateral
 try {
     $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id");
@@ -29,18 +28,15 @@ try {
     
     $nombreUsuario = htmlspecialchars($usuario['nombre']);
     
-    // Asignar ruta de foto de perfil
-    $profilePic = 'default_profile.png'; // Imagen por defecto
+    $profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
     if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) {
         $profilePic = 'uploads/' . $usuario['profile_pic'];
     }
 
 } catch (PDOException $e) {
-    // Si falla la consulta, usamos los datos de la sesión
     $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
-    $profilePic = 'default_profile.png'; // Imagen por defecto
+    $profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
 }
-// ----- FIN DE MODIFICACIÓN -----
 
 ?>
 <!DOCTYPE html>
@@ -53,6 +49,10 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -62,17 +62,22 @@ try {
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .btn-delete { padding: 4px 8px; border-radius: 4px; background-color: #fef2f2; color: #ef4444; font-weight: 500; transition: all 0.2s; }
+        .btn-delete { padding: 4px 8px; border-radius: 4px; background-color: #fef2f2; color: #ef4444; font-weight: 500; transition: all 0.3s; }
         .btn-delete:hover { background-color: #ef4444; color: #ffffff; }
         
-        /* Estilo para la foto de perfil en la barra lateral */
         .sidebar-profile-pic {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            background-color: #e0e6ed; /* bg-border-light */
+            background-color: #e0e6ed;
         }
+
+        /* ----- INICIO MODIFICACIÓN (Velocidad de animación) ----- */
+        :root {
+            --animate-duration: 0.8s;
+        }
+        /* ----- FIN MODIFICACIÓN ----- */
     </style>
     <script id="tailwind-config">
       tailwind.config = {
@@ -108,18 +113,19 @@ try {
                 </div>
             </div>
             <nav class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="dashboard.php">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary transition-all duration-300" href="dashboard.php">
                     <span class="material-symbols-outlined fill">dashboard</span>
                     <p class="text-sm font-medium leading-normal">Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark" href="profile.php">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300" href="profile.php">
                     <span class="material-symbols-outlined">person</span>
                     <p class="text-sm font-medium leading-normal">Perfil</p>
                 </a>
             </nav>
-            </div>
+
+        </div>
         <div class="flex flex-col gap-1 border-t border-border-light dark:border-border-dark pt-4">
-            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark" 
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300" 
                href="logout.php?token=<?php echo $csrf_token; ?>">
                 <span class="material-symbols-outlined">logout</span>
                 <p class="text-sm font-medium leading-normal">Cerrar Sesión</p>
@@ -129,16 +135,18 @@ try {
 </aside>
 <main class="flex-1 flex-col overflow-y-auto">
     <div class="p-8">
-        <header class="flex flex-wrap items-center justify-between gap-4 pb-6">
-            <div class="flex min-w-72 flex-col gap-1">
+        <header class="flex flex-wrap items-center justify-between gap-4 pb-6
+                       animate__animated animate__fadeInDown">
+        <div class="flex min-w-72 flex-col gap-1">
                 <h1 class="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Tu Progreso</h1>
                 <p class="text-secondary-text-light dark:text-secondary-text-dark text-base font-normal leading-normal">Registra y visualiza tu IMC</p>
             </div>
         </header>
         
-        <section class="flex flex-wrap gap-8 py-4">
-            
-            <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark p-6">
+        <section class="flex flex-wrap gap-8 py-4
+                        animate__animated animate__fadeInUp">
+        <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark p-6
+                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <p class="text-text-light dark:text-text-dark text-lg font-medium leading-normal">Evolución de tu IMC</G>
                 
                 <div class="flex min-h-[300px] flex-1 flex-col gap-8 py-4">
@@ -146,8 +154,8 @@ try {
                 </div>
             </div>
 
-            <div class="w-full lg:w-96">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm">
+            <div class="w-full lg:w-96 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-xl">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm h-full">
                     <h2 class="text-xl font-bold mb-4">Registrar Nuevo Peso</h2>
                     
                     <?php if (isset($_GET['error'])): ?>
@@ -167,22 +175,26 @@ try {
                         <div class="grid grid-cols-1 gap-6 items-end">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Altura (en Metros)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal" 
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                       transition-all duration-300" 
                                        placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Peso (kg)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal" 
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                       transition-all duration-300" 
                                        placeholder="Ej: 70.5" type="number" step="0.1" id="peso" name="peso" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Fecha del Registro</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal" 
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                       transition-all duration-300" 
                                        type="date" id="fecha" name="fecha_registro" required />
                             </label>
                         </div>
                         <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-border-light dark:border-border-dark pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full"
+                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full
+                                    transition-all duration-300 hover:scale-105"
                                     type="submit">
                                 <span class="truncate">Guardar Registro</span>
                             </button>
@@ -192,8 +204,11 @@ try {
             </div>
         </section>
 
-        <section class="mt-8 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark">
-            <h2 class="text-text-light dark:text-text-dark text-xl font-bold p-6">Registros de Peso</h2>
+        <section class="mt-8 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark
+                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+                        animate__animated animate__fadeInUp" 
+                        style="--animate-delay: 0.2s;">
+        <h2 class="text-text-light dark:text-text-dark text-xl font-bold p-6">Registros de Peso</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="border-b border-t border-border-light dark:border-border-dark bg-subtle-light dark:bg-content-dark">
@@ -216,6 +231,7 @@ try {
 </div>
 
 <script>
+    // El script de JS sigue siendo el mismo, no necesita cambios.
     document.addEventListener('DOMContentLoaded', function() {
         
         const chartContainer = document.getElementById('imcChart').parentNode;
@@ -253,7 +269,6 @@ try {
                         return;
                     }
 
-                    // --- 1. LÓGICA DEL GRÁFICO (Datos ASC) ---
                     const reversedData = [...data].reverse();
                     const labels = reversedData.map(item => item.fecha_registro); 
                     const imcData = reversedData.map(item => item.imc); 
@@ -261,6 +276,7 @@ try {
                     if (!document.getElementById('imcChart')) {
                          chartContainer.innerHTML = '<canvas id="imcChart"></canvas>';
                     }
+                    
                     const ctx = document.getElementById('imcChart').getContext('2d');
                     
                     imcChartInstance = new Chart(ctx, {
@@ -283,7 +299,6 @@ try {
                         }
                     });
 
-                    // --- 2. LÓGICA DE LA TABLA (Datos DESC) ---
                     let tableHtml = '';
                     data.forEach(item => {
                         const clasificacion = getClasificacionIMC(item.imc);
