@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // 5. REFINAMIENTO (CSRF): Validar el token enviado por 'fetch'
 
-// getallheaders() es más robusto que $_SERVER para leer encabezados
+// CORRECCIÓN: Usar getallheaders() es más robusto que $_SERVER
 $headers = getallheaders();
 $token_enviado = '';
 
