@@ -1,33 +1,45 @@
 <?php
-require 'db.php'; // Incluir la conexión a la base de datos
+// 1. Incluir la conexión a la base de datos
+require 'db.php';
 
-// Verificar que se recibieron datos por POST
+// 2. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // Validar y limpiar datos
+    // 3. Limpiar y validar datos de entrada
+    // trim() elimina espacios en blanco al inicio y al final
     $nombre = trim($_POST['nombre']);
     $apellidos = trim($_POST['apellidos']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
+    // 4. Validaciones de campos
     if (empty($nombre) || empty($apellidos) || empty($email) || empty($password)) {
         header('Location: index.php?reg_error=Todos los campos son obligatorios');
-        exit;
+        exit; // Detener script
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('Location: index.php?reg_error=Email no válido');
-        exit;
+        header('Location: index.php?reg_error=El formato del email no es válido');
+        exit; // Detener script
     }
 
-    // Hashear la contraseña (¡Importante para la seguridad!)
+    if (strlen($password) < 6) {
+        header('Location: index.php?reg_error=La contraseña debe tener al menos 6 caracteres');
+        exit; // Detener script
+    }
+
+    // 5. Refinamiento de Seguridad: Hashear la contraseña
+    // PASSWORD_BCRYPT es el algoritmo recomendado actualmente
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     try {
-        // Preparar la consulta SQL para insertar el usuario
-        $sql = "INSERT INTO usuarios (nombre, apellidos, email, password) VALUES (:nombre, :apellidos, :email, :password)";
+        // 6. Refinamiento de Seguridad: Sentencia Preparada (Previene Inyección SQL)
+        $sql = "INSERT INTO usuarios (nombre, apellidos, email, password) 
+                VALUES (:nombre, :apellidos, :email, :password)";
+        
         $stmt = $pdo->prepare($sql);
         
+        // 7. Ejecutar la consulta pasando los datos de forma segura
         $stmt->execute([
             'nombre' => $nombre,
             'apellidos' => $apellidos,
@@ -35,21 +47,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'password' => $hashed_password
         ]);
 
-        // Redirigir al index con mensaje de éxito
-        header('Location: index.php?success=Registro completado. Por favor, inicia sesión.');
-        exit;
+        // 8. Redirección exitosa
+        header('Location: index.php?success=Registro completado con éxito. Por favor, inicia sesión.');
+        exit; // Detener script
 
     } catch (PDOException $e) {
-        // Manejar error si el email ya existe (basado en la restricción UNIQUE)
+        // 9. Manejo de Errores
+        
+        // Código de error '23000' es para violación de restricción (ej. 'UNIQUE' key)
         if ($e->getCode() == 23000) {
-            header('Location: index.php?reg_error=El email ya está registrado');
+            header('Location: index.php?reg_error=El email introducido ya está registrado');
+            exit; // Detener script
         } else {
-            header('Location: index.php?reg_error=Error en el registro');
+            // Otro error de base de datos
+            // En un entorno de producción, no mostrarías $e->getMessage() al usuario
+            header('Location: index.php?reg_error=Error en el registro. Inténtelo de nuevo.');
+            exit; // Detener script
         }
-        exit;
     }
+
 } else {
+    // 10. Si alguien intenta acceder a register.php directamente
     header('Location: index.php');
-    exit;
+    exit; // Detener script
 }
 ?>
