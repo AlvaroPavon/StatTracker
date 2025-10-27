@@ -1,9 +1,9 @@
 <?php
 // 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php'; 
+require 'db.php';
 
 // 2. REFINAMIENTO (CSRF): Iniciar la sesión
-session_start(); 
+session_start();
 
 // 3. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header('Location: index.php?login_error=Error de seguridad. Intente de nuevo.');
         exit;
     }
-    
+
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
@@ -29,25 +29,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "SELECT id, nombre, password FROM usuarios WHERE email = :email";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['email' => $email]);
-        
+
         // 7. Obtener el usuario
         $user = $stmt->fetch();
 
         // 8. Refinamiento de Seguridad: Verificar usuario y contraseña
         if ($user && password_verify($password, $user['password'])) {
-            
+
             // 9. ¡Refinamiento de Seguridad CRÍTICO!
             // Regenerar el ID de la sesión para prevenir fijación de sesión
             // Borra el token CSRF antiguo y regenera uno nuevo.
             session_regenerate_id(true);
-            
+
             // 10. Guardar datos en la sesión
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_nombre'] = $user['nombre'];
 
             // 11. REFINAMIENTO (CSRF): Generar un nuevo token para el dashboard
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            
+
+            // ----- INICIO MODIFICACIÓN -----
+            // Marcar que se debe mostrar el splash de bienvenida en el dashboard
+            $_SESSION['show_welcome_splash'] = true;
+            // ----- FIN MODIFICACIÓN -----
+
             // 12. Redirigir al panel de control (dashboard)
             header('Location: dashboard.php');
             exit; // Detener script

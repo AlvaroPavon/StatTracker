@@ -33,6 +33,7 @@ $csrf_token = $_SESSION['csrf_token'];
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
+
     <script>
       tailwind.config = {
         darkMode: "class",
@@ -52,76 +53,125 @@ $csrf_token = $_SESSION['csrf_token'];
     </script>
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 }
-        
-        /* ----- INICIO MODIFICACIÓN (Velocidad de animación) ----- */
+
         :root {
+            --animate-duration: 0.8s;
+        }
+
+        /* ----- INICIO MODIFICACIÓN (Estilos Splash Screen) ----- */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #F8F9FA; /* background-light */
+        }
+        .dark #splash-screen {
+            background-color: #1F2937; /* background-dark */
+        }
+        #splash-screen .animate__bounceIn {
+            --animate-duration: 1.2s;
+        }
+        #splash-screen.animate__fadeOut {
             --animate-duration: 0.8s;
         }
         /* ----- FIN MODIFICACIÓN ----- */
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+
+<div id="splash-screen" class="animate__animated animate__bounceIn">
+    <div class="flex items-center gap-3 p-2">
+        <span class="material-symbols-outlined text-primary text-7xl">scale</span>
+    </div>
+    <h1 class="text-4xl font-bold leading-tight tracking-tight text-text-light dark:text-text-dark mt-4">StatTracker</h1>
+</div>
+<div id="main-content" class="hidden">
 <div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 group/design-root">
 
-<div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg
-            transition-all duration-300 hover:shadow-xl
-            animate__animated animate__fadeInUp">
-<div class="flex flex-col items-center mb-8 animate__animated animate__fadeInDown">
-    <div class="flex items-center gap-3 mb-2">
-            <span class="material-symbols-outlined text-primary text-4xl">scale</span>
-            <h1 class="text-2xl font-bold leading-tight tracking-tight">StatTracker</h1>
+    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg
+                transition-all duration-300 hover:shadow-xl
+                animate__animated animate__fadeInUp">
+
+        <div class="flex flex-col items-center mb-8 animate__animated animate__fadeInDown">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-primary text-4xl">scale</span>
+                <h1 class="text-2xl font-bold leading-tight tracking-tight">StatTracker</h1>
+            </div>
+            <p class="text-3xl font-bold leading-tight tracking-tighter text-text-light dark:text-text-dark">Crea Tu Cuenta</p>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Comienza tu camino hacia una mejor gestión de la salud.</p>
         </div>
-        <p class="text-3xl font-bold leading-tight tracking-tighter text-text-light dark:text-text-dark">Crea Tu Cuenta</p>
-        <p class="text-gray-500 dark:text-gray-400 mt-1">Comienza tu camino hacia una mejor gestión de la salud.</p>
+
+        <?php if (isset($_GET['reg_error'])): ?>
+            <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert">
+                <?php echo htmlspecialchars($_GET['reg_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <form class="flex flex-col gap-4" action="register.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Nombre</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    transition-all duration-300"
+                    placeholder="Ej: Jane" type="text" name="nombre" id="reg_nombre" required />
+            </label>
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Apellidos</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    transition-all duration-300"
+                    placeholder="Ej: Doe" type="text" name="apellidos" id="reg_apellidos" required />
+            </label>
+
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Email</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    transition-all duration-300"
+                    placeholder="you@example.com" type="email" name="email" id="reg_email" required />
+            </label>
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    transition-all duration-300"
+                    placeholder="••••••••" type="password" name="password" id="reg_password" minlength="8" required />
+            </label>
+
+            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 mt-4 w-full
+                        transition-all duration-300 hover:scale-105" type="submit">
+                <span class="truncate">Registrarse</span>
+            </button>
+        </form>
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+                ¿Ya tienes una cuenta? <a class="font-medium text-primary hover:underline" href="index.php">Inicia sesión aquí</a>
+            </p>
+        </div>
+    </div>
     </div>
 
-    <?php if (isset($_GET['reg_error'])): ?>
-        <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert">
-            <?php echo htmlspecialchars($_GET['reg_error']); ?>
-        </div>
-    <?php endif; ?>
-
-    <form class="flex flex-col gap-4" action="register.php" method="POST">
-        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-        
-        <label class="flex flex-col w-full">
-            <p class="text-base font-medium leading-normal pb-2">Nombre</p>
-            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
-                   transition-all duration-300" 
-                   placeholder="Ej: Jane" type="text" name="nombre" id="reg_nombre" required />
-        </label>
-        <label class="flex flex-col w-full">
-            <p class="text-base font-medium leading-normal pb-2">Apellidos</p>
-            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
-                   transition-all duration-300" 
-                   placeholder="Ej: Doe" type="text" name="apellidos" id="reg_apellidos" required />
-        </label>
-        
-        <label class="flex flex-col w-full">
-            <p class="text-base font-medium leading-normal pb-2">Email</p>
-            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
-                   transition-all duration-300" 
-                   placeholder="you@example.com" type="email" name="email" id="reg_email" required />
-        </label>
-        <label class="flex flex-col w-full">
-            <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
-            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
-                   transition-all duration-300" 
-                   placeholder="••••••••" type="password" name="password" id="reg_password" minlength="8" required />
-        </label>
-        
-        <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 mt-4 w-full
-                       transition-all duration-300 hover:scale-105" type="submit">
-            <span class="truncate">Registrarse</span>
-        </button>
-    </form>
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-300">
-            ¿Ya tienes una cuenta? <a class="font-medium text-primary hover:underline" href="index.php">Inicia sesión aquí</a>
-        </p>
-    </div>
-</div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const splashScreen = document.getElementById('splash-screen');
+        const mainContent = document.getElementById('main-content');
+
+        // Mismo script que en index.php
+        setTimeout(() => {
+            splashScreen.classList.remove('animate__bounceIn');
+            splashScreen.classList.add('animate__fadeOut');
+
+            splashScreen.addEventListener('animationend', () => {
+                splashScreen.style.display = 'none';
+                mainContent.classList.remove('hidden');
+            });
+
+        }, 2500); // 2.5 segundos de duración total del splash
+    });
+</script>
 </body>
 </html>
