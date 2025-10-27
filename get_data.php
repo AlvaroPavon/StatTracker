@@ -21,7 +21,7 @@ if (!isset($_SESSION['user_id'])) {
 $token_enviado = '';
 
 // Método 1: getallheaders() (El mejor, si está disponible)
-// Añadimos function_exists() para evitar el error HTML
+// CORRECCIÓN: Comprobar si la función existe antes de llamarla
 if (function_exists('getallheaders')) {
     $headers = getallheaders();
     if (isset($headers['X-CSRF-TOKEN'])) {
