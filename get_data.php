@@ -17,17 +17,25 @@ if (!isset($_SESSION['user_id'])) {
 
 // 5. REFINAMIENTO (CSRF): Validar el token enviado por 'fetch'
 
-// CORRECCIÓN: Usar getallheaders() es más robusto que $_SERVER
-$headers = getallheaders();
+// --- INICIO DE LA CORRECCIÓN ROBUSTA ---
 $token_enviado = '';
 
-// Buscar el token (insensible a mayúsculas/minúsculas)
-if (isset($headers['X-CSRF-TOKEN'])) {
-    $token_enviado = $headers['X-CSRF-TOKEN'];
-} else if (isset($headers['x-csrf-token'])) {
-    // Algunos navegadores/proxies pueden enviarlo en minúsculas
-    $token_enviado = $headers['x-csrf-token'];
+// Método 1: getallheaders() (El mejor, si está disponible)
+// Añadimos function_exists() para evitar el error HTML
+if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    if (isset($headers['X-CSRF-TOKEN'])) {
+        $token_enviado = $headers['X-CSRF-TOKEN'];
+    } elseif (isset($headers['x-csrf-token'])) {
+        $token_enviado = $headers['x-csrf-token'];
+    }
 }
+// Método 2: $_SERVER (Si getallheaders no funciona o no existe)
+if (empty($token_enviado) && isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+    $token_enviado = $_SERVER['HTTP_X_CSRF_TOKEN'];
+}
+// --- FIN DE LA CORRECCIÓN ROBUSTA ---
+
 
 // Validar el token
 if (empty($token_enviado) || !hash_equals($_SESSION['csrf_token'], $token_enviado)) {
