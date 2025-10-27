@@ -103,13 +103,18 @@ $csrf_token = $_SESSION['csrf_token'];
         document.addEventListener('DOMContentLoaded', function() {
             
             // 6. REFINAMIENTO (CSRF): Añadir el token al 'fetch'
-            fetch('get_data.php', {
+            
+            // ----- INICIO DE LA MODIFICACIÓN -----
+            // Enviamos el token como un parámetro GET (en la URL)
+            // Es más fiable que enviarlo por Headers en XAMPP
+            fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken), {
                 method: 'GET',
                 headers: {
-                    // Añadimos el token en un encabezado personalizado
-                    'X-CSRF-TOKEN': window.csrfToken
+                    // Ya no necesitamos enviar el token aquí
                 }
             })
+            // ----- FIN DE LA MODIFICACIÓN -----
+
                 .then(response => {
                     if (!response.ok) {
                         // Si el token falla, get_data.php devolverá un error 403

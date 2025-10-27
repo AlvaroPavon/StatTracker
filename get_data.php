@@ -1,9 +1,10 @@
 <?php
-// 1. Iniciar la sesión ANTES de cualquier salida
-session_start();
-
-// 2. Incluir la conexión a la BD
+// 1. REFINAMIENTO DE ARQUITECTURA:
+// Incluir la conexión (que tiene los 'ini_set') ANTES de iniciar la sesión.
 require 'db.php';
+
+// 2. Iniciar la sesión DESPUÉS de cargar la configuración.
+session_start();
 
 // 3. Establecer el tipo de contenido de la respuesta
 header('Content-Type: application/json');
@@ -16,26 +17,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // 5. REFINAMIENTO (CSRF): Validar el token enviado por 'fetch'
-
-// --- INICIO DE LA CORRECCIÓN ROBUSTA ---
 $token_enviado = '';
-
-// Método 1: getallheaders() (El mejor, si está disponible)
-// CORRECCIÓN: Comprobar si la función existe antes de llamarla
-if (function_exists('getallheaders')) {
-    $headers = getallheaders();
-    if (isset($headers['X-CSRF-TOKEN'])) {
-        $token_enviado = $headers['X-CSRF-TOKEN'];
-    } elseif (isset($headers['x-csrf-token'])) {
-        $token_enviado = $headers['x-csrf-token'];
-    }
+if (isset($_GET['token'])) {
+    $token_enviado = $_GET['token'];
 }
-// Método 2: $_SERVER (Si getallheaders no funciona o no existe)
-if (empty($token_enviado) && isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
-    $token_enviado = $_SERVER['HTTP_X_CSRF_TOKEN'];
-}
-// --- FIN DE LA CORRECCIÓN ROBUSTA ---
-
 
 // Validar el token
 if (empty($token_enviado) || !hash_equals($_SESSION['csrf_token'], $token_enviado)) {

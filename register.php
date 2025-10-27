@@ -1,9 +1,9 @@
 <?php
-// 1. REFINAMIENTO (CSRF): Iniciar la sesión para acceder al token
-session_start();
-
-// 2. Incluir la conexión a la base de datos
+// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
 require 'db.php';
+
+// 2. REFINAMIENTO (CSRF): Iniciar la sesión para acceder al token
+session_start();
 
 // 3. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
