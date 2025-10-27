@@ -3,16 +3,19 @@
 session_start();
 
 // 2. Refinamiento de Seguridad: Proteger la página
-// Si el usuario no ha iniciado sesión (no existe 'user_id' en la sesión),
-// redirigirlo a la página de login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
     exit; // Detener la ejecución del script
 }
 
-// 3. Obtener el nombre del usuario de la sesión para saludarlo
-// Usamos htmlspecialchars() por seguridad (prevenir XSS)
+// 3. Obtener el nombre del usuario (con seguridad)
 $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
+
+// 4. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,6 +24,12 @@ $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StatTracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Guardamos el token en una variable global de JS
+        window.csrfToken = "<?php echo $csrf_token; ?>";
+    </script>
+    
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 0; }
         
@@ -50,14 +59,14 @@ $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
 
     <div class="header">
         <h1>Bienvenido, <?php echo $nombreUsuario; ?></h1>
-        <a href="logout.php">Cerrar Sesión</a>
+        <a href="logout.php?token=<?php echo $csrf_token; ?>">Cerrar Sesión</a>
     </div>
 
     <div class="content">
         <div class="form-container">
             <h2>Registrar Nuevo Peso</h2>
             
-            <?php // Mostrar error si add_data.php nos redirige con uno
+            <?php 
             if (isset($_GET['error'])): ?>
                 <div class="message error">
                     <?php echo htmlspecialchars($_GET['error']); ?>
@@ -65,6 +74,8 @@ $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
             <?php endif; ?>
 
             <form action="add_data.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                
                 <div class="form-group">
                     <label for="peso">Peso (en KG):</label>
                     <input type="number" step="0.1" id="peso" name="peso" placeholder="Ej: 70.5" required>
@@ -91,31 +102,32 @@ $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
         // Lógica para cargar y mostrar el gráfico
         document.addEventListener('DOMContentLoaded', function() {
             
-            // 1. Usar fetch (AJAX) para pedir los datos al backend (get_data.php)
-            // 'fetch' es asíncrono, usa Promesas (.then)
-            fetch('get_data.php')
+            // 6. REFINAMIENTO (CSRF): Añadir el token al 'fetch'
+            fetch('get_data.php', {
+                method: 'GET',
+                headers: {
+                    // Añadimos el token en un encabezado personalizado
+                    'X-CSRF-TOKEN': window.csrfToken
+                }
+            })
                 .then(response => {
-                    // Comprobar si la respuesta de la red fue exitosa
                     if (!response.ok) {
+                        // Si el token falla, get_data.php devolverá un error 403
                         throw new Error('Respuesta de red no fue OK: ' + response.statusText);
                     }
-                    return response.json(); // Convertir la respuesta a JSON
+                    return response.json(); 
                 })
                 .then(data => {
-                    // 3. Refinamiento: Verificar si 'get_data.php' devolvió un error JSON
                     if (data.error) {
                         throw new Error(data.error);
                     }
                     
-                    // 4. Procesar los datos recibidos
-                    // 'map' crea nuevos arrays solo con la propiedad que necesitamos
-                    const labels = data.map(item => item.fecha_registro); // Eje X: Fechas
-                    const imcData = data.map(item => item.imc); // Eje Y: IMC
+                    const labels = data.map(item => item.fecha_registro); 
+                    const imcData = data.map(item => item.imc); 
 
-                    // 5. Renderizar el gráfico
                     const ctx = document.getElementById('imcChart').getContext('2d');
                     const imcChart = new Chart(ctx, {
-                        type: 'line', // Tipo de gráfico (línea)
+                        type: 'line', 
                         data: {
                             labels: labels,
                             datasets: [{
@@ -139,9 +151,7 @@ $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
                     });
                 })
                 .catch(error => {
-                    // 6. Refinamiento: Manejar cualquier error (de red o de JSON)
                     console.error('Error al cargar los datos del gráfico:', error);
-                    // Opcional: mostrar un error al usuario en el contenedor del gráfico
                     const chartContainer = document.querySelector('.chart-container');
                     chartContainer.innerHTML = '<h2>Error al cargar el gráfico</h2><p>No se pudieron obtener los datos. Intente recargar la página.</p>';
                 });

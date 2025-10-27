@@ -1,60 +1,77 @@
 <?php
-// 1. Iniciar la sesión ANTES de cualquier salida
+// 1. REFINAMIENTO (CSRF): Iniciar la sesión para acceder al token
 session_start();
 
 // 2. Incluir la conexión a la BD
 require 'db.php';
 
 // 3. Refinamiento de Seguridad: Proteger el script
-// Solo usuarios logueados pueden añadir datos
 if (!isset($_SESSION['user_id'])) {
-    // Si no está logueado, no le damos acceso
     header('Location: index.php');
     exit;
 }
 
 // 4. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // 5. REFINAMIENTO (CSRF): Validar el token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        // Si el token no coincide, es un ataque CSRF o una sesión expirada
+        header('Location: dashboard.php?error=Error de seguridad. Intente de nuevo.');
+        exit;
+    }
     
-    // 5. Obtener el ID del usuario de la sesión
+    // 6. Obtener el ID del usuario de la sesión
     $user_id = $_SESSION['user_id'];
     
-    // 6. Obtener y validar datos del formulario
+    // 7. Obtener y validar datos del formulario
     $peso = $_POST['peso'];
     $altura = $_POST['altura'];
     $fecha_registro = $_POST['fecha_registro'];
 
-    // 7. Refinamiento de Validación: Comprobar que no estén vacíos
+    // 8. Refinamiento de Validación: Comprobar que no estén vacíos
     if (empty($peso) || empty($altura) || empty($fecha_registro)) {
         header('Location: dashboard.php?error=Todos los campos son obligatorios.');
         exit;
     }
 
-    // 8. Convertir a números flotantes (decimales)
+    // 9. Convertir a números flotantes (decimales)
     $peso_num = floatval($peso);
     $altura_num = floatval($altura);
 
-    // 9. Refinamiento de Validación Lógica:
-    // No se puede calcular el IMC si la altura o el peso es 0 o negativo
+    // 10. Refinamiento de Validación Lógica (Peso y Altura):
     if ($peso_num <= 0 || $altura_num <= 0) {
         header('Location: dashboard.php?error=El peso y la altura deben ser valores positivos.');
         exit;
     }
 
-    // 10. Lógica de Negocio: Calcular el IMC
-    // Fórmula: peso / (altura * altura)
+    // 11. REFINAMIENTO: Validación de Fecha
+    try {
+        $fecha_obj = new DateTime($fecha_registro);
+        $hoy = new DateTime(); 
+        
+        if ($fecha_obj > $hoy) {
+            header('Location: dashboard.php?error=La fecha de registro no puede ser en el futuro.');
+            exit;
+        }
+    } catch (Exception $e) {
+        header('Location: dashboard.php?error=El formato de la fecha no es válido.');
+        exit;
+    }
+
+
+    // 12. Lógica de Negocio: Calcular el IMC
     $imc = $peso_num / ($altura_num * $altura_num);
-    // Redondear a 2 decimales
     $imc_redondeado = round($imc, 2);
 
     try {
-        // 11. Refinamiento de Seguridad: Sentencia Preparada (Previene Inyección SQL)
+        // 13. Refinamiento de Seguridad: Sentencia Preparada
         $sql = "INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) 
                 VALUES (:user_id, :peso, :altura, :imc, :fecha_registro)";
         
         $stmt = $pdo->prepare($sql);
         
-        // 12. Ejecutar la inserción
+        // 14. Ejecutar la inserción
         $stmt->execute([
             'user_id' => $user_id,
             'peso' => $peso_num,
@@ -63,18 +80,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'fecha_registro' => $fecha_registro
         ]);
 
-        // 13. Redirección exitosa: Devolver al dashboard
-        // El dashboard se recargará y el script del gráfico (fetch) obtendrá los nuevos datos
+        // 15. Redirección exitosa: Devolver al dashboard
         header('Location: dashboard.php');
         exit;
 
     } catch (PDOException $e) {
-        // 14. Manejar errores de base de datos
+        // 16. REFINAMIENTO: Manejo de Errores de Producción
+        error_log('Error en add_data.php: ' . $e->getMessage());
         header('Location: dashboard.php?error=Error al guardar los datos. Inténtelo de nuevo.');
         exit;
     }
 } else {
-    // 15. Si alguien intenta acceder a add_data.php directamente (GET)
+    // 17. Si alguien intenta acceder a add_data.php directamente (GET)
     header('Location: dashboard.php');
     exit;
 }

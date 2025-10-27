@@ -7,6 +7,14 @@ if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
     exit; // Detener la ejecución del script
 }
+
+// 3. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
+// Genera un token aleatorio y único y lo guarda en la sesión.
+// hash_equals() previene ataques de temporización al comparar tokens.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,8 +32,6 @@ if (isset($_SESSION['user_id'])) {
         .form-group input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
         .btn { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 600; }
         .btn:hover { background-color: #0056b3; }
-        
-        /* Estilos para los mensajes de error y éxito */
         .message { padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; font-size: 14px; }
         .message.error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
         .message.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
@@ -39,7 +45,6 @@ if (isset($_SESSION['user_id'])) {
             <h2>Registro</h2>
             
             <?php 
-            // 3. Refinamiento: Mostrar error de registro (con seguridad)
             if (isset($_GET['reg_error'])): ?>
                 <div class="message error">
                     <?php echo htmlspecialchars($_GET['reg_error']); ?>
@@ -47,6 +52,8 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
 
             <form action="register.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                
                 <div class="form-group">
                     <label for="reg_nombre">Nombre:</label>
                     <input type="text" id="reg_nombre" name="nombre" required>
@@ -61,7 +68,7 @@ if (isset($_SESSION['user_id'])) {
                 </div>
                 <div class="form-group">
                     <label for="reg_password">Contraseña:</label>
-                    <input type="password" id="reg_password" name="password" required minlength="6">
+                    <input type="password" id="reg_password" name="password" required minlength="8">
                 </div>
                 <button type="submit" class="btn">Registrarse</button>
             </form>
@@ -71,7 +78,6 @@ if (isset($_SESSION['user_id'])) {
             <h2>Login</h2>
 
             <?php 
-            // 3. Refinamiento: Mostrar error de login (con seguridad)
             if (isset($_GET['login_error'])): ?>
                 <div class="message error">
                     <?php echo htmlspecialchars($_GET['login_error']); ?>
@@ -79,7 +85,6 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
 
             <?php 
-            // 3. Refinamiento: Mostrar mensaje de éxito (con seguridad)
             if (isset($_GET['success'])): ?>
                 <div class="message success">
                     <?php echo htmlspecialchars($_GET['success']); ?>
@@ -87,6 +92,8 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
 
             <form action="login.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                
                 <div class="form-group">
                     <label for="login_email">Email:</label>
                     <input type="email" id="login_email" name="email" required>

@@ -1,15 +1,22 @@
 <?php
-// 1. Iniciar la sesión ANTES de cualquier salida
-// (Es necesario para acceder a la sesión actual y destruirla)
+// 1. REFINAMIENTO (CSRF): Iniciar la sesión para acceder al token
 session_start();
 
-// 2. Refinamiento: Borrar todas las variables de la sesión
-// Esto vacía el array $_SESSION
+// 2. REFINAMIENTO (CSRF): Validar el token
+// Comprobamos el token enviado por la URL (GET) contra el de la sesión
+if (!isset($_GET['token']) || !hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+    // Si el token no coincide, no cerramos la sesión.
+    // Simplemente redirigimos al dashboard.
+    header('Location: dashboard.php?error=Error de seguridad.');
+    exit;
+}
+
+// --- Si el token es válido, continuamos cerrando la sesión ---
+
+// 3. Refinamiento: Borrar todas las variables de la sesión
 $_SESSION = array();
 
-// 3. Refinamiento: Destruir la cookie de sesión (Opcional pero recomendado)
-// Si la sesión usa cookies (lo estándar), eliminamos la cookie del navegador
-// enviando una con fecha de caducidad en el pasado.
+// 4. Refinamiento: Destruir la cookie de sesión
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -18,10 +25,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// 4. Finalmente, destruir la sesión en el servidor
+// 5. Finalmente, destruir la sesión en el servidor
 session_destroy();
 
-// 5. Redirigir al formulario de login (index.php)
+// 6. Redirigir al formulario de login (index.php)
 header('Location: index.php');
 exit; // Detener el script
 ?>
