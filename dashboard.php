@@ -1,48 +1,58 @@
 <?php
 // 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php';
+require 'db.php'; //
 
 // 2. Iniciar la sesión
-session_start();
+session_start(); //
 
 // 3. Refinamiento de Seguridad: Proteger la página
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit; // Detener la ejecución del script
+if (!isset($_SESSION['user_id'])) { //
+    header('Location: index.php'); //
+    exit; // Detener la ejecución del script //
 }
 
 // 4. Obtener el ID del usuario
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id']; //
 
 // 5. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['csrf_token'])) { //
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); //
 }
-$csrf_token = $_SESSION['csrf_token'];
+$csrf_token = $_SESSION['csrf_token']; //
 
 // 6. Comprobar si debemos mostrar el splash de bienvenida
-$showSplash = false;
-if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) {
-    $showSplash = true;
-    unset($_SESSION['show_welcome_splash']);
+$showSplash = false; //
+if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
+    $showSplash = true; //
+    unset($_SESSION['show_welcome_splash']); //
 }
 
 // 7. Obtener datos del usuario (nombre y foto) para la barra lateral
+$nombreUsuario = ''; // Default empty
+$profilePic = null; // Default null
+$userHasProfilePic = false; // Flag for checking if user has a pic
+
 try {
-    $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id");
-    $stmt->execute(['id' => $user_id]);
-    $usuario = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id"); //
+    $stmt->execute(['id' => $user_id]); //
+    $usuario = $stmt->fetch(); //
 
-    $nombreUsuario = htmlspecialchars($usuario['nombre']);
+    if ($usuario) {
+        $nombreUsuario = htmlspecialchars($usuario['nombre']); //
 
-    $profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
-    if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) {
-        $profilePic = 'uploads/' . $usuario['profile_pic'];
+        if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) { //
+            $profilePic = 'uploads/' . $usuario['profile_pic']; //
+            $userHasProfilePic = true; // Set flag to true
+        }
+    } else {
+         // Fallback if user data couldn't be fetched (should ideally not happen)
+         $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario');
     }
 
+
 } catch (PDOException $e) {
-    $nombreUsuario = htmlspecialchars($_SESSION['user_nombre']);
-    $profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
+    // Fallback if DB query fails
+    $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario'); //
 }
 
 ?>
@@ -56,92 +66,115 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
+    <link rel="stylesheet" href="css/libs/animate.min.css"/>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/wavify@1.0.6/dist/wavify.js"></script>
     <script>
         window.csrfToken = "<?php echo $csrf_token; ?>";
     </script>
 
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .btn-delete { padding: 4px 8px; border-radius: 4px; background-color: #fef2f2; color: #ef4444; font-weight: 500; transition: all 0.3s; }
-        .btn-delete:hover { background-color: #ef4444; color: #ffffff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; } /* */
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; } /* */
+        .btn-delete { padding: 4px 8px; border-radius: 4px; background-color: #fef2f2; color: #ef4444; font-weight: 500; transition: all 0.3s; } /* */
+        .btn-delete:hover { background-color: #ef4444; color: #ffffff; } /* */
 
         .sidebar-profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            background-color: #e0e6ed;
+            width: 40px; /* */
+            height: 40px; /* */
+            border-radius: 50%; /* */
+            object-fit: cover; /* */
+            background-color: #e0e6ed; /* */
+            display: inline-flex; /* */
+            align-items: center; /* */
+            justify-content: center; /* */
+            color: #6B7280; /* */
         }
+         .sidebar-profile-pic img {
+             width: 100%; /* */
+             height: 100%; /* */
+             border-radius: 50%; /* */
+             object-fit: cover; /* */
+         }
 
         :root {
-            --animate-duration: 0.8s;
+            --animate-duration: 0.8s; /* */
         }
 
-        /* ----- INICIO MODIFICACIÓN (Estilos Splash Bienvenida con SVG) ----- */
+        /* ----- INICIO MODIFICACIÓN (Estilos Splash Minimalista) ----- */
         #welcome-splash {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* El fondo ahora será el SVG */
-            background-color: #1a1a2e; /* Fondo oscuro azulado base */
-            overflow: hidden;
+            position: fixed; /* */
+            inset: 0; /* */
+            z-index: 9999; /* */
+            display: flex; /* */
+            align-items: center; /* */
+            justify-content: center; /* */
+            /* Usamos el color de fondo normal de la página */
+            background-color: #F4F7FA; /* background-light */
+            overflow: hidden; /* */
+        }
+        /* Color de fondo para modo oscuro */
+        .dark #welcome-splash {
+             background-color: #1F2937; /* background-dark */
         }
 
-        #waveSvg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1; /* Detrás del texto */
-        }
+        /* Quitamos el SVG */
+        /* #waveSvg { ... } */
 
+        /* Ajustamos el texto */
         #welcome-splash h1 {
-            position: relative;
-            z-index: 2; /* Encima del SVG */
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Sombra más fuerte para contraste */
-            font-size: 3.5rem; /* Más grande */
-            line-height: 1.1;
+            position: relative; /* */
+            z-index: 2; /* */
+             /* Color de texto normal */
+            color: #333333; /* text-light */
+            /* Quitamos sombra */
+            /* text-shadow: 2px 2px 4px rgba(0,0,0,0.7); */
+            font-size: 3rem; /* Tamaño ligeramente más pequeño */
+            line-height: 1.1; /* */
         }
-        @media (min-width: 1024px) { /* lg */
+         /* Color texto modo oscuro */
+        .dark #welcome-splash h1 {
+             color: #F9FAFB; /* text-dark */
+        }
+
+        @media (min-width: 1024px) { /* */
              #welcome-splash h1 {
-                 font-size: 5rem; /* Aún más grande en pantallas grandes */
+                 font-size: 4.5rem; /* */
              }
         }
-
-
-        /* Duración de entrada y pulso (sin cambios) */
-        #welcome-splash .animate__fadeIn {
-             --animate-duration: 1.2s;
-        }
-        #welcome-splash .animate__pulse {
-             --animate-duration: 2s;
-        }
-        /* Duración de salida (sin cambios) */
-        #welcome-splash.animate__fadeOut {
-             --animate-duration: 0.8s;
-             background: transparent; /* Hace que el fondo se desvanezca */
-        }
         /* ----- FIN MODIFICACIÓN ----- */
+
+
+        #welcome-splash .animate__fadeIn {
+             --animate-duration: 1.2s; /* */
+        }
+        /* Quitamos pulso */
+        /* #welcome-splash .animate__pulse { ... } */
+        #welcome-splash.animate__fadeOut {
+             --animate-duration: 0.8s; /* */
+             /* El fondo ya es el de la página, así que no necesitamos hacerlo transparente */
+             /* background: transparent; */
+        }
     </style>
     <script id="tailwind-config">
        tailwind.config = {
          darkMode: "class",
-         theme: { /* ... Tu config de Tailwind ... */ }
+         theme: {
+          extend: {
+            colors: {
+              "primary": "#4A90E2",
+              "background-light": "#F4F7FA", "background-dark": "#1F2937",
+              "content-light": "#ffffff", "content-dark": "#374151",
+              "text-light": "#333333", "text-dark": "#F9FAFB",
+              "border-light": "#E0E6ED", "border-dark": "#4B5563",
+              "subtle-light": "#F4F7FA", "subtle-dark": "#4B5563",
+              "secondary-text-light": "#6B7280", "secondary-text-dark": "#D1D5DB",
+            },
+            fontFamily: { "display": ["Inter", "sans-serif"] },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        }, //
        }
     </script>
 </head>
@@ -149,11 +182,7 @@ try {
 
 <?php if ($showSplash): ?>
     <div id="welcome-splash" class="animate__animated animate__fadeIn">
-        <svg id="waveSvg" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <defs></defs>
-            <path id="wavePath" d=""/>
-        </svg>
-        <h1 class="animate__animated animate__pulse animate__infinite">
+        <h1 class="animate__animated">
             Bienvenido, <?php echo $nombreUsuario; ?>
         </h1>
     </div>
@@ -165,7 +194,13 @@ try {
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
-                <img src="<?php echo $profilePic; ?>?v=<?php echo time(); ?>" alt="Foto de perfil" class="sidebar-profile-pic">
+                 <div class="sidebar-profile-pic">
+                    <?php if ($userHasProfilePic): ?>
+                        <img src="<?php echo $profilePic; ?>?v=<?php echo time(); ?>" alt="Foto de perfil">
+                    <?php else: ?>
+                        <span class="material-symbols-outlined !text-3xl">person</span>
+                    <?php endif; ?>
+                 </div>
                 <div class="flex flex-col">
                     <h1 class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Bienvenido, <?php echo $nombreUsuario; ?></h1>
                 </div>
@@ -289,44 +324,202 @@ try {
 </div> <?php if ($showSplash): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const splash = document.getElementById('welcome-splash');
-        const content = document.getElementById('dashboard-content');
-        const wavePath = document.getElementById('wavePath');
+        const splash = document.getElementById('welcome-splash'); //
+        const content = document.getElementById('dashboard-content'); //
+        // Quitamos la referencia a wavePath
 
-        // ----- INICIO MODIFICACIÓN (Inicializar Wavify) -----
-        if (wavePath) {
-             var wave = wavify(wavePath, {
-                height: 80, // Altura base de la ola
-                bones: 4, // Complejidad de la curva
-                amplitude: 60, // Variación de altura
-                color: 'rgba(74, 144, 226, 0.6)', // Color primario semi-transparente
-                speed: .15 // Velocidad de la animación
-            });
-            // Wavify no necesita ser destruido explícitamente como el canvas
-        }
-        // ----- FIN MODIFICACIÓN -----
+        // Quitamos la inicialización de Wavify
 
-
-        // Lógica para ocultar el splash (sin cambios)
         setTimeout(() => {
-            splash.classList.remove('animate__fadeIn');
-            splash.classList.add('animate__fadeOut');
+            if (splash) { // Añadimos comprobación por si acaso
+                splash.classList.remove('animate__fadeIn'); //
+                splash.classList.add('animate__fadeOut'); //
 
-            splash.addEventListener('animationend', () => {
-                splash.style.display = 'none';
-                content.classList.remove('hidden');
-            }, { once: true });
+                splash.addEventListener('animationend', () => {
+                    splash.style.display = 'none'; //
+                    if(content) content.classList.remove('hidden'); //
+                }, { once: true });
+            } else {
+                 if(content) content.classList.remove('hidden'); // Muestra contenido si no hay splash
+            }
 
-        }, 2200); // Duración total del splash (ajusta si es necesario)
+        }, 2000); // Reducimos ligeramente el tiempo al quitar la onda
     });
 </script>
+<?php else: ?>
+ <script>
+    // Si no hay splash, muestra el contenido directamente
+    document.addEventListener('DOMContentLoaded', function() {
+        const content = document.getElementById('dashboard-content');
+        if (content) {
+            content.classList.remove('hidden');
+        }
+        // Asegurarse de que cargarDatos se llame
+         if (typeof cargarDatos === 'function') {
+            cargarDatos();
+         } else {
+             setTimeout(() => {
+                if (typeof cargarDatos === 'function') {
+                    cargarDatos();
+                }
+            }, 100);
+         }
+    });
+ </script>
 <?php endif; ?>
 
 
 <script>
-    // Script original del dashboard (sin cambios)
-    document.addEventListener('DOMContentLoaded', function() { /* ... */ });
+    // Script original del dashboard
+    let cargarDatos; // Declaración global
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartContainer = document.getElementById('imcChart')?.parentNode; //
+        const tablaBody = document.getElementById('historial-tabla-body'); //
+        const deleteSuccessMessage = document.getElementById('delete-success-message'); //
+        let imcChartInstance = null; //
+
+        function getClasificacionIMC(imc) {
+             if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-600' };
+            if (imc < 25) return { texto: 'Peso Normal', color: 'text-green-600' };
+            if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-600' };
+            if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-600' };
+            if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-600' };
+            return { texto: 'Obesidad III', color: 'text-red-800' }; //
+        }
+
+        // Asignación a la variable global
+        cargarDatos = function() {
+            if (!tablaBody) return; //
+            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td></tr>'; //
+
+            fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken)) //
+                .then(response => {
+                    if (!response.ok) throw new Error('Respuesta de red no fue OK'); //
+                    return response.json(); //
+                })
+                .then(data => {
+                    if (data.error) throw new Error(data.error); //
+
+                    if (imcChartInstance) { //
+                        imcChartInstance.destroy(); //
+                    }
+                    if (!chartContainer) return; //
+
+                    if (data.length === 0) { //
+                        chartContainer.innerHTML = '<p class="text-center text-gray-500">No hay datos registrados todavía.</p>'; //
+                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td></tr>'; //
+                        return;
+                    }
+
+                    const reversedData = [...data].reverse(); //
+                    const labels = reversedData.map(item => item.fecha_registro); //
+                    const imcData = reversedData.map(item => item.imc); //
+
+                    const canvas = document.getElementById('imcChart'); //
+                    if (!canvas) { //
+                        chartContainer.innerHTML = '<canvas id="imcChart"></canvas>'; //
+                    }
+                    const ctx = document.getElementById('imcChart').getContext('2d'); //
+
+
+                    imcChartInstance = new Chart(ctx, { //
+                        type: 'line', //
+                        data: {
+                            labels: labels, //
+                            datasets: [{
+                                label: 'Índice de Masa Corporal (IMC)', //
+                                data: imcData, //
+                                borderColor: 'rgba(74, 144, 226, 1)', //
+                                backgroundColor: 'rgba(74, 144, 226, 0.1)', //
+                                fill: true, //
+                                tension: 0.1 //
+                            }]
+                        },
+                        options: {
+                            responsive: true, //
+                            maintainAspectRatio: false, //
+                            scales: { y: { beginAtZero: false, title: { display: true, text: 'IMC' } } } //
+                        }
+                    });
+
+                    let tableHtml = ''; //
+                    data.forEach(item => { //
+                        const clasificacion = getClasificacionIMC(item.imc); //
+
+                        tableHtml += `
+                            <tr class="hover:bg-subtle-light dark:hover:bg-subtle-dark">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light dark:text-text-dark">${item.fecha_registro}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-text-light dark:text-secondary-text-dark">${item.peso} kg</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-text-light dark:text-secondary-text-dark">${item.altura} m</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${clasificacion.color}">${item.imc}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${clasificacion.color}">${clasificacion.texto}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="btn-delete" data-id="${item.id}" type="button">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        `; //
+                    });
+                    tablaBody.innerHTML = tableHtml; //
+
+                })
+                .catch(error => {
+                    console.error('Error al cargar los datos:', error); //
+                    if (chartContainer) {
+                       chartContainer.innerHTML = '<h2>Error al cargar el gráfico</h2><p>No se pudieron obtener los datos.</p>'; //
+                    }
+                    if (tablaBody) {
+                       tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar los registros.</td></tr>'; //
+                    }
+                });
+        } // Fin de cargarDatos
+
+        if (tablaBody) { //
+            tablaBody.addEventListener('click', function(e) { //
+                 if (e.target.classList.contains('btn-delete')) { //
+                    const button = e.target; //
+                    const metricId = button.getAttribute('data-id'); //
+
+                    if (confirm('¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer.')) { //
+
+                        const url = `delete_data.php?id=${metricId}&token=${encodeURIComponent(window.csrfToken)}`; //
+
+                        fetch(url, {
+                            method: 'GET' //
+                        })
+                        .then(response => response.json()) //
+                        .then(result => {
+                            if (result.success) { //
+                                cargarDatos(); //
+                                if (deleteSuccessMessage) { //
+                                    deleteSuccessMessage.classList.remove('hidden'); //
+                                    setTimeout(() => { //
+                                        deleteSuccessMessage.classList.add('hidden'); //
+                                    }, 3000); //
+                                }
+                            } else {
+                                alert('Error al eliminar: ' + (result.error || 'Error desconocido')); //
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error en fetch delete:', err); //
+                            alert('Error de conexión al intentar eliminar.'); //
+                        });
+                    }
+                }
+            });
+        }
+
+        // Llamar a cargarDatos solo si el splash NO se está mostrando inicialmente
+        if (!<?php echo json_encode($showSplash); ?>) {
+           cargarDatos();
+        }
+
+    });
 </script>
+
 
 </body>
 </html>
