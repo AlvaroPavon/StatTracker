@@ -1,38 +1,49 @@
-<?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php';
+<?php declare(strict_types=1);
 
-// 2. Iniciar la sesión
-session_start();
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// 3. Refinamiento de Seguridad: Proteger la página
-if (!isset($_SESSION['user_id'])) {
+use App\Database;
+use App\Session;
+use App\User;
+use PDOException;
+
+Session::init();
+
+// 1. Autenticación
+if (!Session::has('user_id')) {
     header('Location: index.php');
-    exit; // Detener la ejecución del script
+    exit;
 }
 
-// 4. Obtener el ID del usuario
-$user_id = $_SESSION['user_id'];
+$user_id = Session::get('user_id');
 
-// 5. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+// 2. Generar Token CSRF para los formularios
+$csrf_token = Session::generateCsrfToken();
 
-// 6. Obtener TODOS los datos del usuario para rellenar el formulario
+// 3. Obtener TODOS los datos del usuario para rellenar el formulario
+$nombreUsuario = '';
+$apellidosUsuario = '';
+$emailUsuario = '';
+$profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4='; // Default SVG
+
 try {
-    $stmt = $pdo->prepare("SELECT nombre, apellidos, email, profile_pic FROM usuarios WHERE id = :id");
-    $stmt->execute(['id' => $user_id]);
-    $usuario = $stmt->fetch();
+    $pdo = Database::getInstance();
+    $userRepo = new User($pdo);
+    $usuario = $userRepo->findById((int)$user_id);
     
-    $nombreUsuario = htmlspecialchars($usuario['nombre']);
-    $apellidosUsuario = htmlspecialchars($usuario['apellidos']);
-    $emailUsuario = htmlspecialchars($usuario['email']);
-    
-    $profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4=';
-    if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) {
-        $profilePic = 'uploads/' . $usuario['profile_pic'];
+    if ($usuario) {
+        $nombreUsuario = htmlspecialchars($usuario['nombre']);
+        $apellidosUsuario = htmlspecialchars($usuario['apellidos']);
+        $emailUsuario = htmlspecialchars($usuario['email']);
+        
+        if (!empty($usuario['profile_pic']) && file_exists(__DIR__ . '/uploads/' . $usuario['profile_pic'])) {
+            $profilePic = 'uploads/' . $usuario['profile_pic'];
+        }
+    } else {
+        // Esto no debería pasar si la sesión es válida, pero es un buen fallback
+        Session::destroy();
+        header('Location: index.php?login_error=Error de usuario.');
+        exit;
     }
 
 } catch (PDOException $e) {
@@ -97,11 +108,9 @@ try {
             border-color: #4A90E2;
         }
         
-        /* ----- INICIO MODIFICACIÓN (Velocidad de animación) ----- */
         :root {
             --animate-duration: 0.8s;
         }
-        /* ----- FIN MODIFICACIÓN ----- */
     </style>
     <script id="tailwind-config">
       tailwind.config = {
@@ -177,7 +186,6 @@ try {
                 <?php echo htmlspecialchars($_GET['success']); ?>
             </div>
         <?php endif; ?>
-
 
         <section class="rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark
                         transition-all duration-300 hover:shadow-xl hover:-translate-y-1

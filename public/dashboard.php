@@ -1,58 +1,54 @@
-<?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php'; //
+<?php declare(strict_types=1);
 
-// 2. Iniciar la sesión
-session_start(); //
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// 3. Refinamiento de Seguridad: Proteger la página
-if (!isset($_SESSION['user_id'])) { //
-    header('Location: index.php'); //
-    exit; // Detener la ejecución del script //
+use App\Database;
+use App\Session;
+use App\User; // <-- CORRECCIÓN: Asegúrate de que aquí dice "User", NO "Auth"
+
+Session::init();
+
+// 1. Autenticación
+if (!Session::has('user_id')) {
+    header('Location: index.php');
+    exit;
 }
 
-// 4. Obtener el ID del usuario
-$user_id = $_SESSION['user_id']; //
+$user_id = Session::get('user_id');
 
-// 5. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
-if (empty($_SESSION['csrf_token'])) { //
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); //
-}
-$csrf_token = $_SESSION['csrf_token']; //
+// 2. Generar Token CSRF para los formularios y peticiones AJAX
+$csrf_token = Session::generateCsrfToken();
 
-// 6. Comprobar si debemos mostrar el splash de bienvenida
-$showSplash = false; //
-if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
-    $showSplash = true; //
-    unset($_SESSION['show_welcome_splash']); //
+// 3. Comprobar splash de bienvenida
+$showSplash = Session::get('show_welcome_splash', false);
+if ($showSplash) {
+    Session::remove('show_welcome_splash'); // Mostrar solo una vez
 }
 
-// 7. Obtener datos del usuario (nombre y foto) para la barra lateral
-$nombreUsuario = ''; // Default empty
-$profilePic = null; // Default null
-$userHasProfilePic = false; // Flag for checking if user has a pic
+// 4. Obtener datos del usuario para la vista
+$nombreUsuario = Session::get('user_nombre', 'Usuario'); // Fallback
+$profilePic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzZCNzI4MCI+CiAgPHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPgo8L3N2Zz4='; // Default SVG
+$userHasProfilePic = false;
 
 try {
-    $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id"); //
-    $stmt->execute(['id' => $user_id]); //
-    $usuario = $stmt->fetch(); //
+    $pdo = Database::getInstance();
+    $userRepo = new User($pdo); // <-- CORRECCIÓN: Debe ser "new User($pdo)", NO "new Auth($pdo)"
+    $usuario = $userRepo->findById((int)$user_id); // <-- CORRECCIÓN: Llama a la función de $userRepo
 
     if ($usuario) {
-        $nombreUsuario = htmlspecialchars($usuario['nombre']); //
-
-        if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) { //
-            $profilePic = 'uploads/' . $usuario['profile_pic']; //
-            $userHasProfilePic = true; // Set flag to true
+        $nombreUsuario = htmlspecialchars($usuario['nombre']);
+        // Actualizar sesión por si cambió en otro lugar
+        Session::set('user_nombre', $usuario['nombre']); 
+        
+        if (!empty($usuario['profile_pic']) && file_exists(__DIR__ . '/uploads/' . $usuario['profile_pic'])) {
+            $profilePic = 'uploads/' . $usuario['profile_pic'];
+            $userHasProfilePic = true;
         }
-    } else {
-         // Fallback if user data couldn't be fetched (should ideally not happen)
-         $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario');
     }
 
-
 } catch (PDOException $e) {
-    // Fallback if DB query fails
-    $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario'); //
+    // No fatal, solo loguear. Ya tenemos el nombre de la sesión.
+    error_log('Error en dashboard.php (get user): ' . $e->getMessage());
 }
 
 ?>
@@ -313,7 +309,7 @@ try {
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Altura</th>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">IMC</th>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Clasificación</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Acciones</th>
+                        <th scope="col" classs="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Acciones</th>
                     </tr>
                     </thead>
                     <tbody id="historial-tabla-body" class="divide-y divide-border-light dark:divide-border-dark">
@@ -323,51 +319,47 @@ try {
         </section>
     </div>
 </main>
-</div> <?php if ($showSplash): ?>
+</div> 
+
+<?php if ($showSplash): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const splash = document.getElementById('welcome-splash'); //
-        const content = document.getElementById('dashboard-content'); //
-        // Quitamos la referencia a wavePath
-
-        // Quitamos la inicialización de Wavify
+        const splash = document.getElementById('welcome-splash');
+        const content = document.getElementById('dashboard-content');
 
         setTimeout(() => {
-            if (splash) { // Añadimos comprobación por si acaso
-                splash.classList.remove('animate__fadeIn'); //
-                splash.classList.add('animate__fadeOut'); //
+            if (splash) {
+                splash.classList.remove('animate__fadeIn');
+                splash.classList.add('animate__fadeOut');
 
                 splash.addEventListener('animationend', () => {
-                    splash.style.display = 'none'; //
-                    if(content) content.classList.remove('hidden'); //
+                    splash.style.display = 'none';
+                    if(content) content.classList.remove('hidden');
                     
-                    // ----- INICIO DE LA MODIFICACIÓN (Arreglar bug) -----
-                    // Llamamos a cargarDatos() DESPUÉS de mostrar el contenido
+                    // Asegurarnos de llamar a cargarDatos después de la animación
                     if (typeof cargarDatos === 'function') {
                         cargarDatos();
                     }
-                    // ----- FIN DE LA MODIFICACIÓN -----
-
                 }, { once: true });
             } else {
-                 if(content) content.classList.remove('hidden'); // Muestra contenido si no hay splash
+                 if(content) content.classList.remove('hidden');
             }
-
-        }, 2000); // Reducimos ligeramente el tiempo al quitar la onda
+        }, 2000); 
     });
 </script>
 <?php else: ?>
  <script>
-    // Si no hay splash, muestra el contenido directamente
+    // Si no hay splash, muestra contenido y carga datos
     document.addEventListener('DOMContentLoaded', function() {
         const content = document.getElementById('dashboard-content');
         if (content) {
             content.classList.remove('hidden');
         }
-        // Asegurarse de que cargarDatos se llame
+         // Asegurarse de que cargarDatos se llame
          if (typeof cargarDatos === 'function') {
             cargarDatos();
          } else {
+             // Fallback por si el script principal carga después
              setTimeout(() => {
                 if (typeof cargarDatos === 'function') {
                     cargarDatos();
@@ -380,14 +372,14 @@ try {
 
 
 <script>
-    // Script original del dashboard
+    // Script principal del dashboard
     let cargarDatos; // Declaración global
 
     document.addEventListener('DOMContentLoaded', function() {
-        const chartContainer = document.getElementById('imcChart')?.parentNode; //
-        const tablaBody = document.getElementById('historial-tabla-body'); //
-        const deleteSuccessMessage = document.getElementById('delete-success-message'); //
-        let imcChartInstance = null; //
+        const chartContainer = document.getElementById('imcChart')?.parentNode;
+        const tablaBody = document.getElementById('historial-tabla-body');
+        const deleteSuccessMessage = document.getElementById('delete-success-message');
+        let imcChartInstance = null;
 
         function getClasificacionIMC(imc) {
              if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-600' };
@@ -395,67 +387,70 @@ try {
             if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-600' };
             if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-600' };
             if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-600' };
-            return { texto: 'Obesidad III', color: 'text-red-800' }; //
+            return { texto: 'Obesidad III', color: 'text-red-800' };
         }
 
         // Asignación a la variable global
         cargarDatos = function() {
-            if (!tablaBody) return; //
-            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td></tr>'; //
+            if (!tablaBody) return;
+            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td></tr>';
 
-            fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken)) //
+            // El fetch ahora usa la variable global window.csrfToken
+            fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken))
                 .then(response => {
-                    if (!response.ok) throw new Error('Respuesta de red no fue OK'); //
-                    return response.json(); //
+                    if (!response.ok) {
+                        // Si la respuesta no es OK, intentar leer el error JSON
+                        return response.json().then(err => { throw new Error(err.error || `Error ${response.status}`); });
+                    }
+                    return response.json();
                 })
                 .then(data => {
-                    if (data.error) throw new Error(data.error); //
+                    if (data.error) throw new Error(data.error); // Capturar errores lógicos de la API
 
-                    if (imcChartInstance) { //
-                        imcChartInstance.destroy(); //
+                    if (imcChartInstance) {
+                        imcChartInstance.destroy();
                     }
-                    if (!chartContainer) return; //
+                    if (!chartContainer) return;
 
-                    if (data.length === 0) { //
-                        chartContainer.innerHTML = '<p class="text-center text-gray-500">No hay datos registrados todavía.</p>'; //
-                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td></tr>'; //
+                    if (data.length === 0) {
+                        chartContainer.innerHTML = '<p class="text-center text-gray-500">No hay datos registrados todavía.</p>';
+                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td></tr>';
                         return;
                     }
 
-                    const reversedData = [...data].reverse(); //
-                    const labels = reversedData.map(item => item.fecha_registro); //
-                    const imcData = reversedData.map(item => item.imc); //
+                    const reversedData = [...data].reverse();
+                    const labels = reversedData.map(item => item.fecha_registro);
+                    const imcData = reversedData.map(item => item.imc);
 
-                    const canvas = document.getElementById('imcChart'); //
-                    if (!canvas) { //
-                        chartContainer.innerHTML = '<canvas id="imcChart"></canvas>'; //
+                    const canvas = document.getElementById('imcChart');
+                    if (!canvas) {
+                        chartContainer.innerHTML = '<canvas id="imcChart"></canvas>';
                     }
-                    const ctx = document.getElementById('imcChart').getContext('2d'); //
+                    const ctx = document.getElementById('imcChart').getContext('2d');
 
-
-                    imcChartInstance = new Chart(ctx, { //
-                        type: 'line', //
+                    imcChartInstance = new Chart(ctx, {
+                        type: 'line',
                         data: {
-                            labels: labels, //
+                            labels: labels,
                             datasets: [{
-                                label: 'Índice de Masa Corporal (IMC)', //
-                                data: imcData, //
-                                borderColor: 'rgba(74, 144, 226, 1)', //
-                                backgroundColor: 'rgba(74, 144, 226, 0.1)', //
-                                fill: true, //
-                                tension: 0.1 //
+                                label: 'Índice de Masa Corporal (IMC)',
+                                data: imcData,
+                                borderColor: 'rgba(74, 144, 226, 1)',
+                                backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                                fill: true,
+                                tension: 0.1
                             }]
                         },
                         options: {
-                            responsive: true, //
-                            maintainAspectRatio: false, //
-                            scales: { y: { beginAtZero: false, title: { display: true, text: 'IMC' } } } //
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: false, title: { display: true, text: 'IMC' } } }
                         }
                     });
 
-                    let tableHtml = ''; //
-                    data.forEach(item => { //
-                        const clasificacion = getClasificacionIMC(item.imc); //
+                    let tableHtml = '';
+                    data.forEach(item => {
+                        const clasificacion = getClasificacionIMC(item.imc);
 
                         tableHtml += `
                             <tr class="hover:bg-subtle-light dark:hover:bg-subtle-dark">
@@ -470,66 +465,66 @@ try {
                                     </button>
                                 </td>
                             </tr>
-                        `; //
+                        `;
                     });
-                    tablaBody.innerHTML = tableHtml; //
+                    tablaBody.innerHTML = tableHtml;
 
                 })
                 .catch(error => {
-                    console.error('Error al cargar los datos:', error); //
+                    console.error('Error al cargar los datos:', error);
+                    let errorMsg = error.message.includes('Token') ? 'Error de seguridad. Recargue la página.' : 'Error al cargar los registros.';
+                    
                     if (chartContainer) {
-                       chartContainer.innerHTML = '<h2>Error al cargar el gráfico</h2><p>No se pudieron obtener los datos.</p>'; //
+                       chartContainer.innerHTML = `<p class="text-center text-red-500">${errorMsg}</p>`;
                     }
                     if (tablaBody) {
-                       tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar los registros.</td></tr>'; //
+                       tablaBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">${errorMsg}</td></tr>`;
                     }
                 });
         } // Fin de cargarDatos
 
-        if (tablaBody) { //
-            tablaBody.addEventListener('click', function(e) { //
-                 if (e.target.classList.contains('btn-delete')) { //
-                    const button = e.target; //
-                    const metricId = button.getAttribute('data-id'); //
+        if (tablaBody) {
+            tablaBody.addEventListener('click', function(e) {
+                 if (e.target.classList.contains('btn-delete')) {
+                    const button = e.target;
+                    const metricId = button.getAttribute('data-id');
 
-                    if (confirm('¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer.')) { //
+                    if (confirm('¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer.')) {
+                        
+                        // El fetch ahora usa la variable global window.csrfToken
+                        const url = `delete_data.php?id=${metricId}&token=${encodeURIComponent(window.csrfToken)}`;
 
-                        const url = `delete_data.php?id=${metricId}&token=${encodeURIComponent(window.csrfToken)}`; //
-
-                        fetch(url, {
-                            method: 'GET' //
-                        })
-                        .then(response => response.json()) //
+                        fetch(url, { method: 'GET' }) // Podría ser 'DELETE' si el servidor lo acepta
+                        .then(response => response.json())
                         .then(result => {
-                            if (result.success) { //
-                                cargarDatos(); //
-                                if (deleteSuccessMessage) { //
-                                    deleteSuccessMessage.classList.remove('hidden'); //
-                                    setTimeout(() => { //
-                                        deleteSuccessMessage.classList.add('hidden'); //
-                                    }, 3000); //
+                            if (result.success) {
+                                cargarDatos(); // Recargar datos
+                                if (deleteSuccessMessage) {
+                                    deleteSuccessMessage.classList.remove('hidden');
+                                    setTimeout(() => {
+                                        deleteSuccessMessage.classList.add('hidden');
+                                    }, 3000);
                                 }
                             } else {
-                                alert('Error al eliminar: ' + (result.error || 'Error desconocido')); //
+                                alert('Error al eliminar: ' + (result.error || 'Error desconocido'));
                             }
                         })
                         .catch(err => {
-                            console.error('Error en fetch delete:', err); //
-                            alert('Error de conexión al intentar eliminar.'); //
+                            console.error('Error en fetch delete:', err);
+                            alert('Error de conexión al intentar eliminar.');
                         });
                     }
                 }
             });
         }
 
-        // Llamar a cargarDatos solo si el splash NO se está mostrando inicialmente
+        // Llamar a cargarDatos solo si el splash NO se está mostrando
         if (!<?php echo json_encode($showSplash); ?>) {
            cargarDatos();
         }
 
     });
 </script>
-
 
 </body>
 </html>

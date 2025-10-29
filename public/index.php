@@ -1,21 +1,22 @@
-<?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php';
+<?php declare(strict_types=1);
 
-// 2. Iniciar la sesión
-session_start();
+// 1. Cargar el Autoloader de Composer
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// 3. Refinamiento: Redirigir si el usuario ya está logueado
-if (isset($_SESSION['user_id'])) {
+// 2. Usar las clases que necesitamos
+use App\Session;
+
+// 3. Iniciar la sesión de forma segura
+Session::init();
+
+// 4. Refinamiento: Redirigir si el usuario ya está logueado
+if (Session::has('user_id')) {
     header('Location: dashboard.php');
-    exit; // Detener la ejecución del script
+    exit;
 }
 
-// 4. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+// 5. Generar Token CSRF usando nuestra clase de Sesión
+$csrf_token = Session::generateCsrfToken();
 ?>
 <!DOCTYPE html>
 <html lang="es">
