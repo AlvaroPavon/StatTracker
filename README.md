@@ -1,38 +1,76 @@
-# StatTracker: Tu Rastreador de Progreso Físico
+# StatTracker: Tu Rastreador de Progreso Físico 📊
 
-Un sencillo pero potente rastreador para monitorizar tu peso y estatura a lo largo del tiempo. Registra tus datos de forma local y visualiza tu progreso con un cronograma claro y ordenado por fecha.
+<p align="center">
+  <span style="font-size: 80px;">⚖️</span> </p>
+
+Una aplicación web para monitorizar tu peso, estatura e Índice de Masa Corporal (IMC) a lo largo del tiempo. Registra tus métricas, gestiona tu perfil y visualiza tu progreso con gráficos y tablas. ¡Cuida tu salud día a día! 💪
 
 ---
 
 ## 📝 Descripción
 
-StatTracker es una aplicación web/móvil diseñada para usuarios que desean llevar un control de su progreso físico sin la necesidad de crear cuentas o iniciar sesión. Simplemente introduce tu nombre, apellido, peso y estatura, y la aplicación guardará tu historial en tu propio dispositivo, permitiéndote ver cómo evolucionan tus métricas a lo largo del tiempo.
+StatTracker es una aplicación web intuitiva diseñada para que puedas llevar un control detallado de tus métricas físicas (peso, altura, IMC) de forma sencilla y segura. La aplicación requiere registro y autenticación para proteger tu información. Una vez dentro, podrás:
 
-El objetivo principal es ofrecer una herramienta rápida, privada y fácil de usar.
+* Registrar nuevas mediciones.
+* Consultar tu historial completo.
+* Visualizar la evolución de tu IMC en un gráfico interactivo. 📈
+* Actualizar tus datos personales (¡incluyendo tu foto de perfil! 📸).
+* Cambiar tu contraseña de forma segura.
+
+Construida con PHP y MySQL, y con un diseño moderno gracias a Tailwind CSS y Chart.js.
+
+---
 
 ## ✨ Características Principales
 
-* **Sin Cuentas ni Login:** Empieza a usar la aplicación al instante. Tu privacidad es lo primero.
-* **Almacenamiento Local:** Todos tus datos se guardan de forma segura en tu propio dispositivo.
-* **Registro Sencillo:** Un formulario intuitivo para registrar tu nombre, apellido, peso y estatura.
-* **Cálculo de IMC Automático:** La aplicación calcula tu Índice de Masa Corporal (IMC) con cada nuevo registro.
-* **Cronograma de Progreso:** Visualiza tu historial completo en una tabla ordenada cronológicamente para ver tu evolución.
+* **👤 Sistema de Usuarios:** Registro seguro y autenticación (login/logout).
+* **✏️ Gestión de Perfil:** Actualiza tu nombre, apellidos, email y foto de perfil fácilmente.
+* **🔑 Cambio de Contraseña:** Modifica tu contraseña cuando lo necesites con seguridad.
+* **📏 Registro de Métricas:** Formulario simple para añadir peso, altura y fecha.
+* **⚖️ Cálculo de IMC Automático:** El IMC se calcula y guarda con cada registro. ¡Sin complicaciones!
+* **📈 Dashboard Visual:**
+    * Gráfico dinámico que muestra la evolución de tu IMC.
+    * Tabla clara con tu historial de registros, incluyendo clasificación del IMC (Bajo Peso, Normal, Sobrepeso...).
+* **🗑️ Eliminación de Registros:** ¿Un error? Elimina registros individuales fácilmente.
+* **🔒 Seguridad:**
+    * Contraseñas cifradas (bcrypt). 🛡️
+    * Protección Anti-CSRF con tokens.
+    * Configuración de sesión segura (HttpOnly, UseOnlyCookies).
+    * Sentencias preparadas (PDO) contra Inyección SQL.
+    * Validaciones robustas en el servidor. ✅
+* **🎨 Interfaz de Usuario:** Diseño moderno y *responsive* con Tailwind CSS, animaciones suaves y pantallas de bienvenida. ✨
+
+---
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **Frontend:** [ HTML5, CSS3, JavaScript]
-* **Almacenamiento:** [ LocalStorage API del navegador]
+* **Backend:** PHP
+* **Base de Datos:** MySQL (con PDO)
+* **Frontend:** HTML5, Tailwind CSS (vía CDN), JavaScript
+* **Librerías JS:**
+    * Chart.js (gráficos) 📊
+    * Animate.css (animaciones) 🎬
+
+---
 
 ## 🗺️ Hoja de Ruta (Roadmap)
 
-Este es el plan de desarrollo actual, gestionado a través de nuestro [tablero Kanban del proyecto](https://github.com/users/AlvaroPavon/projects/2).
+Estado actual del proyecto y próximos pasos:
 
--   [ ] **(MVP)** Formulario de entrada de datos y validaciones.
--   [ ] **(MVP)** Lógica para guardar y recuperar registros del almacenamiento local.
--   [ ] **(MVP)** Visualización del historial en una tabla ordenada por fecha.
--   [ ] Cálculo e inclusión del IMC en los registros.
--   [ ] **(Mejora Futura)** Implementación de un gráfico de líneas para visualizar el progreso del peso.
--   [ ] **(Mejora Futura)** Opción para exportar los datos a un archivo CSV.
-
+* [x] **(MVP)** Sistema de registro y login.
+* [x] **(MVP)** Base de datos funcional.
+* [x] **(MVP)** Formulario de registro de métricas.
+* [x] **(MVP)** Guardado y recuperación de datos.
+* [x] **(MVP)** Tabla de historial.
+* [x] Cálculo e inclusión del IMC.
+* [x] Gráfico de evolución del IMC.
+* [x] Funcionalidad de eliminación.
+* [x] Sección de perfil (actualizar datos + foto).
+* [x] Cambio de contraseña.
+* [x] Medidas de seguridad implementadas.
+* [ ] **(Mejora)** Exportar datos a CSV. 📄
+* [ ] **(Mejora)** Usar Tailwind CSS con PostCSS/CLI (¡adiós CDN en producción!). 🚀
+* [ ] **(Mejora)** Añadir más gráficos (ej. evolución del peso). 🧐
+* [ ] **(Mejora)** Implementar pruebas unitarias/integración. ✔️
 
 ---
