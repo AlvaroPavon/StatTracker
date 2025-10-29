@@ -1,22 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
+require 'db.php';
 
-// 1. Cargar Autoloader
-require_once __DIR__ . '/../vendor/autoload.php';
+// 2. Iniciar la sesión
+session_start();
 
-// 2. Usar Clases
-use App\Session;
-
-// 3. Iniciar Sesión Segura
-Session::init();
-
-// 4. Redirigir si ya está logueado
-if (Session::has('user_id')) {
+// 3. Refinamiento: Redirigir si el usuario ya está logueado
+if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
     exit;
 }
 
-// 5. Generar Token CSRF
-$csrf_token = Session::generateCsrfToken();
+// 4. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -149,7 +148,7 @@ $csrf_token = Session::generateCsrfToken();
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600 dark:text-gray-300">
                 ¿Ya tienes una cuenta? <a class="font-medium text-primary hover:underline" href="index.php">Inicia sesión aquí</a>
-            </Crea Tu Cuentaa>
+            </p>
         </div>
     </div>
     </div>
