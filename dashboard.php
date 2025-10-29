@@ -66,8 +66,10 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 
-    <link rel="stylesheet" href="css/libs/animate.min.css"/>
-
+    <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -338,6 +340,14 @@ try {
                 splash.addEventListener('animationend', () => {
                     splash.style.display = 'none'; //
                     if(content) content.classList.remove('hidden'); //
+                    
+                    // ----- INICIO DE LA MODIFICACIÓN (Arreglar bug) -----
+                    // Llamamos a cargarDatos() DESPUÉS de mostrar el contenido
+                    if (typeof cargarDatos === 'function') {
+                        cargarDatos();
+                    }
+                    // ----- FIN DE LA MODIFICACIÓN -----
+
                 }, { once: true });
             } else {
                  if(content) content.classList.remove('hidden'); // Muestra contenido si no hay splash
