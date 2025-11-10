@@ -87,12 +87,18 @@ try {
             height: 40px; /* */
             border-radius: 50%; /* */
             object-fit: cover; /* */
-            background-color: #e0e6ed; /* */
+            /* MODIFICADO: Fondo de icono de perfil transparente */
+            background-color: rgba(255, 255, 255, 0.2); /* */
             display: inline-flex; /* */
             align-items: center; /* */
             justify-content: center; /* */
-            color: #6B7280; /* */
+            color: #1F2937; /* */
         }
+        .dark .sidebar-profile-pic {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: #E5E7EB;
+        }
+
          .sidebar-profile-pic img {
              width: 100%; /* */
              height: 100%; /* */
@@ -112,26 +118,16 @@ try {
             display: flex; /* */
             align-items: center; /* */
             justify-content: center; /* */
-            /* Usamos el color de fondo normal de la página */
-            background-color: #F4F7FA; /* background-light */
+            /* MODIFICADO: Se quita el fondo sólido, se aplicará por Tailwind */
             overflow: hidden; /* */
         }
-        /* Color de fondo para modo oscuro */
-        .dark #welcome-splash {
-             background-color: #1F2937; /* background-dark */
-        }
-
-        /* Quitamos el SVG */
-        /* #waveSvg { ... } */
 
         /* Ajustamos el texto */
         #welcome-splash h1 {
             position: relative; /* */
             z-index: 2; /* */
-             /* Color de texto normal */
-            color: #333333; /* text-light */
-            /* Quitamos sombra */
-            /* text-shadow: 2px 2px 4px rgba(0,0,0,0.7); */
+             /* MODIFICADO: Color de texto */
+            color: #111827; /* text-gray-900 */
             font-size: 3rem; /* Tamaño ligeramente más pequeño */
             line-height: 1.1; /* */
         }
@@ -151,13 +147,32 @@ try {
         #welcome-splash .animate__fadeIn {
              --animate-duration: 1.2s; /* */
         }
-        /* Quitamos pulso */
-        /* #welcome-splash .animate__pulse { ... } */
         #welcome-splash.animate__fadeOut {
              --animate-duration: 0.8s; /* */
-             /* El fondo ya es el de la página, así que no necesitamos hacerlo transparente */
-             /* background: transparent; */
         }
+
+        /* ----- INICIO MODIFICACIÓN (Estilo "Gota de Agua") ----- */
+        .glass-card {
+            /* Fondo casi transparente */
+            background-color: rgba(255, 255, 255, 0.1);
+            
+            /* El efecto de desenfoque (muy intenso) */
+            -webkit-backdrop-filter: blur(35px); /* Safari */
+            backdrop-filter: blur(35px);
+            
+            /* Borde brillante muy sutil */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dark .glass-card {
+            /* Fondo oscuro casi transparente */
+            background-color: rgba(31, 41, 55, 0.1); /* Tono oscuro semitransparente */
+            
+            /* Borde oscuro más sutil */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* ----- FIN MODIFICACIÓN ----- */
+
     </style>
     <script id="tailwind-config">
        tailwind.config = {
@@ -166,12 +181,11 @@ try {
           extend: {
             colors: {
               "primary": "#4A90E2",
-              "background-light": "#F4F7FA", "background-dark": "#1F2937",
-              "content-light": "#ffffff", "content-dark": "#374151",
+              /* MODIFICADO: Se quitan los colores de fondo y contenido, ya que ahora usamos el gradiente y el 'glass' */
               "text-light": "#333333", "text-dark": "#F9FAFB",
               "border-light": "#E0E6ED", "border-dark": "#4B5563",
-              "subtle-light": "#F4F7FA", "subtle-dark": "#4B5563",
-              "secondary-text-light": "#6B7280", "secondary-text-dark": "#D1D5DB",
+              "subtle-light": "rgba(255, 255, 255, 0.1)", "subtle-dark": "rgba(0, 0, 0, 0.1)",
+              "secondary-text-light": "#374151", "secondary-text-dark": "#D1D5DB",
             },
             fontFamily: { "display": ["Inter", "sans-serif"] },
             borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
@@ -180,19 +194,18 @@ try {
        }
     </script>
 </head>
-<body class="font-display bg-background-light dark:bg-background-dark">
+<body class="font-display text-gray-900 dark:text-gray-100 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
 
 <?php if ($showSplash): ?>
-    <div id="welcome-splash" class="animate__animated animate__fadeIn">
+    <div id="welcome-splash" class="animate__animated animate__fadeIn bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
         <h1 class="animate__animated">
             Bienvenido, <?php echo $nombreUsuario; ?>
         </h1>
     </div>
 <?php endif; ?>
 
-<div id="dashboard-content" class="flex h-screen w-full <?php echo $showSplash ? 'hidden' : ''; ?>">
-
-<aside class="flex w-64 flex-col border-r border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark">
+<div id="dashboard-content" class="flex h-screen w-full hidden">
+<aside class="flex w-64 flex-col glass-card m-4 rounded-xl">
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
@@ -204,7 +217,7 @@ try {
                     <?php endif; ?>
                  </div>
                 <div class="flex flex-col">
-                    <h1 class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Bienvenido, <?php echo $nombreUsuario; ?></h1>
+                    <h1 class="text-gray-900 dark:text-gray-100 text-base font-medium leading-normal">Bienvenido, <?php echo $nombreUsuario; ?></h1>
                 </div>
             </div>
             <nav class="flex flex-col gap-2">
@@ -212,14 +225,14 @@ try {
                     <span class="material-symbols-outlined fill">dashboard</span>
                     <p class="text-sm font-medium leading-normal">Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300" href="profile.php">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-900 dark:text-gray-100 hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300" href="profile.php">
                     <span class="material-symbols-outlined">person</span>
                     <p class="text-sm font-medium leading-normal">Perfil</p>
                 </a>
             </nav>
         </div>
-        <div class="flex flex-col gap-1 border-t border-border-light dark:border-border-dark pt-4">
-            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-light dark:text-text-dark hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300"
+        <div class="flex flex-col gap-1 border-t border-white/20 dark:border-white/10 pt-4">
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-900 dark:text-gray-100 hover:bg-subtle-light dark:hover:bg-subtle-dark transition-all duration-300"
                href="logout.php?token=<?php echo $csrf_token; ?>">
                 <span class="material-symbols-outlined">logout</span>
                 <p class="text-sm font-medium leading-normal">Cerrar Sesión</p>
@@ -228,21 +241,21 @@ try {
     </div>
 </aside>
 <main class="flex-1 flex-col overflow-y-auto">
-   <div class="p-8">
+   <div class="p-4 md:p-8">
         <header class="flex flex-wrap items-center justify-between gap-4 pb-6
                        animate__animated animate__fadeInDown">
             <div class="flex min-w-72 flex-col gap-1">
-                <h1 class="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Tu Progreso</h1>
-                <p class="text-secondary-text-light dark:text-secondary-text-dark text-base font-normal leading-normal">Registra y visualiza tu IMC</p>
+                <h1 class="text-gray-900 dark:text-gray-100 text-3xl font-bold leading-tight tracking-tight">Tu Progreso</h1>
+                <p class="text-gray-700 dark:text-gray-300 text-base font-normal leading-normal">Registra y visualiza tu IMC</p>
             </div>
         </header>
 
         <section class="flex flex-wrap gap-8 py-4
                         animate__animated animate__fadeInUp">
 
-            <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark p-6
-                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <p class="text-text-light dark:text-text-dark text-lg font-medium leading-normal">Evolución de tu IMC</G>
+            <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl p-6
+                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1 glass-card">
+                <p class="text-gray-900 dark:text-gray-100 text-lg font-medium leading-normal">Evolución de tu IMC</G>
 
                 <div class="flex min-h-[300px] flex-1 flex-col gap-8 py-4">
                     <canvas id="imcChart"></canvas>
@@ -250,17 +263,17 @@ try {
             </div>
 
             <div class="w-full lg:w-96 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-xl">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm h-full">
-                    <h2 class="text-xl font-bold mb-4">Registrar Nuevo Peso</h2>
+                <div class="p-6 rounded-xl shadow-sm h-full glass-card">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Registrar Nuevo Peso</h2>
 
                     <?php if (isset($_GET['error'])): ?>
-                        <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert">
+                        <div class="mb-4 p-4 text-sm text-red-900 dark:text-red-100 bg-red-500/20 rounded-lg border border-red-500/30" role="alert">
                             <?php echo htmlspecialchars($_GET['error']); ?>
                         </div>
                     <?php endif; ?>
 
                     <div id="delete-success-message"
-                         class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-300 hidden"
+                         class="mb-4 p-4 text-sm text-green-900 dark:text-green-100 bg-green-500/20 rounded-lg border border-green-500/30 hidden"
                          role="alert">
                         Registro eliminado con éxito.
                     </div>
@@ -270,26 +283,26 @@ try {
                         <div class="grid grid-cols-1 gap-6 items-end">
                            <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Altura (en Metros)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Peso (kg)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        placeholder="Ej: 70.5" type="number" step="0.1" id="peso" name="peso" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Fecha del Registro</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        type="date" id="fecha" name="fecha_registro" required />
                             </label>
                         </div>
-                        <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-border-light dark:border-border-dark pt-6">
+                        <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
                             <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full
-                                    transition-all duration-300 hover:scale-105"
+                                    transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
                                     type="submit">
                                 <span class="truncate">Guardar Registro</span>
                             </button>
@@ -299,39 +312,37 @@ try {
             </div>
         </section>
 
-        <section class="mt-8 rounded-xl border border-border-light dark:border-border-dark bg-content-light dark:bg-content-dark
+        <section class="mt-8 rounded-xl
                         transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                        animate__animated animate__fadeInUp"
+                        animate__animated animate__fadeInUp glass-card overflow-hidden"
                         style="--animate-delay: 0.2s;">
-            <h2 class="text-text-light dark:text-text-dark text-xl font-bold p-6">Registros de Peso</h2>
+            <h2 class="text-gray-900 dark:text-gray-100 text-xl font-bold p-6">Registros de Peso</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="border-b border-t border-border-light dark:border-border-dark bg-subtle-light dark:bg-content-dark">
+                    <thead class="border-b border-t border-white/20 dark:border-white/10 bg-transparent">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Fecha</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Peso</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Altura</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">IMC</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Clasificación</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-secondary-text-light dark:text-secondary-text-dark">Acciones</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Fecha</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Peso</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Altura</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">IMC</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Clasificación</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Acciones</th>
                     </tr>
                     </thead>
-                    <tbody id="historial-tabla-body" class="divide-y divide-border-light dark:divide-border-dark">
+                    <tbody id="historial-tabla-body" class="divide-y divide-white/20 dark:divide-white/10">
                         </tbody>
                 </table>
             </div>
         </section>
     </div>
 </main>
-</div> <?php if ($showSplash): ?>
+</div> 
+<?php if ($showSplash): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const splash = document.getElementById('welcome-splash'); //
         const content = document.getElementById('dashboard-content'); //
-        // Quitamos la referencia a wavePath
-
-        // Quitamos la inicialización de Wavify
-
+        
         setTimeout(() => {
             if (splash) { // Añadimos comprobación por si acaso
                 splash.classList.remove('animate__fadeIn'); //
@@ -389,19 +400,20 @@ try {
         const deleteSuccessMessage = document.getElementById('delete-success-message'); //
         let imcChartInstance = null; //
 
+        // MODIFICADO: Colores de clasificación para el nuevo fondo
         function getClasificacionIMC(imc) {
-             if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-600' };
-            if (imc < 25) return { texto: 'Peso Normal', color: 'text-green-600' };
-            if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-600' };
-            if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-600' };
-            if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-600' };
-            return { texto: 'Obesidad III', color: 'text-red-800' }; //
+             if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-800 dark:text-blue-300' };
+            if (imc < 25) return { texto: 'Peso Normal', color: 'text-green-800 dark:text-green-300' };
+            if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-800 dark:text-yellow-300' };
+            if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-800 dark:text-orange-300' };
+            if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-800 dark:text-red-300' };
+            return { texto: 'Obesidad III', color: 'text-red-900 dark:text-red-200' }; //
         }
 
         // Asignación a la variable global
         cargarDatos = function() {
             if (!tablaBody) return; //
-            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td></tr>'; //
+            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">Cargando historial...</td></tr>'; //
 
             fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken)) //
                 .then(response => {
@@ -416,9 +428,10 @@ try {
                     }
                     if (!chartContainer) return; //
 
+                    // MODIFICADO: color de texto
                     if (data.length === 0) { //
-                        chartContainer.innerHTML = '<p class="text-center text-gray-500">No hay datos registrados todavía.</p>'; //
-                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td></tr>'; //
+                        chartContainer.innerHTML = '<p class="text-center text-gray-700 dark:text-gray-300">No hay datos registrados todavía.</p>'; //
+                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">No hay registros.</td></tr>'; //
                         return;
                     }
 
@@ -432,6 +445,11 @@ try {
                     }
                     const ctx = document.getElementById('imcChart').getContext('2d'); //
 
+                    // MODIFICADO: Colores del gráfico para adaptarse al modo claro/oscuro del nuevo fondo
+                    const isDarkMode = document.documentElement.classList.contains('dark');
+                    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                    const textColor = isDarkMode ? '#F9FAFB' : '#111827';
+
 
                     imcChartInstance = new Chart(ctx, { //
                         type: 'line', //
@@ -441,7 +459,7 @@ try {
                                 label: 'Índice de Masa Corporal (IMC)', //
                                 data: imcData, //
                                 borderColor: 'rgba(74, 144, 226, 1)', //
-                                backgroundColor: 'rgba(74, 144, 226, 0.1)', //
+                                backgroundColor: 'rgba(74, 144, 226, 0.2)', //
                                 fill: true, //
                                 tension: 0.1 //
                             }]
@@ -449,7 +467,23 @@ try {
                         options: {
                             responsive: true, //
                             maintainAspectRatio: false, //
-                            scales: { y: { beginAtZero: false, title: { display: true, text: 'IMC' } } } //
+                            scales: { 
+                                y: { 
+                                    beginAtZero: false, 
+                                    title: { display: true, text: 'IMC', color: textColor },
+                                    grid: { color: gridColor },
+                                    ticks: { color: textColor }
+                                },
+                                x: {
+                                    grid: { color: gridColor },
+                                    ticks: { color: textColor }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: { color: textColor }
+                                }
+                            }
                         }
                     });
 
@@ -457,11 +491,12 @@ try {
                     data.forEach(item => { //
                         const clasificacion = getClasificacionIMC(item.imc); //
 
+                        // MODIFICADO: hover y colores de texto
                         tableHtml += `
                             <tr class="hover:bg-subtle-light dark:hover:bg-subtle-dark">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light dark:text-text-dark">${item.fecha_registro}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-text-light dark:text-secondary-text-dark">${item.peso} kg</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-text-light dark:text-secondary-text-dark">${item.altura} m</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${item.fecha_registro}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.peso} kg</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.altura} m</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${clasificacion.color}">${item.imc}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${clasificacion.color}">${clasificacion.texto}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -522,11 +557,7 @@ try {
             });
         }
 
-        // Llamar a cargarDatos solo si el splash NO se está mostrando inicialmente
-        if (!<?php echo json_encode($showSplash); ?>) {
-           cargarDatos();
-        }
-
+       
     });
 </script>
 
