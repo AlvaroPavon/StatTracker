@@ -3,7 +3,7 @@
         'name' => 'alvaropavon/stat-tracker',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1d304f85791d699ad422212ada7bb255b74cbe95',
+        'reference' => '4dccde202c011712d97498845d11b592e55e88a8',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'alvaropavon/stat-tracker' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1d304f85791d699ad422212ada7bb255b74cbe95',
+            'reference' => '4dccde202c011712d97498845d11b592e55e88a8',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
