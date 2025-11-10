@@ -1,78 +1,62 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php';
+// 1. Cargar el autoloader de Composer
+require 'vendor/autoload.php';
 
-// 2. REFINAMIENTO (CSRF): Iniciar la sesión
-session_start();
+// 2. Cargar la conexión a la BD ($pdo)
+require 'db.php'; 
 
-// 3. Verificar que la solicitud sea por método POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// 3. Usar el namespace de nuestra clase
+use App\Auth;
 
-    // 4. REFINAMIENTO (CSRF): Validar el token
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        // Si el token no coincide, es un ataque CSRF o una sesión expirada
-        header('Location: index.php?login_error=Error de seguridad. Intente de nuevo.');
-        exit;
+// 4. Iniciar la sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 5. Comprobar si el formulario fue enviado
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    
+    // 6. Validar CSRF token
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['login_error'] = "Error de seguridad (CSRF). Por favor, inténtelo de nuevo desde el formulario.";
+        header("Location: index.php");
+        exit();
     }
+    unset($_SESSION['csrf_token']);
 
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+    // Obtenemos los datos
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    // 5. Validación de campos vacíos
-    if (empty($email) || empty($password)) {
-        header('Location: index.php?login_error=Email y contraseña son requeridos');
-        exit; // Detener script
+    // 7. Instanciar nuestra clase de lógica
+    $auth = new Auth($pdo);
+
+    // 8. Llamar a la lógica de login (Auth::login ahora devuelve [id, nombre])
+    $result = $auth->login($email, $password);
+
+    // 9. Comprobar el resultado
+    if (is_array($result)) {
+        // ÉXITO
+
+        session_regenerate_id(true);
+
+        // CORRECCIÓN: Guardar 'nombre' (de la BD 'usuarios') en la sesión.
+        $_SESSION['user_id'] = $result['id'];
+        $_SESSION['nombre'] = $result['nombre']; // Antes era 'username'
+
+        // Redirigir al dashboard
+        header("Location: dashboard.php");
+        exit();
+
+    } else {
+        // ERROR
+        $_SESSION['login_error'] = $result;
+        header("Location: index.php");
+        exit();
     }
-
-    try {
-        // 6. Refinamiento de Seguridad: Sentencia Preparada
-        $sql = "SELECT id, nombre, password FROM usuarios WHERE email = :email";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['email' => $email]);
-
-        // 7. Obtener el usuario
-        $user = $stmt->fetch();
-
-        // 8. Refinamiento de Seguridad: Verificar usuario y contraseña
-        if ($user && password_verify($password, $user['password'])) {
-
-            // 9. ¡Refinamiento de Seguridad CRÍTICO!
-            // Regenerar el ID de la sesión para prevenir fijación de sesión
-            // Borra el token CSRF antiguo y regenera uno nuevo.
-            session_regenerate_id(true);
-
-            // 10. Guardar datos en la sesión
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_nombre'] = $user['nombre'];
-
-            // 11. REFINAMIENTO (CSRF): Generar un nuevo token para el dashboard
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
-            // ----- INICIO MODIFICACIÓN -----
-            // Marcar que se debe mostrar el splash de bienvenida en el dashboard
-            $_SESSION['show_welcome_splash'] = true;
-            // ----- FIN MODIFICACIÓN -----
-
-            // 12. Redirigir al panel de control (dashboard)
-            header('Location: dashboard.php');
-            exit; // Detener script
-
-        } else {
-            // 13. Credenciales incorrectas
-            header('Location: index.php?login_error=Email o contraseña incorrectos');
-            exit; // Detener script
-        }
-
-    } catch (PDOException $e) {
-        // 14. REFINAMIENTO: Manejo de Errores de Producción
-        error_log('Error en login.php: ' . $e->getMessage());
-        header('Location: index.php?login_error=Error interno. Inténtelo de nuevo.');
-        exit; // Detener script
-    }
-
+    
 } else {
-    // 15. Si alguien intenta acceder a login.php directamente
-    header('Location: index.php');
-    exit; // Detener script
+    header("Location: index.php");
+    exit();
 }
 ?>
