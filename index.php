@@ -1,9 +1,13 @@
 <?php
 // 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
+// (db.php ahora incluye session_config.php y database_connection.php)
 require 'db.php';
 
 // 2. Iniciar la sesión
-session_start();
+// MODIFICACIÓN: Asegurarnos de que solo se inicie si no está activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // 3. Refinamiento: Redirigir si el usuario ya está logueado
 if (isset($_SESSION['user_id'])) {
@@ -41,7 +45,6 @@ $csrf_token = $_SESSION['csrf_token'];
           extend: {
             colors: {
               "primary": "#4A90E2", "secondary": "#50E3C2",
-              /* MODIFICADO: Estos colores ya no se usarán para el fondo principal */
               "background-light": "#F8F9FA", "background-dark": "#1F2937",
               "text-light": "#4A4A4A", "text-dark": "#E5E7EB",
               "border-light": "#E1E8ED", "border-dark": "#374151"
@@ -68,7 +71,10 @@ $csrf_token = $_SESSION['csrf_token'];
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* MODIFICADO: Se quita el fondo sólido, se aplicará por Tailwind */
+            background-color: #F8F9FA; /* background-light */
+        }
+        .dark #splash-screen {
+            background-color: #1F2937; /* background-dark */
         }
         
         /* Ajustar duraciones de las animaciones específicas */
@@ -79,37 +85,15 @@ $csrf_token = $_SESSION['csrf_token'];
             --animate-duration: 0.8s; /* Duración del desvanecimiento */
         }
         /* ----- FIN MODIFICACIÓN ----- */
-
-        /* ----- INICIO MODIFICACIÓN (Estilo "Gota de Agua" - MÁXIMA TRANSPARENCIA Y BLUR) ----- */
-        .glass-card {
-            /* Fondo casi transparente */
-            background-color: rgba(255, 255, 255, 0.1);
-            
-            /* El efecto de desenfoque (muy intenso) */
-            -webkit-backdrop-filter: blur(35px); /* Safari */
-            backdrop-filter: blur(35px);
-            
-            /* Borde brillante muy sutil */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .dark .glass-card {
-            /* Fondo oscuro casi transparente */
-            background-color: rgba(31, 41, 55, 0.1); /* Tono oscuro semitransparente */
-            
-            /* Borde oscuro más sutil */
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        /* ----- FIN MODIFICACIÓN ----- */
     </style>
 </head>
-<body class="font-display text-gray-900 dark:text-gray-100 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
 
-<div id="splash-screen" class="animate__animated animate__bounceIn bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
+<div id="splash-screen" class="animate__animated animate__bounceIn">
     <div class="flex items-center gap-3 p-2">
         <span class="material-symbols-outlined text-primary text-7xl">scale</span>
     </div>
-    <h1 class="text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white mt-4">StatTracker</h1>
+    <h1 class="text-4xl font-bold leading-tight tracking-tight text-text-light dark:text-text-dark mt-4">StatTracker</h1>
 </div>
 <div id="main-content" class="hidden">
 <div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
@@ -117,22 +101,28 @@ $csrf_token = $_SESSION['csrf_token'];
         <div class="flex flex-col items-center mb-8 animate__animated animate__fadeInDown">
             <div class="flex items-center gap-3 p-2">
                 <span class="material-symbols-outlined text-primary text-5xl">scale</span>
-                <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">StatTracker</h1>
+                <h1 class="text-3xl font-bold leading-tight tracking-tight text-text-light dark:text-text-dark">StatTracker</h1>
             </div>
-            <p class="text-gray-700 dark:text-gray-300 mt-2">¡Bienvenido! Por favor, inicia sesión.</p>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">¡Bienvenido! Por favor, inicia sesión.</p>
         </div>
         
-        <div class="p-8 rounded-xl shadow-lg 
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg 
                     transition-all duration-300 hover:shadow-xl
-                    animate__animated animate__fadeInUp glass-card">
+                    animate__animated animate__fadeInUp">
             
-            <?php if (isset($_GET['login_error'])): ?>
-                <div class="mb-4 p-4 text-sm text-red-900 dark:text-red-100 bg-red-500/20 rounded-lg border border-red-500/30" role="alert">
-                    <?php echo htmlspecialchars($_GET['login_error']); ?>
+            <?php 
+            if (isset($_SESSION['login_error'])): ?>
+                <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300 animate__animated animate__shakeX" role="alert">
+                    <?php 
+                    echo htmlspecialchars($_SESSION['login_error']); 
+                    // Limpiamos el error para que no se muestre de nuevo
+                    unset($_SESSION['login_error']);
+                    ?>
                 </div>
             <?php endif; ?>
+
             <?php if (isset($_GET['success'])): ?>
-                <div class="mb-4 p-4 text-sm text-green-900 dark:text-green-100 bg-green-500/20 rounded-lg border border-green-500/30" role="alert">
+                <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-300" role="alert">
                     <?php echo htmlspecialchars($_GET['success']); ?>
                 </div>
             <?php endif; ?>
@@ -142,18 +132,18 @@ $csrf_token = $_SESSION['csrf_token'];
                 
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Email</p>
-                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300" 
                         placeholder="you@example.com" type="email" name="email" id="login_email" required />
                 </label>
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
-                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300"
                         placeholder="••••••••" type="password" name="password" id="login_password" required />
                 </label>
                 
-                <button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-slate-900
+                <button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
                         transition-all duration-300 hover:scale-105"
                         type="submit">
                     <span>Iniciar Sesión</span>
@@ -161,7 +151,7 @@ $csrf_token = $_SESSION['csrf_token'];
             </form>
         </div>
         <div class="mt-6 text-center">
-            <p class="text-sm text-gray-700 dark:text-gray-300">¿No tienes una cuenta? <a class="font-medium text-primary hover:underline" href="register_page.php">Regístrate ahora</a></p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">¿No tienes una cuenta? <a class="font-medium text-primary hover:underline" href="register_page.php">Regístrate ahora</a></p>
         </div>
     </div>
     </div>

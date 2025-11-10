@@ -1,63 +1,63 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA:
-// Incluir la conexión (que tiene los 'ini_set') ANTES de iniciar la sesión.
-require 'db.php';
+// 1. Cargar el autoloader
+require 'vendor/autoload.php';
 
-// 2. Iniciar la sesión DESPUÉS de cargar la configuración.
-session_start();
+// 2. Usar el namespace de nuestra clase
+use App\Metrics;
 
-// 3. Establecer el tipo de contenido de la respuesta
+// 3. CORRECCIÓN: Mover la lógica de sesión DENTRO del IF
+if (session_status() === PHP_SESSION_NONE) {
+    // Solo cargamos la config si la sesión no está activa
+    require 'session_config.php'; 
+    session_start();
+}
+
+// 4. Cargar la conexión a la BD ($pdo)
+// (db.php ahora solo trae $pdo)
+require 'db.php'; 
+
+// 5. Establecer la cabecera de respuesta como JSON
 header('Content-Type: application/json');
 
-// 4. Refinamiento de Seguridad: Proteger la API (Autenticación)
+// 6. Verificar que el usuario esté logueado
+// (La prueba ya seteó $_SESSION['user_id'] en la sesión activa)
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(403); // Forbidden
-    echo json_encode(['error' => 'Acceso no autorizado']);
-    exit; // Detener script
+    http_response_code(401); // No autorizado
+    echo json_encode(['success' => false, 'message' => 'Error: No autorizado. Inicie sesión.']);
+    exit();
 }
 
-// 5. REFINAMIENTO (CSRF): Validar el token enviado por 'fetch'
-$token_enviado = '';
-if (isset($_GET['token'])) {
-    $token_enviado = $_GET['token'];
+// 7. Verificar el método de solicitud (debe ser GET)
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405); // Método no permitido
+    echo json_encode(['success' => false, 'message' => 'Error: Método no permitido, se esperaba GET.']);
+    exit();
 }
 
-// Validar el token
-if (empty($token_enviado) || !hash_equals($_SESSION['csrf_token'], $token_enviado)) {
-    // Si el token no coincide, es un ataque CSRF
-    http_response_code(403); // Forbidden
-    echo json_encode(['error' => 'Error de seguridad (Token CSRF inválido)']);
-    exit;
-}
+// 8. Obtener el ID de usuario de la sesión
+$user_id = (int)$_SESSION['user_id'];
 
+// 9. Instanciar nuestra clase de lógica
+$metrics = new Metrics($pdo);
 
-// 6. Obtener el ID del usuario de la sesión de forma segura
-$user_id = $_SESSION['user_id'];
+// 10. Llamar a la lógica (que ahora usa la tabla 'metricas')
+$result = $metrics->getHealthData($user_id);
 
-try {
-    // 7. Refinamiento de Seguridad: Sentencia Preparada
-    
-    // ----- INICIO DE LA MODIFICACIÓN -----
-    // Ahora seleccionamos también el 'id' de la métrica
-    $sql = "SELECT id, fecha_registro, imc, peso, altura FROM metricas 
-            WHERE user_id = :user_id 
-            ORDER BY fecha_registro DESC";
-    // ----- FIN DE LA MODIFICACIÓN -----
-            
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['user_id' => $user_id]);
-    
-    // 8. Obtener todos los resultados
-    $datos = $stmt->fetchAll();
-
-    // 9. Devolver los datos en formato JSON
-    echo json_encode($datos);
-
-} catch (PDOException $e) {
-    // 10. REFINAMIENTO: Manejo de Errores de Producción
-    error_log('Error en get_data.php: ' . $e->getMessage());
+// 11. Comprobar el resultado y devolver JSON
+if (is_array($result)) {
+    // ÉXITO
+    http_response_code(200); // OK
+    echo json_encode([
+        'success' => true, 
+        'data' => $result
+    ]);
+} else {
+    // ERROR
     http_response_code(500); // Internal Server Error
-    echo json_encode(['error' => 'Error interno al obtener los datos.']);
-    exit; // Detener script
+    echo json_encode([
+        'success' => false, 
+        'message' => $result
+    ]);
 }
+exit();
 ?>

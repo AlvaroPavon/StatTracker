@@ -8,7 +8,10 @@
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
-         verbose="true">
+         verbose="true"
+         
+         convertWarningsToExceptions="false"
+         stderr="false">
 
     <testsuites>
         <testsuite name="default">

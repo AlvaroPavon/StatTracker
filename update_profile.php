@@ -1,126 +1,63 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-require 'db.php';
+// 1. Cargar el autoloader de Composer
+require 'vendor/autoload.php';
 
-// 2. Iniciar la sesión
-session_start();
+// 2. Cargar la conexión a la BD ($pdo)
+require 'db.php'; 
 
-// 3. Refinamiento de Seguridad: Autenticación
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php'); // No autorizado
-    exit;
+// 3. Usar el namespace de nuestra clase
+use App\User;
+
+// 4. Iniciar la sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// 4. Verificar que la solicitud sea por método POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// 5. Verificar que el usuario esté logueado
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 
-    // 5. REFINAMIENTO (CSRF): Validar el token
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        header('Location: profile.php?error=Error de seguridad. Intente de nuevo.');
-        exit;
+// 6. Verificar el método de solicitud
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    
+    // 7. Validar CSRF token
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        header("Location: profile.php?error=" . urlencode("Error de seguridad (CSRF)."));
+        exit();
     }
+    
+    // 8. CORRECCIÓN: Obtener 'nombre' y 'apellidos'
+    // (El formulario en profile.php envía 'nombre' y 'apellidos')
+    $user_id = (int)$_SESSION['user_id'];
+    $nombre = $_POST['nombre'] ?? '';
+    $apellidos = $_POST['apellidos'] ?? '';
+    $email = $_POST['email'] ?? '';
 
-    // 6. Obtener ID de usuario y datos del formulario
-    $user_id = $_SESSION['user_id'];
-    $nombre = trim($_POST['nombre']);
-    $apellidos = trim($_POST['apellidos']);
-    $email = trim($_POST['email']);
+    // 9. Instanciar nuestra clase de lógica
+    $user = new User($pdo);
 
-    // 7. Validaciones de campos
-    if (empty($nombre) || empty($apellidos) || empty($email)) {
-        header('Location: profile.php?error=Nombre, apellidos y email son obligatorios.');
-        exit;
-    }
+    // 10. CORRECCIÓN: Llamar a la lógica con los campos correctos
+    $result = $user->updateProfile($user_id, $nombre, $apellidos, $email);
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('Location: profile.php?error=El formato del email no es válido.');
-        exit;
-    }
-
-    // 8. Manejo de la subida de la foto de perfil
-    $profile_pic_filename = null;
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
+    // 11. Comprobar el resultado y redirigir
+    if ($result === true) {
+        // ÉXITO
+        // CORRECCIÓN: Actualizar la variable de sesión 'nombre'
+        $_SESSION['nombre'] = $nombre; 
         
-        $file = $_FILES['profile_pic'];
-        $upload_dir = 'uploads/'; // La carpeta que creamos
-        
-        // Validar tipo de archivo (MIME)
-        $allowed_types = ['image/jpeg', 'image/png'];
-        if (!in_array($file['type'], $allowed_types)) {
-            header('Location: profile.php?error=Formato de imagen no válido. Solo se permite JPG o PNG.');
-            exit;
-        }
-
-        // Validar tamaño (ej: max 2MB)
-        if ($file['size'] > 2 * 1024 * 1024) {
-            header('Location: profile.php?error=La imagen es demasiado grande (máx 2MB).');
-            exit;
-        }
-
-        // Generar un nombre de archivo único
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $profile_pic_filename = 'user_' . $user_id . '_' . uniqid() . '.' . $extension;
-        $upload_path = $upload_dir . $profile_pic_filename;
-
-        // Mover el archivo
-        if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
-            error_log('Error al mover el archivo subido a: ' . $upload_path);
-            header('Location: profile.php?error=Error interno al guardar la imagen.');
-            exit;
-        }
-    }
-
-    try {
-        // 9. Actualizar la base de datos
-        
-        // Si se subió una nueva foto, la consulta la incluye
-        if ($profile_pic_filename) {
-            $sql = "UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, email = :email, profile_pic = :profile_pic 
-                    WHERE id = :id";
-            $params = [
-                'nombre' => $nombre,
-                'apellidos' => $apellidos,
-                'email' => $email,
-                'profile_pic' => $profile_pic_filename,
-                'id' => $user_id
-            ];
-        } else {
-            // Si no se subió foto, la consulta no toca esa columna
-            $sql = "UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, email = :email 
-                    WHERE id = :id";
-            $params = [
-                'nombre' => $nombre,
-                'apellidos' => $apellidos,
-                'email' => $email,
-                'id' => $user_id
-            ];
-        }
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-
-        // 10. Actualizar el nombre en la sesión (por si cambió)
-        $_SESSION['user_nombre'] = $nombre;
-
-        // 11. Redirección exitosa
-        header('Location: profile.php?success=Perfil actualizado con éxito.');
-        exit;
-
-    } catch (PDOException $e) {
-        // Manejo de error de email duplicado
-        if ($e->getCode() == 23000) {
-            header('Location: profile.php?error=El email introducido ya está registrado por otro usuario.');
-            exit;
-        } else {
-            error_log('Error en update_profile.php: ' . $e->getMessage());
-            header('Location: profile.php?error=Error en la base de datos. Inténtelo de nuevo.');
-            exit;
-        }
+        header("Location: profile.php?success=" . urlencode("Perfil actualizado con éxito."));
+        exit();
+    } else {
+        // ERROR: $result es un string con el mensaje de error
+        header("Location: profile.php?error=" . urlencode($result));
+        exit();
     }
 
 } else {
-    // Si alguien intenta acceder directamente
-    header('Location: profile.php');
-    exit;
+    // Si alguien accede directamente sin POST
+    header("Location: profile.php");
+    exit();
 }
 ?>
