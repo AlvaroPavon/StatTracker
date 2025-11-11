@@ -1,0 +1,68 @@
+name: PHP CI (PHPUnit & MySQL)
+
+# 1. Definir cuándo se ejecuta este workflow
+on:
+  push:
+    branches: [ "main" ] # Se ejecuta en cada push a la rama 'main'
+  pull_request:
+    branches: [ "main" ] # Se ejecuta en cada Pull Request a la rama 'main'
+
+# 2. Definir las variables de entorno para la base de datos de pruebas
+# Estas variables sobrescribirán las de phpunit.xml durante la CI.
+env:
+  DB_HOST: 127.0.0.1
+  DB_DATABASE: testing_db # Un nombre de BD temporal para la CI
+  DB_USERNAME: root
+  DB_PASSWORD: '' # La base de datos del runner de GitHub no usa contraseña por defecto
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 3. Configurar PHP con las extensiones necesarias
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Asumo que usas PHP 8.2 o similar
+          extensions: mbstring, pdo, pdo_mysql # extensiones que necesita tu proyecto
+          coverage: none # No necesitamos cobertura aquí, solo ejecutar tests
+
+      # 4. Configurar y arrancar el servicio de MySQL
+      - name: Start MySQL
+        uses: mirko-heizenreder/action-mysql@v1
+        with:
+          database: ${{ env.DB_DATABASE }}
+          root-password: ${{ env.DB_PASSWORD }}
+          
+      # 5. Esperar a que la base de datos esté lista
+      - name: Wait for MySQL
+        run: while ! mysql -u ${{ env.DB_USERNAME }} -h 127.0.0.1 -e "quit" 2>/dev/null; do sleep 1; done
+        
+      # 6. Importar el esquema de la base de datos
+      # Esto asume que tu archivo 'database.sql' está en la raíz, lo cual es correcto.
+      - name: Import database schema (database.sql)
+        run: |
+          mysql -u ${{ env.DB_USERNAME }} -h 127.0.0.1 ${{ env.DB_DATABASE }} < database.sql
+        
+      # 7. Instalar dependencias con Composer
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+          
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+      
+      # 8. Ejecutar PHPUnit
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit

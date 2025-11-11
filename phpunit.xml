@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         cacheResultFile=".phpunit.cache/test-results"
-         executionOrder="depends,defects"
-         forceCoversAnnotation="true"
-         beStrictAboutCoversAnnotation="true"
-         
-         beStrictAboutOutputDuringTests="false"
-         
-         beStrictAboutTodoAnnotatedTests="true"
-         verbose="true"
-         
-         convertWarningsToExceptions="false"
-         stderr="false">
+<phpunit 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    cacheResultFile=".phpunit.cache/test-results"
+    colors="true"
+>
 
-    <testsuites>
-        <testsuite name="default">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
+    <php>
+        <env name="DB_HOST" value="localhost"/>
+        <env name="DB_DATABASE" value="proyecto_imc"/>
+        <env name="DB_USERNAME" value="root"/>
+        <env name="DB_PASSWORD" value=""/>
+
+        <ini name="date.timezone" value="UTC"/>
+    </php>
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">.</directory>
+            <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <directory suffix=".php">vendor</directory>
-            <directory suffix=".php">tests</directory>
-        </exclude>
+            <directory>vendor</directory>
+            <file>add_data.php</file>
+            <file>get_data.php</file>
+            <file>delete_data.php</file>
+            <file>dashboard.php</file>
+            <file>database_connection.php</file>
+            <file>db.php</file>
+            <file>session_config.php</file>
+            </exclude>
     </coverage>
-
+    
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>
