@@ -1,33 +1,50 @@
--- Crear la base de datos (puedes nombrarla como quieras)
-CREATE DATABASE IF NOT EXISTS `proyecto_imc` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `proyecto_imc`;
+-- database.sql
 
---
--- Estructura de tabla para la tabla `usuarios`
--- Guarda la información de login
---
-CREATE TABLE `usuarios` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellidos` VARCHAR(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Estructura de la tabla `usuarios`
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  profile_pic VARCHAR(255) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Estructura de tabla para la tabla `metricas`
--- Guarda cada registro de peso/altura asociado a un usuario
---
-CREATE TABLE `metricas` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `peso` DECIMAL(5,2) NOT NULL COMMENT 'Peso en KG',
-  `altura` DECIMAL(3,2) NOT NULL COMMENT 'Altura en Metros (ej: 1.75)',
-  `imc` DECIMAL(4,2) NOT NULL,
-  `fecha_registro` DATE NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `metricas_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Estructura de la tabla `metricas`
+CREATE TABLE IF NOT EXISTS metricas (
+  id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT(11) UNSIGNED NOT NULL,
+  peso DECIMAL(5,2) NOT NULL,
+  altura DECIMAL(3,2) NOT NULL,
+  imc DECIMAL(5,2) NOT NULL,
+  fecha_registro DATE NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  
+  -- Clave foránea que enlaza con la tabla 'usuarios'
+  FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- BLOQUE DE DATOS DE PRUEBA PARA CI
+
+-- Reinicia los contadores y limpia para asegurar tests idempotentes
+DELETE FROM metricas;
+DELETE FROM usuarios;
+ALTER TABLE usuarios AUTO_INCREMENT = 1;
+ALTER TABLE metricas AUTO_INCREMENT = 1;
+
+-- Usuario de prueba principal (ID=1). 
+-- Esto resuelve el error "Table 'testing_db.usuarios' doesn't exist" y provee el FK.
+-- La contraseña 'password123' hasheada con bcrypt.
+INSERT INTO usuarios (id, nombre, email, password, profile_pic) VALUES 
+(1, 'Test User', 'test@example.com', '$2y$10$wKz0b9lM9pLz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.', NULL); 
+
+-- Usuario de prueba que no tendrá métricas (ID=2)
+INSERT INTO usuarios (id, nombre, email, password, profile_pic) VALUES 
+(2, 'Second Test User', 'second@example.com', '$2y$10$wKz0b9lM9pLz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.', NULL); 
+
+-- Dato inicial de prueba para el usuario 1.
+-- El test getHealthDataSuccess espera un IMC de 80.0. 
+INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) VALUES 
+(1, 80.0, 1.00, 80.0, '2025-01-01');

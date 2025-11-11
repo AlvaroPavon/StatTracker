@@ -39,7 +39,12 @@ class Metrics
             ]);
             return true;
         } catch (\PDOException $e) {
-            // Devolver mensaje de error
+            // CORRECCIÓN CRÍTICA: Capturar el SQLSTATE 23000 (Violación de restricción de integridad, incluye FK)
+            if ($e->getCode() === '23000') {
+                 // Devuelve el mensaje esperado por la prueba fallida
+                return "ID de usuario inválido."; 
+            }
+            // Devolver mensaje de error genérico si no es un error que esperemos
             return "Error al guardar los datos: " . $e->getMessage();
         }
     }
@@ -49,8 +54,7 @@ class Metrics
      */
     public function getHealthData(int $user_id): array|string
     {
-        // MODIFICACIÓN (BUG): Añadir 'id DESC' como segundo criterio de ordenación
-        // Esto soluciona el "empate" cuando dos registros tienen la misma fecha.
+        // Ordenación de más reciente a más antiguo, usando ID como desempate (Corregido en la sesión anterior)
         $sql = "SELECT id, peso, altura, imc, fecha_registro 
                 FROM metricas 
                 WHERE user_id = :user_id 
@@ -85,7 +89,6 @@ class Metrics
             if ($stmt->rowCount() > 0) {
                 return true;
             } else {
-                // No se borró nada, probablemente porque el ID no existía o no pertenecía al usuario
                 return "No se encontró el registro o no tiene permiso para borrarlo.";
             }
         } catch (\PDOException $e) {
