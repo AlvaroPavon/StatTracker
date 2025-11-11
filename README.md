@@ -25,14 +25,2150 @@
 * Profesionales de la salud registrando datos de pacientes
 * Cualquier persona interesada en llevar un control de sus métricas corporales
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
 
 ## 📚 Documentación Completa
 
 Este README proporciona información básica de instalación y ejecución. Para documentación completa, consulta:
 
 | Documento | Descripción |
-|-----------|-------------|
+|## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>--|## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
+---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>-|
 | **[Manual de Usuario](docs/manual-usuario.adoc)** | Guía completa de uso de la aplicación |
 | **[Mockups](docs/mockups/)** | Diagramas visuales de las pantallas y flujos |
 | **[Análisis de Cobertura](docs/coverage-analisis.adoc)** | Informe detallado de cobertura de código |
@@ -41,7 +2177,274 @@ Este README proporciona información básica de instalación y ejecución. Para 
 
 > 💡 **Tip**: Si eres usuario final, empieza por el [Manual de Usuario](docs/manual-usuario.adoc). Si eres desarrollador, revisa los documentos técnicos de cobertura y pruebas.
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
 
 ## 🛠️ Requisitos del Sistema
 
@@ -58,7 +2461,274 @@ Este README proporciona información básica de instalación y ejecución. Para 
 * **PHPUnit**: Framework de testing (instalado via Composer)
 * **Git**: Control de versiones
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
 
 ## ⚙️ Instalación y Configuración
 
@@ -127,7 +2797,274 @@ php -S localhost:8000
 
 Accede a `http://localhost/StatTracker` o tu configuración de virtual host.
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
 
 ## ✅ Ejecución de Pruebas
 
@@ -165,7 +3102,274 @@ vendor/bin/phpunit tests/MetricsTest.php
 > 
 > Ver [Análisis de Cobertura](docs/coverage-analisis.adoc) para detalles completos.
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
 
 ## 🚀 Uso Rápido
 
@@ -194,4 +3398,271 @@ vendor/bin/phpunit --coverage-html coverage
 tree -L 2 -I 'vendor|node_modules'
 ```
 
+## 📁 Estructura del Proyecto
+
+```
+StatTracker/
+├── src/                    # Clases principales (lógica de negocio)
+│   ├── Auth.php           # Autenticación (registro, login)
+│   ├── User.php           # Gestión de perfil y contraseñas
+│   └── Metrics.php        # Gestión de métricas de salud
+├── tests/                  # Tests unitarios y de integración
+│   ├── AuthTest.php       # Tests de autenticación
+│   ├── UserTest.php       # Tests de usuario
+│   ├── MetricsTest.php    # Tests de métricas
+│   └── ApiIntegrationTest.php
+├── docs/                   # Documentación completa
+│   ├── manual-usuario.adoc         # Manual de usuario
+│   ├── coverage-analisis.adoc      # Análisis de cobertura
+│   ├── system-test-report.adoc     # Informe de pruebas
+│   ├── entrevista-notas.adoc       # Notas del proyecto
+│   └── mockups/                    # Diagramas Mermaid
+├── coverage/               # Informes de cobertura (generado)
+├── database.sql           # Esquema de base de datos
+├── database_connection.php # Configuración de BD
+├── composer.json          # Dependencias de PHP
+├── phpunit.xml            # Configuración de PHPUnit
+└── README.md              # Este archivo
+
+# Archivos de interfaz:
+├── index.php              # Página de inicio
+├── login.php              # Procesamiento de login
+├── register.php           # Procesamiento de registro
+├── dashboard.php          # Panel principal
+├── profile.php            # Página de perfil
+├── add_data.php           # Añadir métricas
+├── get_data.php           # Obtener métricas
+├── delete_data.php        # Eliminar métricas
+└── update_profile.php     # Actualizar perfil
+```
+
 ---
+
+## 🏗️ Arquitectura
+
+StatTracker sigue una arquitectura **MVC simplificada**:
+
+### Modelo (src/)
+* **Auth.php**: Lógica de autenticación
+* **User.php**: Lógica de gestión de usuarios
+* **Metrics.php**: Lógica de métricas de salud
+
+### Vista (archivos .php raíz)
+* Archivos PHP con HTML que renderizan la interfaz
+
+### Controlador (archivos de procesamiento)
+* Scripts PHP que procesan requests y llaman a los modelos
+
+### Base de Datos
+
+**Tablas principales:**
+
+```sql
+usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
+metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+
+Ver `database.sql` para el esquema completo.
+
+---
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
+* ✅ **Prepared Statements**: Protección contra SQL injection
+* ✅ **Validación de inputs**: En servidor
+* ✅ **Sesiones seguras**: Configuración PHP adecuada
+* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
+* ✅ **Verificación de permisos**: En todas las operaciones
+
+### Recomendaciones para Producción
+
+* Implementar tokens CSRF
+* Activar HTTPS
+* Configurar headers de seguridad (CSP, HSTS)
+* Implementar rate limiting
+* Logs de auditoría
+* Backups automáticos
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para más detalles.
+
+---
+
+## 🧪 Testing
+
+### Estrategia de Testing
+
+El proyecto implementa múltiples niveles de testing:
+
+#### 1. Tests Unitarios (PHPUnit)
+
+**Cobertura**: ~85% de líneas
+
+* `AuthTest.php`: Registro, login, validaciones
+* `UserTest.php`: Perfil, cambio de contraseña
+* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
+
+#### 2. Tests de Integración
+
+* `ApiIntegrationTest.php`: Pruebas de endpoints completos
+* `DatabaseTest.php`: Conexión a base de datos
+
+#### 3. Tests de Sistema (Manual/Automatizado)
+
+Ver [Informe de Pruebas de Sistema](docs/system-test-report.adoc) para casos de prueba E2E.
+
+### Ejecutar Tests por Categoría
+
+```bash
+# Tests de autenticación
+vendor/bin/phpunit --filter Auth
+
+# Tests de métricas
+vendor/bin/phpunit --filter Metrics
+
+# Tests de integración
+vendor/bin/phpunit --filter Integration
+```
+
+---
+
+## 📊 Métricas del Proyecto
+
+| Métrica | Valor |
+|---------|-------|
+| Líneas de código (src/) | ~350 |
+| Tests unitarios | 24+ |
+| Cobertura de código | 85%+ |
+| Clases principales | 3 |
+| Endpoints API | 8 |
+| Casos de prueba E2E | 20 |
+
+---
+
+## 🤝 Contribuir
+
+### Proceso de Contribución
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+### Guía de Estilo
+
+* Seguir PSR-12 para código PHP
+* Escribir tests para nuevas funcionalidades
+* Mantener cobertura >80%
+* Documentar funciones públicas
+* Validar inputs en servidor
+
+---
+
+## 🐛 Reportar Problemas
+
+Si encuentras un bug o tienes una sugerencia:
+
+1. Verifica que no exista un issue similar
+2. Crea un nuevo issue con:
+   * Descripción clara del problema
+   * Pasos para reproducir
+   * Comportamiento esperado vs actual
+   * Screenshots (si aplica)
+   * Versión de PHP y navegador
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producción Segura** en el IES Zaidín-Vergeles.
+
+**Uso académico y educativo.**
+
+---
+
+## 👥 Autores
+
+* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
+
+---
+
+## 🙏 Agradecimientos
+
+* Profesor del módulo de Puesta en Producción Segura
+* IES Zaidín-Vergeles
+* Comunidad de PHP y PHPUnit
+* Stack Overflow y documentación oficial
+
+---
+
+## 📞 Contacto y Soporte
+
+* **Documentación**: Consulta la carpeta `docs/`
+* **Issues**: Usa el sistema de issues de GitHub
+* **Wiki**: Para más información, consulta la wiki del proyecto
+
+---
+
+## 🔄 Historial de Versiones
+
+### v1.0 (Enero 2025)
+* ✨ Implementación inicial del MVP
+* ✅ Sistema de autenticación completo
+* ✅ Gestión de métricas de salud
+* ✅ Tests unitarios (>85% cobertura)
+* ✅ Documentación completa
+* ✅ Mockups y diagramas
+
+---
+
+## 🚀 Roadmap (Futuras Versiones)
+
+### v1.1 (Planificado)
+* 📧 Recuperación de contraseña por email
+* 📊 Gráficos de evolución de métricas
+* 📱 Mejoras responsive para móviles
+* 🌐 Internacionalización (i18n)
+
+### v2.0 (Futuro)
+* 📤 Exportación de datos (PDF, CSV)
+* 🔔 Notificaciones y recordatorios
+* 🎯 Objetivos y metas personalizadas
+* 📈 Estadísticas avanzadas
+
+---
+
+## 💻 Comandos Útiles
+
+```bash
+# Desarrollo
+composer install              # Instalar dependencias
+php -S localhost:8000         # Servidor de desarrollo
+
+# Testing
+vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit --testdox  # Salida legible
+vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+
+# Base de Datos
+mysql -u root -p stattracker < database.sql  # Importar esquema
+
+# Ver logs (si usas Apache)
+tail -f /var/log/apache2/error.log
+```
+
+---
+
+**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.adoc) o revisa la documentación técnica en la carpeta `docs/`.
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
+
+Hecho con ❤️ por el equipo StatTracker
+
+</div>
