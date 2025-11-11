@@ -22,10 +22,8 @@ jobs:
         image: mysql:8.0 
         env:
           MYSQL_DATABASE: ${{ env.DB_DATABASE }}
-          # CORRECCIÓN CRÍTICA: Permite la contraseña vacía de forma explícita
+          # Permite la contraseña vacía para el entorno de CI
           MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
-          # Opcional: Se puede comentar o quitar la línea de MYSQL_ROOT_PASSWORD
-          # ya que usamos la variable de arriba para la seguridad en CI.
         ports:
           - 3306:3306 
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
@@ -43,16 +41,20 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
           
-      # 3. Esperar a que MySQL esté listo
+      # 3. CORRECCIÓN: Instalar el cliente MySQL en el runner principal (para usar el comando 'mysql')
+      - name: Install MySQL Client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
+      # 4. Esperar a que MySQL esté listo
       - name: Wait for MySQL
         run: while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do sleep 1; done
         
-      # 4. Importar el esquema de la base de datos
+      # 5. Importar el esquema de la base de datos
       - name: Import database schema (database.sql)
         run: |
           mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} ${{ env.DB_DATABASE }} < database.sql
         
-      # 5. Instalar dependencias
+      # 6. Instalar dependencias
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-dir)" >> $GITHUB_OUTPUT
@@ -67,6 +69,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
       
-      # 6. Ejecutar PHPUnit
+      # 7. Ejecutar PHPUnit
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
