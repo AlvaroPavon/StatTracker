@@ -45,7 +45,18 @@ if (!isset($_SESSION['user_id'])) {
     return;
 }
 
-// 6. Validar método HTTP
+// 6. MODIFICACIÓN (SEGURIDAD): Validar Token CSRF
+// El dashboard envía el token por GET, aquí lo validamos.
+if (!isset($_GET['token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+    send_json_response(
+        ['success' => false, 'message' => 'Error: Token CSRF no válido o ausente.'],
+        403 // 403 Forbidden
+    );
+    return;
+}
+
+
+// 7. Validar método HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     send_json_response(
         ['success' => false, 'message' => 'Error: Método no permitido, se esperaba GET.'],
@@ -54,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     return;
 }
 
-// 7. Obtener el ID de usuario y lógica principal
+// 8. Obtener el ID de usuario y lógica principal
 $user_id = (int) $_SESSION['user_id'];
 $metrics = new Metrics($pdo);
 $result = $metrics->getHealthData($user_id);
 
-// 8. Respuesta final
+// 9. Respuesta final
 if (is_array($result)) {
     send_json_response([
         'success' => true,
@@ -73,3 +84,5 @@ if (is_array($result)) {
 }
 
 return; // <-- En vez de exit()
+
+// MODIFICACIÓN (BUG): Se eliminó la llave '}' extra que estaba aquí y causaba el error.

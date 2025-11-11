@@ -1,33 +1,36 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
+// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php'
 require 'db.php'; //
 
-// 2. Iniciar la sesión
+// 2. MODIFICACIÓN (BUG CSRF): Incluir 'session_config.php' ANTES de session_start()
+require __DIR__ . '/session_config.php'; //
+
+// 3. Iniciar la sesión
 session_start(); //
 
-// 3. Refinamiento de Seguridad: Proteger la página
+// 4. Refinamiento de Seguridad: Proteger la página
 if (!isset($_SESSION['user_id'])) { //
     header('Location: index.php'); //
     exit; // Detener la ejecución del script //
 }
 
-// 4. Obtener el ID del usuario
+// 5. Obtener el ID del usuario
 $user_id = $_SESSION['user_id']; //
 
-// 5. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
+// 6. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
 if (empty($_SESSION['csrf_token'])) { //
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); //
 }
 $csrf_token = $_SESSION['csrf_token']; //
 
-// 6. Comprobar si debemos mostrar el splash de bienvenida
+// 7. Comprobar si debemos mostrar el splash de bienvenida
 $showSplash = false; //
 if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
     $showSplash = true; //
     unset($_SESSION['show_welcome_splash']); //
 }
 
-// 7. Obtener datos del usuario (nombre y foto) para la barra lateral
+// 8. Obtener datos del usuario (nombre y foto) para la barra lateral
 $nombreUsuario = ''; // Default empty
 $profilePic = null; // Default null
 $userHasProfilePic = false; // Flag for checking if user has a pic
@@ -337,6 +340,8 @@ try {
     </div>
 </main>
 </div> 
+
+
 <?php if ($showSplash): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -352,38 +357,28 @@ try {
                     splash.style.display = 'none'; //
                     if(content) content.classList.remove('hidden'); //
                     
-                    // ----- INICIO DE LA MODIFICACIÓN (Arreglar bug) -----
-                    // Llamamos a cargarDatos() DESPUÉS de mostrar el contenido
                     if (typeof cargarDatos === 'function') {
                         cargarDatos();
                     }
-                    // ----- FIN DE LA MODIFICACIÓN -----
 
                 }, { once: true });
             } else {
                  if(content) content.classList.remove('hidden'); // Muestra contenido si no hay splash
             }
 
-        }, 2000); // Reducimos ligeramente el tiempo al quitar la onda
+        }, 2000); 
     });
 </script>
 <?php else: ?>
  <script>
-    // Si no hay splash, muestra el contenido directamente
     document.addEventListener('DOMContentLoaded', function() {
         const content = document.getElementById('dashboard-content');
         if (content) {
             content.classList.remove('hidden');
         }
-        // Asegurarse de que cargarDatos se llame
+
          if (typeof cargarDatos === 'function') {
             cargarDatos();
-         } else {
-             setTimeout(() => {
-                if (typeof cargarDatos === 'function') {
-                    cargarDatos();
-                }
-            }, 100);
          }
     });
  </script>
@@ -391,173 +386,188 @@ try {
 
 
 <script>
-    // Script original del dashboard
-    let cargarDatos; // Declaración global
+    let imcChartInstance = null; //
+    const chartContainer = document.getElementById('imcChart')?.parentNode; //
+    const tablaBody = document.getElementById('historial-tabla-body'); //
+    const deleteSuccessMessage = document.getElementById('delete-success-message'); //
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const chartContainer = document.getElementById('imcChart')?.parentNode; //
-        const tablaBody = document.getElementById('historial-tabla-body'); //
-        const deleteSuccessMessage = document.getElementById('delete-success-message'); //
-        let imcChartInstance = null; //
+    function getClasificacionIMC(imc) {
+         if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-800 dark:text-blue-300' };
+        if (imc < 25) return { texto: 'Peso Normal', color: 'text-green-800 dark:text-green-300' };
+        if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-800 dark:text-yellow-300' };
+        if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-800 dark:text-orange-300' };
+        if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-800 dark:text-red-300' };
+        return { texto: 'Obesidad III', color: 'text-red-900 dark:text-red-200' }; //
+    }
 
-        // MODIFICADO: Colores de clasificación para el nuevo fondo
-        function getClasificacionIMC(imc) {
-             if (imc < 18.5) return { texto: 'Bajo Peso', color: 'text-blue-800 dark:text-blue-300' };
-            if (imc < 25) return { texto: 'Peso Normal', color: 'text-green-800 dark:text-green-300' };
-            if (imc < 30) return { texto: 'Sobrepeso', color: 'text-yellow-800 dark:text-yellow-300' };
-            if (imc < 35) return { texto: 'Obesidad I', color: 'text-orange-800 dark:text-orange-300' };
-            if (imc < 40) return { texto: 'Obesidad II', color: 'text-red-800 dark:text-red-300' };
-            return { texto: 'Obesidad III', color: 'text-red-900 dark:text-red-200' }; //
-        }
+    function cargarDatos() {
+        if (!tablaBody) return; //
+        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">Cargando historial...</td></tr>'; //
 
-        // Asignación a la variable global
-        cargarDatos = function() {
-            if (!tablaBody) return; //
-            tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">Cargando historial...</td></tr>'; //
+        fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken)) //
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errData => {
+                        throw new Error(errData.error || errData.message || 'Respuesta de red no fue OK');
+                    });
+                }
+                return response.json(); //
+            })
+            .then(jsonResponse => { 
+                if (!jsonResponse.success || !jsonResponse.data) {
+                    throw new Error(jsonResponse.error || jsonResponse.message || 'Error en el formato de datos recibidos.');
+                }
+                
+                const data = jsonResponse.data; 
 
-            fetch('get_data.php?token=' + encodeURIComponent(window.csrfToken)) //
-                .then(response => {
-                    if (!response.ok) throw new Error('Respuesta de red no fue OK'); //
-                    return response.json(); //
-                })
-                .then(data => {
-                    if (data.error) throw new Error(data.error); //
+                if (imcChartInstance) { 
+                    imcChartInstance.destroy(); 
+                }
+                if (!chartContainer) return; 
 
-                    if (imcChartInstance) { //
-                        imcChartInstance.destroy(); //
-                    }
-                    if (!chartContainer) return; //
+                if (data.length === 0) { 
+                    chartContainer.innerHTML = '<p class="text-center text-gray-700 dark:text-gray-300">No hay datos registrados todavía.</p>'; 
+                    tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">No hay registros.</td></tr>'; 
+                    return;
+                }
 
-                    // MODIFICADO: color de texto
-                    if (data.length === 0) { //
-                        chartContainer.innerHTML = '<p class="text-center text-gray-700 dark:text-gray-300">No hay datos registrados todavía.</p>'; //
-                        tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">No hay registros.</td></tr>'; //
-                        return;
-                    }
+                const reversedData = [...data].reverse(); 
+                const labels = reversedData.map(item => item.fecha_registro); 
+                const imcData = reversedData.map(item => item.imc); 
 
-                    const reversedData = [...data].reverse(); //
-                    const labels = reversedData.map(item => item.fecha_registro); //
-                    const imcData = reversedData.map(item => item.imc); //
+                const canvas = document.getElementById('imcChart'); 
+                if (!canvas) { 
+                    chartContainer.innerHTML = '<canvas id="imcChart"></canvas>'; 
+                }
+                const ctx = document.getElementById('imcChart').getContext('2d'); 
 
-                    const canvas = document.getElementById('imcChart'); //
-                    if (!canvas) { //
-                        chartContainer.innerHTML = '<canvas id="imcChart"></canvas>'; //
-                    }
-                    const ctx = document.getElementById('imcChart').getContext('2d'); //
-
-                    // MODIFICADO: Colores del gráfico para adaptarse al modo claro/oscuro del nuevo fondo
-                    const isDarkMode = document.documentElement.classList.contains('dark');
-                    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-                    const textColor = isDarkMode ? '#F9FAFB' : '#111827';
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                const textColor = isDarkMode ? '#F9FAFB' : '#111827';
 
 
-                    imcChartInstance = new Chart(ctx, { //
-                        type: 'line', //
-                        data: {
-                            labels: labels, //
-                            datasets: [{
-                                label: 'Índice de Masa Corporal (IMC)', //
-                                data: imcData, //
-                                borderColor: 'rgba(74, 144, 226, 1)', //
-                                backgroundColor: 'rgba(74, 144, 226, 0.2)', //
-                                fill: true, //
-                                tension: 0.1 //
-                            }]
-                        },
-                        options: {
-                            responsive: true, //
-                            maintainAspectRatio: false, //
-                            scales: { 
-                                y: { 
-                                    beginAtZero: false, 
-                                    title: { display: true, text: 'IMC', color: textColor },
-                                    grid: { color: gridColor },
-                                    ticks: { color: textColor }
-                                },
-                                x: {
-                                    grid: { color: gridColor },
-                                    ticks: { color: textColor }
-                                }
+                imcChartInstance = new Chart(ctx, { 
+                    type: 'line', 
+                    data: {
+                        labels: labels, 
+                        datasets: [{
+                            label: 'Índice de Masa Corporal (IMC)', 
+                            data: imcData, 
+                            borderColor: 'rgba(74, 144, 226, 1)', 
+                            backgroundColor: 'rgba(74, 144, 226, 0.2)', 
+                            fill: true, 
+                            tension: 0.1 
+                        }]
+                    },
+                    options: {
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        scales: { 
+                            y: { 
+                                beginAtZero: false, 
+                                title: { display: true, text: 'IMC', color: textColor },
+                                grid: { color: gridColor },
+                                ticks: { color: textColor }
                             },
-                            plugins: {
-                                legend: {
-                                    labels: { color: textColor }
-                                }
+                            x: {
+                                grid: { color: gridColor },
+                                ticks: { color: textColor }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: textColor }
                             }
                         }
-                    });
-
-                    let tableHtml = ''; //
-                    data.forEach(item => { //
-                        const clasificacion = getClasificacionIMC(item.imc); //
-
-                        // MODIFICADO: hover y colores de texto
-                        tableHtml += `
-                            <tr class="hover:bg-subtle-light dark:hover:bg-subtle-dark">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${item.fecha_registro}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.peso} kg</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.altura} m</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${clasificacion.color}">${item.imc}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${clasificacion.color}">${clasificacion.texto}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <button class="btn-delete" data-id="${item.id}" type="button">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        `; //
-                    });
-                    tablaBody.innerHTML = tableHtml; //
-
-                })
-                .catch(error => {
-                    console.error('Error al cargar los datos:', error); //
-                    if (chartContainer) {
-                       chartContainer.innerHTML = '<h2>Error al cargar el gráfico</h2><p>No se pudieron obtener los datos.</p>'; //
-                    }
-                    if (tablaBody) {
-                       tablaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar los registros.</td></tr>'; //
                     }
                 });
-        } // Fin de cargarDatos
 
-        if (tablaBody) { //
-            tablaBody.addEventListener('click', function(e) { //
-                 if (e.target.classList.contains('btn-delete')) { //
-                    const button = e.target; //
-                    const metricId = button.getAttribute('data-id'); //
+                let tableHtml = ''; 
+                data.forEach(item => { 
+                    const clasificacion = getClasificacionIMC(item.imc); 
 
-                    if (confirm('¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer.')) { //
+                    tableHtml += `
+                        <tr class="hover:bg-subtle-light dark:hover:bg-subtle-dark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${item.fecha_registro}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.peso} kg</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${item.altura} m</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${clasificacion.color}">${item.imc}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${clasificacion.color}">${clasificacion.texto}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <button class="btn-delete" data-id="${item.id}" type="button">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    `; 
+                });
+                tablaBody.innerHTML = tableHtml; 
 
-                        const url = `delete_data.php?id=${metricId}&token=${encodeURIComponent(window.csrfToken)}`; //
+            })
+            .catch(error => {
+                console.error('Error al cargar los datos:', error); 
+                if (chartContainer) {
+                   chartContainer.innerHTML = `<h2>Error al cargar el gráfico</h2><p>${error.message || 'No se pudieron obtener los datos.'}</p>`; 
+                }
+                if (tablaBody) {
+                   tablaBody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar los registros: ${error.message || ''}</td></tr>`; 
+                }
+            });
+    } 
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (tablaBody) { 
+            tablaBody.addEventListener('click', function(e) { 
+                 if (e.target.classList.contains('btn-delete')) { 
+                    const button = e.target; 
+                    const metricId = button.getAttribute('data-id'); 
+
+                    if (confirm('¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer.')) { 
+
+                        // ----- INICIO DE LA MODIFICACIÓN (API Call) -----
+                        
+                        // 1. La URL ya no lleva parámetros
+                        const url = 'delete_data.php';
 
                         fetch(url, {
-                            method: 'GET' //
+                            // 2. Cambiar a POST
+                            method: 'POST', 
+                            // 3. Definir la cabecera JSON
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            // 4. Enviar el ID y el Token en el cuerpo como un string JSON
+                            body: JSON.stringify({
+                                id: metricId,
+                                token: window.csrfToken
+                            })
                         })
-                        .then(response => response.json()) //
+                        .then(response => response.json()) 
                         .then(result => {
-                            if (result.success) { //
-                                cargarDatos(); //
-                                if (deleteSuccessMessage) { //
-                                    deleteSuccessMessage.classList.remove('hidden'); //
-                                    setTimeout(() => { //
-                                        deleteSuccessMessage.classList.add('hidden'); //
-                                    }, 3000); //
+                            if (result.success) { 
+                                cargarDatos(); 
+                                if (deleteSuccessMessage) { 
+                                    deleteSuccessMessage.classList.remove('hidden'); 
+                                    setTimeout(() => { 
+                                        deleteSuccessMessage.classList.add('hidden'); 
+                                    }, 3000); 
                                 }
                             } else {
-                                alert('Error al eliminar: ' + (result.error || 'Error desconocido')); //
+                                // Mostramos el error devuelto por la API (ej. "Token no válido")
+                                alert('Error al eliminar: ' + (result.message || 'Error desconocido')); 
                             }
                         })
                         .catch(err => {
-                            console.error('Error en fetch delete:', err); //
-                            alert('Error de conexión al intentar eliminar.'); //
+                            console.error('Error en fetch delete:', err); 
+                            alert('Error de conexión al intentar eliminar.'); 
                         });
+                        
+                        // ----- FIN DE LA MODIFICACIÓN -----
                     }
                 }
             });
         }
-
-       
     });
 </script>
 
