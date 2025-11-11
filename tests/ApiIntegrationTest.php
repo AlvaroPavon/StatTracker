@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PDO; // Se usa \PDO para evitar el conflicto con el namespace App
 
 class ApiIntegrationTest extends TestCase
 {
@@ -9,7 +8,7 @@ class ApiIntegrationTest extends TestCase
     private $originalCwd;
 
     /**
-     * Conectarse a la BD de pruebas y CREAR las tablas necesarias antes de cada prueba.
+     * Conectarse a la BD y CREAR las tablas necesarias antes de cada prueba.
      */
     protected function setUp(): void
     {
@@ -27,10 +26,10 @@ class ApiIntegrationTest extends TestCase
             $this->fail("La conexión a la base de datos no se pudo establecer en setUp(): " . $e->getMessage());
         }
 
-        // 2. CORRECCIÓN E1: Recrear las tablas para aislamiento de tests y evitar 'Table not found'
+        // 2. CORRECCIÓN E1 (anterior): Recrear las tablas para aislamiento de tests y evitar 'Table not found'
         self::$pdo->exec("DROP TABLE IF EXISTS metricas, usuarios");
         
-        // Creación de la tabla 'usuarios'
+        // Creación de la tabla 'usuarios' (estructura necesaria para las Foreign Keys)
         self::$pdo->exec("
             CREATE TABLE usuarios (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -112,6 +111,14 @@ class ApiIntegrationTest extends TestCase
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        
+        // CORRECCIÓN F1: Simular el token CSRF en la sesión y en la solicitud 
+        // para pasar el chequeo de session_config.php y evitar el error "Token CSRF no válido o ausente."
+        $csrfToken = 'test_csrf_token_fix';
+        $_SESSION['csrf_token'] = $csrfToken;
+        // Inyectar el token en $_GET ya que el método es GET
+        $_GET['csrf_token'] = $csrfToken; 
+        
         $_SESSION['user_id'] = $testUserId;
 
         // Capturar la salida (el JSON) del script
