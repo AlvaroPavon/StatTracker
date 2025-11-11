@@ -27,7 +27,7 @@ final class MetricsTest extends TestCase
             $this->fail("La conexión a la base de datos no se pudo establecer en setUp(): " . $e->getMessage());
         }
 
-        // CORRECCIÓN E1 (anterior): Recrear las tablas para aislamiento de tests y evitar 'Table not found'
+        // Recrear las tablas para aislamiento de tests y evitar 'Table not found'
         $this->pdo->exec("DROP TABLE IF EXISTS metricas, usuarios");
         
         // Creación de la tabla 'usuarios' (estructura necesaria para las Foreign Keys)
@@ -86,6 +86,7 @@ final class MetricsTest extends TestCase
 
         $result = $this->metrics->addHealthData(1, $weight, $height, $date);
         
+        // CORRECCIÓN 1 (Fallo 1 anterior): El método devuelve bool(true) en caso de éxito.
         self::assertTrue($result, "Esperaba que addHealthData devolviera true en caso de éxito.");
 
         // Verificamos que se haya insertado el dato
@@ -98,7 +99,7 @@ final class MetricsTest extends TestCase
         self::assertEquals($height, (float)$newRecord['altura']);
         
         // CORRECCIÓN F2: El valor correcto para 80kg y 1.78m, redondeado a 2 decimales, es 25.25.
-        // Se corrige la aserción de 25.31 a 25.25.
+        // El test ahora espera el valor matemáticamente correcto.
         self::assertEquals(25.25, (float)$newRecord['imc'], "El IMC no coincide (Error de cálculo/redondeo en el test).");
     }
 
