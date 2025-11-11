@@ -1,0 +1,398 @@
+= Notas de Entrevista con el Cliente
+:toc:
+:toc-title: Contenido
+:icons: font
+:numbered:
+
+== Información General
+
+*Fecha de la entrevista*: Diciembre 2024 +
+*Cliente/Stakeholder*: Profesor del módulo Puesta en Producción Segura +
+*Entrevistadores*: Equipo de desarrollo StatTracker +
+*Duración*: 45 minutos
+
+== Contexto del Proyecto
+
+=== Descripción Inicial del Cliente
+
+El cliente solicitó el desarrollo de una aplicación web para el registro y seguimiento de estadísticas o métricas personales. La aplicación debe ser sencilla de usar pero funcional, enfocándose en la calidad del código y la implementación de buenas prácticas de desarrollo.
+
+=== Objetivo Principal
+
+____
+"Necesito una aplicación que permita a los usuarios registrar y hacer seguimiento de sus métricas personales de salud, específicamente peso y altura, con cálculo automático del IMC."
+____
+
+== Requisitos Funcionales Identificados
+
+=== RF-001: Sistema de Autenticación
+
+*Necesidad del cliente*:
+
+* Los usuarios deben poder registrarse en el sistema
+* Cada usuario debe tener acceso exclusivo a sus propios datos
+* La autenticación debe ser segura
+
+*Preguntas realizadas*:
+
+[qanda]
+Q: ¿Se requiere autenticación de dos factores?::
+R: No es necesario en la versión inicial, pero la seguridad básica es fundamental.
+
+Q: ¿Hay roles de usuario (admin, usuario normal)?::
+R: No, todos los usuarios tienen el mismo nivel de acceso a sus propios datos.
+
+Q: ¿Se necesita recuperación de contraseña?::
+R: No es prioritario para la primera versión, puede implementarse después.
+
+*Criterios de aceptación*:
+
+* [x] Formulario de registro con validación
+* [x] Formulario de login funcional
+* [x] Contraseñas almacenadas de forma segura (hash)
+* [x] Sesiones persistentes
+* [ ] Recuperación de contraseña (futuro)
+
+=== RF-002: Gestión de Perfil de Usuario
+
+*Necesidad del cliente*:
+
+* Los usuarios deben poder actualizar su información personal
+* Capacidad de cambiar la contraseña
+
+*Preguntas realizadas*:
+
+[qanda]
+Q: ¿Qué información del perfil se puede modificar?::
+R: Nombre, apellidos, email. La contraseña debe cambiarse por separado por seguridad.
+
+Q: ¿Se requiere foto de perfil?::
+R: Sería un plus, pero no es crítico para el MVP.
+
+Q: ¿Pueden los usuarios eliminar su cuenta?::
+R: No es necesario en la primera versión.
+
+*Criterios de aceptación*:
+
+* [x] Actualizar nombre y apellidos
+* [x] Cambiar email (con validación de duplicados)
+* [x] Cambiar contraseña (verificando la actual)
+* [x] Foto de perfil (implementado)
+* [ ] Eliminar cuenta (futuro)
+
+=== RF-003: Registro de Métricas de Salud
+
+*Necesidad del cliente*:
+
+____
+"Lo más importante es que los usuarios puedan añadir sus datos de peso y altura regularmente, y que el sistema calcule el IMC automáticamente."
+____
+
+*Preguntas realizadas*:
+
+[qanda]
+Q: ¿Qué métricas específicas se deben registrar?::
+R: Peso, altura y fecha. El IMC debe calcularse automáticamente.
+
+Q: ¿En qué unidades?::
+R: Kilogramos para peso, metros para altura. El sistema debe ser claro en esto.
+
+Q: ¿Se pueden registrar métricas de fechas pasadas?::
+R: Sí, el usuario debe poder especificar la fecha del registro.
+
+Q: ¿Hay límites en los valores?::
+R: Deben ser valores realistas y positivos. La altura no puede ser cero (división por cero).
+
+*Criterios de aceptación*:
+
+* [x] Formulario para añadir peso (kg)
+* [x] Formulario para añadir altura (m)
+* [x] Selección de fecha de registro
+* [x] Cálculo automático de IMC
+* [x] Validación de valores positivos
+* [x] Prevención de división por cero
+
+=== RF-004: Visualización de Historial
+
+*Necesidad del cliente*:
+
+* Los usuarios deben poder ver todos sus registros históricos
+* El historial debe estar ordenado cronológicamente
+
+*Preguntas realizadas*:
+
+[qanda]
+Q: ¿Cómo deben visualizarse los datos?::
+R: Una tabla simple es suficiente, mostrando todos los datos claramente.
+
+Q: ¿Se necesitan gráficos?::
+R: No es prioritario para el MVP, pero sería una mejora futura interesante.
+
+Q: ¿Cuántos registros se deben mostrar?::
+R: Todos los registros del usuario, sin paginación es aceptable en esta versión.
+
+*Criterios de aceptación*:
+
+* [x] Tabla con todos los registros del usuario
+* [x] Mostrar: peso, altura, IMC, fecha
+* [x] Ordenación por fecha (más reciente primero)
+* [ ] Gráficos de evolución (futuro)
+* [ ] Paginación (si se necesita en futuro)
+
+=== RF-005: Gestión de Registros
+
+*Necesidad del cliente*:
+
+* Los usuarios deben poder eliminar registros incorrectos
+
+*Preguntas realizadas*:
+
+[qanda]
+Q: ¿Se pueden editar registros existentes?::
+R: No es necesario. Pueden eliminar y crear uno nuevo si se equivocaron.
+
+Q: ¿Se requiere confirmación antes de eliminar?::
+R: Sí, para evitar eliminaciones accidentales.
+
+Q: ¿Se guardan registros eliminados (papelera)?::
+R: No, la eliminación puede ser permanente.
+
+*Criterios de aceptación*:
+
+* [x] Botón de eliminar por registro
+* [x] Solo el propietario puede eliminar sus registros
+* [x] Eliminación permanente
+* [ ] Confirmación de eliminación (recomendado en frontend)
+* [ ] Edición de registros (futuro)
+
+== Requisitos No Funcionales
+
+=== RNF-001: Seguridad
+
+*Necesidades identificadas*:
+
+* Contraseñas cifradas (bcrypt o similar)
+* Protección contra SQL injection
+* Validación de datos en servidor
+* Sesiones seguras
+* Cada usuario solo puede acceder a sus propios datos
+
+*Implementación*:
+
+* [x] Password hashing con `password_hash()` de PHP (bcrypt)
+* [x] Prepared statements en todas las consultas SQL
+* [x] Validación de inputs en backend
+* [x] Sesiones PHP configuradas correctamente
+* [x] Verificación de user_id en todas las operaciones
+
+=== RNF-002: Usabilidad
+
+*Necesidades del cliente*:
+
+____
+"La aplicación debe ser intuitiva. Un usuario nuevo debe poder empezar a usarla sin manual."
+____
+
+*Requisitos*:
+
+* Interfaz limpia y clara
+* Mensajes de error descriptivos
+* Formularios simples
+* Feedback inmediato de acciones
+
+*Implementación*:
+
+* [x] Diseño responsive
+* [x] Mensajes de error claros
+* [x] Validación en tiempo real (frontend)
+* [x] Confirmaciones de acciones exitosas
+
+=== RNF-003: Rendimiento
+
+*Expectativas*:
+
+* Tiempos de respuesta rápidos (<2 segundos)
+* Base de datos optimizada
+
+*Implementación*:
+
+* [x] Índices en base de datos (email, user_id)
+* [x] Consultas optimizadas
+* [x] Sin N+1 queries
+
+=== RNF-004: Mantenibilidad
+
+*Necesidad del cliente*:
+
+____
+"El código debe ser limpio y estar bien probado. Es un proyecto académico, así que la calidad es importante."
+____
+
+*Requisitos*:
+
+* Código organizado en clases
+* Separación de responsabilidades
+* Pruebas unitarias
+* Documentación clara
+
+*Implementación*:
+
+* [x] Arquitectura MVC básica
+* [x] Clases específicas (Auth, User, Metrics)
+* [x] PHPUnit para testing
+* [x] Cobertura de código >70%
+* [x] Comentarios en código
+* [x] README con instrucciones
+
+== Restricciones y Limitaciones
+
+=== Técnicas
+
+* *Lenguaje*: PHP (7.4+)
+* *Base de datos*: MySQL/MariaDB
+* *Framework*: Ninguno (PHP vanilla)
+* *Testing*: PHPUnit
+
+=== Temporales
+
+* *Plazo*: 2-3 semanas para el MVP
+* *Entrega*: Código + documentación + pruebas
+
+=== Presupuestarias
+
+* Proyecto académico, sin presupuesto real
+* Uso de herramientas gratuitas/open source
+
+== Ambigüedades y Aclaraciones
+
+=== Puntos Ambiguos Identificados
+
+. *Unidades de medida*
+   * Inicialmente no estaba claro si se usarían libras o kilogramos
+   * *Aclaración*: Se usará sistema métrico (kg, metros)
+
+. *Formato de fecha*
+   * ¿Permitir fechas futuras?
+   * *Aclaración*: Idealmente no, pero no es crítico validarlo
+
+. *Límites de datos*
+   * ¿Cuánto peso/altura son valores realistas?
+   * *Aclaración*: Validación básica, confiar en el usuario
+
+. *Interpretación del IMC*
+   * ¿Debe la aplicación dar consejos de salud?
+   * *Aclaración*: No, solo calcular y mostrar el número
+
+=== Preguntas Pendientes
+
+. ¿Se necesitará exportación de datos (PDF, CSV)?
+   * Respuesta: No prioritario, fase futura
+
+. ¿Múltiples idiomas?
+   * Respuesta: Solo español inicialmente
+
+. ¿Notificaciones o recordatorios?
+   * Respuesta: No requerido
+
+== Prioridades del Cliente
+
+=== Prioridad Alta (Must Have)
+
+. Sistema de autenticación funcional
+. Registro de peso, altura y fecha
+. Cálculo automático de IMC
+. Visualización de historial
+. Eliminación de registros
+
+=== Prioridad Media (Should Have)
+
+. Actualización de perfil
+. Cambio de contraseña
+. Validaciones robustas
+. Mensajes de error claros
+
+=== Prioridad Baja (Could Have)
+
+. Foto de perfil
+. Gráficos de evolución
+. Exportación de datos
+. Recuperación de contraseña
+
+=== Fuera del Alcance (Won't Have)
+
+. Aplicación móvil nativa
+. Integración con wearables
+. Red social / compartir datos
+. Planes de nutrición o ejercicio
+. Múltiples idiomas
+
+== Conclusiones de la Entrevista
+
+=== Resumen de Requisitos Acordados
+
+Se acordó desarrollar una aplicación web de seguimiento de métricas de salud con:
+
+* Autenticación segura de usuarios
+* Registro de peso, altura e IMC
+* Historial completo de mediciones
+* Gestión básica de perfil
+* Interfaz limpia y responsive
+* Código bien estructurado y probado
+
+=== Próximos Pasos
+
+. Crear mockups de las pantallas principales
+. Diseñar el esquema de base de datos
+. Implementar las clases básicas (Auth, User, Metrics)
+. Desarrollar las interfaces web
+. Escribir pruebas unitarias
+. Generar informe de cobertura
+. Documentar el proyecto
+
+=== Cambios Esperados
+
+El cliente advirtió que podría haber cambios en los requisitos durante el desarrollo, simulando un entorno real de trabajo. El equipo debe estar preparado para adaptar el código de manera flexible.
+
+== Anexos
+
+=== Anexo A: Esquema de Base de Datos Propuesto
+
+[source,sql]
+----
+-- Tabla de usuarios
+CREATE TABLE usuarios (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(100),
+  apellidos VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255),
+  created_at TIMESTAMP
+);
+
+-- Tabla de métricas
+CREATE TABLE metricas (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  peso DECIMAL(5,2),
+  altura DECIMAL(3,2),
+  imc DECIMAL(5,2),
+  fecha_registro DATE,
+  created_at TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES usuarios(id)
+);
+----
+
+=== Anexo B: Bocetos Iniciales
+
+Durante la entrevista se realizaron bocetos a mano alzada de:
+
+* Pantalla de login
+* Dashboard principal
+* Formulario de registro de datos
+* Tabla de historial
+
+Estos bocetos se digitalizaron posteriormente en mockups formales con Mermaid.
+
+---
+
+_Documento de trabajo interno. Estas notas sirvieron de base para el desarrollo del proyecto StatTracker._
