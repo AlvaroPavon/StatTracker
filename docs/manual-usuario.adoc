@@ -1,0 +1,497 @@
+= Manual de Usuario - StatTracker
+:toc:
+:toc-title: Contenido
+:icons: font
+:source-highlighter: rouge
+:numbered:
+
+== Introducción
+
+=== ¿Qué es StatTracker?
+
+StatTracker es una plataforma web diseñada para el registro, visualización y gestión de estadísticas de salud personales. Permite a los usuarios realizar un seguimiento de sus métricas corporales como peso, altura e Índice de Masa Corporal (IMC) a lo largo del tiempo.
+
+=== Objetivo de la Aplicación
+
+El objetivo principal de StatTracker es proporcionar una herramienta sencilla y eficaz para:
+
+* Registrar datos de salud de forma periódica
+* Visualizar la evolución de las métricas a lo largo del tiempo
+* Calcular automáticamente el IMC
+* Gestionar el perfil de usuario de forma segura
+* Mantener un historial completo de mediciones
+
+=== Público Objetivo
+
+Esta aplicación está dirigida a:
+
+* Personas que desean monitorizar su estado físico
+* Usuarios que siguen programas de pérdida o ganancia de peso
+* Profesionales de la salud que necesitan registrar datos de pacientes
+* Cualquier persona interesada en llevar un registro histórico de sus métricas corporales
+
+== Requisitos del Sistema
+
+=== Requisitos Técnicos
+
+* *Navegador web moderno*: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+* *Conexión a Internet*: Requerida para acceder a la aplicación
+* *JavaScript*: Debe estar habilitado en el navegador
+
+=== Requisitos para el Servidor
+
+* PHP 7.4 o superior
+* Servidor web (Apache/Nginx)
+* MySQL 5.7+ o MariaDB 10.3+
+* Composer para gestión de dependencias
+
+== Funcionalidades Principales
+
+=== R001: Registro de Usuarios
+
+El sistema permite a nuevos usuarios crear una cuenta proporcionando:
+
+* Nombre
+* Apellidos
+* Dirección de correo electrónico
+* Contraseña segura
+
+*Validaciones*:
+
+* El email debe tener un formato válido
+* Todos los campos son obligatorios
+* El email no puede estar duplicado en el sistema
+* La contraseña se almacena de forma segura (hash)
+
+=== R002: Inicio de Sesión
+
+Los usuarios registrados pueden acceder al sistema mediante:
+
+* Email registrado
+* Contraseña
+
+*Características de seguridad*:
+
+* Verificación de credenciales cifradas
+* Sesión persistente después del login
+* Mensaje de error genérico para evitar enumeration attacks
+
+=== R003: Gestión de Perfil
+
+Los usuarios autenticados pueden:
+
+* Actualizar su nombre y apellidos
+* Cambiar su dirección de email
+* Modificar su contraseña
+* Subir o actualizar foto de perfil
+
+*Validaciones de actualización de perfil*:
+
+* El nuevo email debe ser válido
+* El email no puede estar en uso por otro usuario
+* Todos los campos son obligatorios
+
+*Validaciones de cambio de contraseña*:
+
+* La contraseña actual debe ser correcta
+* La nueva contraseña debe tener al menos 8 caracteres
+* La confirmación de contraseña debe coincidir
+* Todos los campos son obligatorios
+
+=== R004: Registro de Métricas de Salud
+
+Los usuarios pueden añadir registros de sus métricas corporales:
+
+* *Peso*: En kilogramos (Ej: 75.5)
+* *Altura*: En metros (Ej: 1.75)
+* *Fecha de registro*: Fecha de la medición
+* *IMC*: Calculado automáticamente por el sistema
+
+*Cálculo del IMC*:
+
+----
+IMC = Peso (kg) / (Altura (m))²
+----
+
+El sistema redondea el IMC a 2 decimales.
+
+*Validaciones*:
+
+* La altura debe ser mayor que 0 (evita división por cero)
+* Todos los campos son obligatorios
+* El peso y altura deben ser valores numéricos positivos
+
+=== R005: Visualización de Historial
+
+Los usuarios pueden ver todos sus registros históricos:
+
+* Listado ordenado por fecha (más reciente primero)
+* Visualización de: peso, altura, IMC y fecha de registro
+* Interfaz clara y fácil de leer
+
+=== R006: Eliminación de Registros
+
+Los usuarios pueden eliminar registros específicos de su historial:
+
+* Solo el propietario del registro puede eliminarlo
+* Confirmación antes de eliminar (previene borrado accidental)
+* Eliminación permanente de la base de datos
+
+== Guía de Uso
+
+=== Primer Acceso: Registro
+
+. Accede a la página principal de StatTracker
+. Haz clic en el botón *"Registrarse"* o enlace *"¿No tienes cuenta? Regístrate aquí"*
+. Completa el formulario de registro:
+   * Nombre: Tu nombre
+   * Apellidos: Tus apellidos
+   * Email: Tu correo electrónico
+   * Contraseña: Una contraseña segura (mínimo 8 caracteres recomendado)
+   * Confirmar contraseña: Repite la contraseña
+. Haz clic en *"Registrarse"*
+. Si el registro es exitoso, serás redirigido a la página de inicio de sesión
+
+[NOTE]
+====
+Si el email ya está registrado, recibirás un mensaje de error indicándolo.
+====
+
+=== Iniciar Sesión
+
+. Accede a la página de login de StatTracker
+. Introduce tu email y contraseña
+. Haz clic en *"Iniciar Sesión"*
+. Serás redirigido al panel principal (Dashboard)
+
+=== Uso del Dashboard
+
+Una vez autenticado, verás el panel principal con:
+
+* *Barra de navegación superior*: Con tu nombre y opciones de perfil/logout
+* *Formulario de añadir datos*: Para registrar nuevas métricas
+* *Tabla de historial*: Con todos tus registros anteriores
+
+=== Añadir un Nuevo Registro de Salud
+
+. En el Dashboard, localiza el formulario *"Añadir Datos de Salud"*
+. Completa los campos:
+   * *Peso (kg)*: Introduce tu peso en kilogramos (Ej: 72.5)
+   * *Altura (m)*: Introduce tu altura en metros (Ej: 1.75)
+   * *Fecha*: Selecciona la fecha de la medición
+. Haz clic en *"Añadir Datos"*
+. El sistema calculará automáticamente tu IMC
+. Los datos aparecerán inmediatamente en tu tabla de historial
+
+[TIP]
+====
+Para obtener la altura en metros, divide tu altura en centímetros entre 100.
+Ejemplo: 175 cm = 1.75 m
+====
+
+=== Visualizar tu Historial
+
+En el Dashboard, la tabla de historial muestra:
+
+* *ID*: Identificador único del registro
+* *Peso*: Tu peso registrado
+* *Altura*: Tu altura registrada
+* *IMC*: Índice de Masa Corporal calculado
+* *Fecha de Registro*: Cuándo se tomó la medición
+* *Acciones*: Botón para eliminar el registro
+
+Los registros se ordenan automáticamente mostrando los más recientes primero.
+
+=== Eliminar un Registro
+
+. Localiza el registro que deseas eliminar en la tabla de historial
+. Haz clic en el botón *"Eliminar"* (icono de papelera o botón rojo)
+. Confirma la eliminación en el diálogo que aparece
+. El registro desaparecerá de tu historial
+
+[WARNING]
+====
+La eliminación es permanente y no se puede deshacer. Asegúrate de que realmente deseas eliminar el registro.
+====
+
+=== Actualizar tu Perfil
+
+. Haz clic en tu nombre o en el menú de usuario en la barra superior
+. Selecciona *"Mi Perfil"* o *"Perfil"*
+. Actualiza los campos que desees modificar:
+   * Nombre
+   * Apellidos
+   * Email
+   * Foto de perfil (si está disponible)
+. Haz clic en *"Actualizar Perfil"*
+. Recibirás una confirmación de que los cambios se guardaron correctamente
+
+=== Cambiar Contraseña
+
+. Accede a tu perfil (menú de usuario → "Perfil")
+. Busca la sección *"Cambiar Contraseña"*
+. Completa los campos:
+   * *Contraseña Actual*: Tu contraseña actual
+   * *Nueva Contraseña*: Tu nueva contraseña (mínimo 8 caracteres)
+   * *Confirmar Nueva Contraseña*: Repite la nueva contraseña
+. Haz clic en *"Cambiar Contraseña"*
+. Recibirás confirmación del cambio
+
+[IMPORTANT]
+====
+Asegúrate de recordar tu nueva contraseña. El sistema no puede recuperar contraseñas olvidadas (están cifradas).
+====
+
+=== Cerrar Sesión
+
+. Haz clic en tu nombre en la barra superior
+. Selecciona *"Cerrar Sesión"* o *"Logout"*
+. Serás redirigido a la página de inicio de sesión
+. Tu sesión se cerrará de forma segura
+
+== Interpretación del IMC
+
+=== ¿Qué es el IMC?
+
+El Índice de Masa Corporal (IMC) es una medida de asociación entre el peso y la altura de una persona. Se utiliza como indicador general del estado nutricional.
+
+=== Tabla de Clasificación del IMC (Adultos)
+
+[cols="1,2,3"]
+|===
+|IMC |Clasificación |Descripción
+
+|< 18.5
+|Bajo peso
+|Puede indicar desnutrición o problemas de salud
+
+|18.5 - 24.9
+|Peso normal
+|Rango de peso saludable
+
+|25.0 - 29.9
+|Sobrepeso
+|Peso por encima del rango saludable
+
+|30.0 - 34.9
+|Obesidad Clase I
+|Obesidad moderada
+
+|35.0 - 39.9
+|Obesidad Clase II
+|Obesidad severa
+
+|≥ 40.0
+|Obesidad Clase III
+|Obesidad mórbida
+|===
+
+[NOTE]
+====
+El IMC es solo un indicador y no considera factores como:
+
+* Masa muscular
+* Densidad ósea
+* Distribución de grasa
+* Edad y sexo
+
+Consulta siempre con un profesional de la salud para una evaluación completa.
+====
+
+== Preguntas Frecuentes (FAQ)
+
+=== ¿Puedo usar StatTracker en mi móvil?
+
+Sí, StatTracker es una aplicación web responsive que funciona en navegadores móviles modernos. Solo necesitas acceso a Internet.
+
+=== ¿Con qué frecuencia debo registrar mis datos?
+
+La frecuencia depende de tus objetivos:
+
+* *Pérdida/ganancia de peso*: Semanal o quincenal
+* *Mantenimiento*: Mensual
+* *Seguimiento médico*: Según indicaciones de tu profesional de salud
+
+=== ¿Puedo editar un registro después de crearlo?
+
+Actualmente, la aplicación no permite editar registros existentes. Si cometiste un error:
+
+. Elimina el registro incorrecto
+. Crea uno nuevo con los datos correctos
+
+=== ¿Mis datos están seguros?
+
+Sí, StatTracker implementa medidas de seguridad:
+
+* Contraseñas cifradas con algoritmos de hash seguros (bcrypt)
+* Sesiones seguras
+* Validación de datos en servidor
+* Protección contra inyección SQL mediante prepared statements
+* Solo tú puedes ver y modificar tus datos
+
+=== ¿Qué hago si olvidé mi contraseña?
+
+Actualmente, necesitarás contactar con el administrador del sistema para restablecer tu contraseña.
+
+[NOTE]
+====
+En futuras versiones se planea implementar un sistema de recuperación automática de contraseñas.
+====
+
+=== ¿Puedo exportar mis datos?
+
+En la versión actual, la exportación de datos no está disponible. Esta funcionalidad está planificada para versiones futuras.
+
+=== ¿Cuántos registros puedo almacenar?
+
+No hay límite específico en el número de registros que puedes almacenar. Puedes registrar tus métricas tantas veces como desees.
+
+=== ¿La aplicación calcula el IMC automáticamente?
+
+Sí, el sistema calcula automáticamente el IMC cuando introduces tu peso y altura. No necesitas calcularlo manualmente.
+
+== Solución de Problemas
+
+=== No puedo iniciar sesión
+
+*Posibles causas y soluciones*:
+
+. *Credenciales incorrectas*
+   * Verifica que el email esté escrito correctamente
+   * Asegúrate de que la contraseña sea la correcta (mayúsculas/minúsculas)
+   * Intenta restablecer la contraseña si es necesario
+
+. *Cuenta no registrada*
+   * Verifica que completaste el registro
+   * Si es necesario, regístrate nuevamente
+
+. *Problemas del navegador*
+   * Borra las cookies y caché del navegador
+   * Intenta con otro navegador
+   * Asegúrate de que JavaScript esté habilitado
+
+=== No aparecen mis datos después de añadirlos
+
+*Posibles soluciones*:
+
+. Refresca la página (F5 o Ctrl+R)
+. Cierra sesión y vuelve a iniciar sesión
+. Verifica que no haya mensajes de error en pantalla
+. Comprueba tu conexión a Internet
+
+=== Error al actualizar mi perfil
+
+*Verifica lo siguiente*:
+
+. El email que intentas usar no esté ya registrado por otro usuario
+. Todos los campos estén completos
+. El formato del email sea válido (ejemplo@dominio.com)
+. No haya caracteres especiales no permitidos
+
+=== El IMC calculado parece incorrecto
+
+*Revisa*:
+
+. Que hayas introducido la altura en *metros* (no centímetros)
+   * Correcto: 1.75
+   * Incorrecto: 175
+
+. Que el peso esté en *kilogramos*
+   * Correcto: 70.5
+   * Incorrecto: 70500 (gramos)
+
+. Usa el punto como separador decimal, no la coma
+   * Correcto: 1.75
+   * Incorrecto: 1,75
+
+=== La página no carga correctamente
+
+. Verifica tu conexión a Internet
+. Intenta refrescar la página (Ctrl+Shift+R para forzar recarga)
+. Borra la caché del navegador
+. Prueba con otro navegador
+. Contacta con el soporte técnico si el problema persiste
+
+== Glosario de Términos
+
+[glossary]
+IMC:: Índice de Masa Corporal. Medida que relaciona peso y altura para evaluar el estado nutricional.
+
+Dashboard:: Panel principal donde se visualizan los datos y se interactúa con la aplicación.
+
+Perfil:: Información personal del usuario (nombre, apellidos, email, foto).
+
+Métrica:: Medición específica de salud (peso, altura, IMC en una fecha determinada).
+
+Registro:: Conjunto de métricas guardadas en una fecha específica.
+
+Sesión:: Periodo de tiempo en el que un usuario está autenticado en el sistema.
+
+Hash:: Técnica de cifrado unidireccional usada para proteger contraseñas.
+
+== Contacto y Soporte
+
+=== Reportar Problemas
+
+Si encuentras algún problema o error en la aplicación:
+
+. Anota el mensaje de error exacto (si lo hay)
+. Describe los pasos que seguiste antes del error
+. Indica el navegador y versión que estás usando
+. Contacta con el administrador del sistema
+
+=== Sugerencias y Mejoras
+
+Tus sugerencias son bienvenidas. Si tienes ideas para mejorar StatTracker, contacta con el equipo de desarrollo.
+
+== Información de Versión
+
+*Versión*: 1.0 +
+*Fecha de última actualización*: Enero 2025 +
+*Autor*: Equipo StatTracker
+
+== Apéndices
+
+=== Apéndice A: Atajos de Teclado
+
+Actualmente, StatTracker no implementa atajos de teclado específicos. Se puede navegar usando la tecla Tab y Enter para enviar formularios.
+
+=== Apéndice B: Compatibilidad de Navegadores
+
+[cols="2,1,3"]
+|===
+|Navegador |Versión Mínima |Notas
+
+|Google Chrome
+|90+
+|Totalmente compatible
+
+|Mozilla Firefox
+|88+
+|Totalmente compatible
+
+|Safari
+|14+
+|Totalmente compatible
+
+|Microsoft Edge
+|90+
+|Totalmente compatible
+
+|Internet Explorer
+|No soportado
+|Usar navegadores modernos
+|===
+
+=== Apéndice C: Límites y Restricciones
+
+* *Longitud máxima de nombres*: 100 caracteres
+* *Longitud máxima de email*: 100 caracteres
+* *Longitud mínima de contraseña*: 8 caracteres recomendados
+* *Formato de peso*: Decimal con 2 decimales (max 999.99 kg)
+* *Formato de altura*: Decimal con 2 decimales (max 9.99 m)
+* *Formato de IMC*: Decimal con 2 decimales (calculado automáticamente)
+
+---
+
+_Este manual es un documento vivo y se actualiza regularmente. Para la versión más reciente, consulta la wiki del proyecto._
