@@ -1,54 +1,60 @@
 name: PHP CI (PHPUnit & MySQL)
 
-# 1. Definir cuándo se ejecuta este workflow
 on:
   push:
-    branches: [ "main" ] # Se ejecuta en cada push a la rama 'main'
+    branches: [ "main" ] 
   pull_request:
-    branches: [ "main" ] # Se ejecuta en cada Pull Request a la rama 'main'
+    branches: [ "main" ] 
 
-# 2. Definir las variables de entorno para la base de datos de pruebas
-# Estas variables sobrescribirán las de phpunit.xml durante la CI.
 env:
   DB_HOST: 127.0.0.1
-  DB_DATABASE: testing_db # Un nombre de BD temporal para la CI
+  DB_DATABASE: testing_db 
   DB_USERNAME: root
-  DB_PASSWORD: '' # La base de datos del runner de GitHub no usa contraseña por defecto
-
+  DB_PASSWORD: '' 
+  # Necesario para que MySQL sepa dónde escuchar las conexiones dentro del runner
+  # El puerto 3306 es el puerto estándar de MySQL
+  MYSQL_PORT: 3306 
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     
+    # 1. MODIFICACIÓN CRÍTICA: Uso de 'services' para MySQL
+    services:
+      mysql:
+        image: mysql:8.0 # Usamos una imagen Docker oficial de MySQL
+        env:
+          MYSQL_DATABASE: ${{ env.DB_DATABASE }}
+          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
+        # Mapea el puerto del contenedor (3306) al host (127.0.0.1:3306)
+        ports:
+          - ${{ env.MYSQL_PORT }}:3306 
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 3. Configurar PHP con las extensiones necesarias
+      # 2. Configurar PHP
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Asumo que usas PHP 8.2 o similar
-          extensions: mbstring, pdo, pdo_mysql # extensiones que necesita tu proyecto
-          coverage: none # No necesitamos cobertura aquí, solo ejecutar tests
-
-      # 4. Configurar y arrancar el servicio de MySQL
-      - name: Start MySQL
-        uses: mirko-heizenreder/action-mysql@v1
-        with:
-          database: ${{ env.DB_DATABASE }}
-          root-password: ${{ env.DB_PASSWORD }}
+          php-version: '8.2' 
+          extensions: mbstring, pdo, pdo_mysql
+          coverage: none
           
-      # 5. Esperar a que la base de datos esté lista
+      # 3. Esperar a que MySQL esté listo y funcione
       - name: Wait for MySQL
-        run: while ! mysql -u ${{ env.DB_USERNAME }} -h 127.0.0.1 -e "quit" 2>/dev/null; do sleep 1; done
+        # Intentamos una conexión directa, esperando hasta que tenga éxito
+        run: while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do sleep 1; done
         
-      # 6. Importar el esquema de la base de datos
-      # Esto asume que tu archivo 'database.sql' está en la raíz, lo cual es correcto.
+      # 4. Importar el esquema de la base de datos (usando las credenciales y el puerto del servicio)
       - name: Import database schema (database.sql)
         run: |
-          mysql -u ${{ env.DB_USERNAME }} -h 127.0.0.1 ${{ env.DB_DATABASE }} < database.sql
+          mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} ${{ env.DB_DATABASE }} < database.sql
         
-      # 7. Instalar dependencias con Composer
+      # 5. Instalar dependencias
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-dir)" >> $GITHUB_OUTPUT
@@ -63,6 +69,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
       
-      # 8. Ejecutar PHPUnit
+      # 6. Ejecutar PHPUnit
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
