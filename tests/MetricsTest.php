@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 use App\Metrics;
 use PHPUnit\Framework\TestCase;
-use PDO; // Se usa \PDO en setUp/tearDown
+use PDO;
 use PDOException;
+
+// Necesitas la configuración de conexión a la BD de pruebas aquí
+// Asegúrate de que tu tests/bootstrap.php o un archivo similar se encargue de cargar $pdo
 
 final class MetricsTest extends TestCase
 {
@@ -13,18 +16,18 @@ final class MetricsTest extends TestCase
 
     public function setUp(): void
     {
-        // 1. Conexión a la BD de pruebas (Usamos las variables de entorno de phpunit.xml / CI)
-        // Uso de \PDO para evitar el conflicto con el namespace App
+        // El runner de GitHub Actions inyecta estas variables
         $dsn = 'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_DATABASE') . ';port=' . getenv('MYSQL_PORT');
         
         try {
+            // Uso de \PDO para evitar el conflicto con el namespace App
             $this->pdo = new \PDO($dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             $this->fail("La conexión a la base de datos no se pudo establecer en setUp(): " . $e->getMessage());
         }
 
-        // 2. CORRECCIÓN E1: Recrear las tablas para aislamiento de tests y evitar 'Table not found'
+        // CORRECCIÓN E1 (anterior): Recrear las tablas para aislamiento de tests y evitar 'Table not found'
         $this->pdo->exec("DROP TABLE IF EXISTS metricas, usuarios");
         
         // Creación de la tabla 'usuarios' (estructura necesaria para las Foreign Keys)
@@ -52,7 +55,6 @@ final class MetricsTest extends TestCase
             )
         ");
 
-        // CORRECCIÓN E2-E9: La clase Metrics ya está importada y se instancia correctamente
         $this->metrics = new Metrics($this->pdo);
 
         // Insertar fixture: usuario 1 y su registro inicial (IMC 25.95)
@@ -65,7 +67,6 @@ final class MetricsTest extends TestCase
     
     public function tearDown(): void
     {
-        // Se deja nulo, ya que el setUp con DROP/CREATE es más seguro para el aislamiento.
         $this->pdo = null;
         $this->metrics = null;
     }
@@ -78,8 +79,12 @@ final class MetricsTest extends TestCase
      */
     public function testAddHealthDataSuccess(): void
     {
-        // 80 kg / 1.78m^2 = 25.3086... -> 25.31 (Aserción corregida para usar el valor redondeado)
-        $result = $this->metrics->addHealthData(1, 80.0, 1.78, '2025-01-02');
+        // Cálculo: 80 kg / 1.78m^2 = 25.2536...
+        $weight = 80.0;
+        $height = 1.78;
+        $date = '2025-01-02';
+
+        $result = $this->metrics->addHealthData(1, $weight, $height, $date);
         
         self::assertTrue($result, "Esperaba que addHealthData devolviera true en caso de éxito.");
 
@@ -89,10 +94,12 @@ final class MetricsTest extends TestCase
         $newRecord = $stmt->fetch();
 
         self::assertNotFalse($newRecord);
-        self::assertEquals(80.0, (float)$newRecord['peso']);
-        self::assertEquals(1.78, (float)$newRecord['altura']);
-        // 25.31
-        self::assertEquals(25.31, (float)$newRecord['imc']);
+        self::assertEquals($weight, (float)$newRecord['peso']);
+        self::assertEquals($height, (float)$newRecord['altura']);
+        
+        // CORRECCIÓN F2: El valor correcto para 80kg y 1.78m, redondeado a 2 decimales, es 25.25.
+        // Se corrige la aserción de 25.31 a 25.25.
+        self::assertEquals(25.25, (float)$newRecord['imc'], "El IMC no coincide (Error de cálculo/redondeo en el test).");
     }
 
     /**
@@ -106,7 +113,6 @@ final class MetricsTest extends TestCase
         
         $result = $this->metrics->addHealthData(1, 80.0, -1.75, '2025-01-01');
         
-        // La prueba es correcta al esperar el mismo mensaje, ya que -1.75 <= 0 no es estricto en la validación inicial.
         self::assertEquals("La altura no puede ser cero.", $result);
     }
 
@@ -119,7 +125,6 @@ final class MetricsTest extends TestCase
         $invalidUserId = 999; 
         $result = $this->metrics->addHealthData($invalidUserId, 70.0, 1.75, '2025-01-01');
         
-        // La prueba espera este mensaje de error personalizado.
         self::assertEquals("ID de usuario inválido.", $result, 
             "Esperaba el mensaje de error de ID de usuario inválido.");
     }
@@ -139,11 +144,11 @@ final class MetricsTest extends TestCase
         
         self::assertIsArray($data);
         // Ahora hay 2 registros (1 del setup + 1 de este test)
-        // Corrección F2 de la sesión anterior: el test ahora espera el recuento real.
         self::assertCount(2, $data, "Debe haber 2 registros en la tabla.");
 
         // El registro más reciente debe ser el primero (el que acabamos de añadir)
         self::assertEquals(82.0, (float)$data[0]['peso'], "El peso del registro más reciente no coincide.");
+        // El IMC del segundo registro (82kg / 1.80^2) es 25.3086..., que redondeado es 25.31.
         self::assertEquals(25.31, (float)$data[0]['imc'], "El IMC del registro más reciente no coincide.");
         
         // El registro inicial debe ser el segundo
