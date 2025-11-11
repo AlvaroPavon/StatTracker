@@ -3,12 +3,7 @@
 namespace App;
 
 use PDO;
-use PDOException;
 
-/**
- * Clase Metrics para manejar la lógica de datos de salud (peso, altura, etc.)
- * VERSIÓN CORREGIDA para la BD 'metricas'
- */
 class Metrics
 {
     private $pdo;
@@ -19,98 +14,81 @@ class Metrics
     }
 
     /**
-     * Añade un nuevo registro de salud para un usuario.
-     *
-     * @param int $userId
-     * @param float $peso
-     * @param float $altura
-     * @param float $imc
-     * @return int|string Devuelve el ID del nuevo registro si tiene éxito, o un string con el mensaje de error si falla.
+     * Añade un nuevo registro de salud (peso, altura, imc) para un usuario.
      */
-    public function addHealthData(int $userId, float $peso, float $altura, float $imc): int|string
+    public function addHealthData(int $user_id, float $peso, float $altura, string $fecha_registro): bool|string
     {
-        // 1. Validación simple
-        if ($userId <= 0) {
-             return "ID de usuario inválido.";
+        // 1. Calcular IMC
+        if ($altura <= 0) {
+            return "La altura no puede ser cero.";
         }
-        if ($peso <= 0 || $altura <= 0 || $imc <= 0) {
-            return "Los valores de peso, altura e IMC deben ser positivos.";
-        }
-        
-        // 2. Obtener la fecha actual (formato YYYY-MM-DD para la BD)
-        $fecha_registro = date('Y-m-d');
+        $imc = round($peso / ($altura * $altura), 2);
+
+        // 2. Preparar la inserción
+        $sql = "INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) 
+                VALUES (:user_id, :peso, :altura, :imc, :fecha_registro)";
 
         try {
-            // 3. CORRECCIÓN: Insertar en la tabla 'metricas'
-            $stmt = $this->pdo->prepare(
-                "INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) VALUES (?, ?, ?, ?, ?)"
-            );
-            
-            // 4. Ejecutamos la inserción
-            $stmt->execute([$userId, $peso, $altura, $imc, $fecha_registro]);
-
-            // 5. Devolvemos el ID
-            return (int)$this->pdo->lastInsertId();
-
-        } catch (PDOException $e) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'user_id' => $user_id,
+                'peso' => $peso,
+                'altura' => $altura,
+                'imc' => $imc,
+                'fecha_registro' => $fecha_registro
+            ]);
+            return true;
+        } catch (\PDOException $e) {
+            // Devolver mensaje de error
             return "Error al guardar los datos: " . $e->getMessage();
         }
     }
 
     /**
-     * Obtiene todos los registros de salud para un usuario.
-     *
-     * @param int $userId
-     * @return array|string Devuelve un array de datos si tiene éxito, o un string con el mensaje de error si falla.
+     * Obtiene todos los registros de salud de un usuario.
      */
-    public function getHealthData(int $userId): array|string
+    public function getHealthData(int $user_id): array|string
     {
-        if ($userId <= 0) {
-            return "ID de usuario inválido.";
-        }
+        // MODIFICACIÓN (BUG): Añadir 'id DESC' como segundo criterio de ordenación
+        // Esto soluciona el "empate" cuando dos registros tienen la misma fecha.
+        $sql = "SELECT id, peso, altura, imc, fecha_registro 
+                FROM metricas 
+                WHERE user_id = :user_id 
+                ORDER BY fecha_registro DESC, id DESC";
 
         try {
-            // 2. CORRECCIÓN: Seleccionar de 'metricas' y usar 'fecha_registro'
-            $stmt = $this->pdo->prepare(
-                "SELECT id, peso, altura, imc, fecha_registro FROM metricas WHERE user_id = ? ORDER BY fecha_registro ASC"
-            );
-            $stmt->execute([$userId]);
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        } catch (PDOException $e) {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['user_id' => $user_id]);
+            return $stmt->fetchAll();
+        } catch (\PDOException $e) {
             return "Error al obtener los datos: " . $e->getMessage();
         }
     }
 
     /**
-     * Borra un registro de salud específico.
-     *
-     * @param int $userId El ID del usuario (desde la sesión).
-     * @param int $dataId El ID del registro (metricas.id) a borrar.
-     * @return bool|string Devuelve true si tiene éxito, o un string con el mensaje de error si falla.
+     * Elimina un registro de salud específico.
      */
-    public function deleteHealthData(int $userId, int $dataId): bool|string
+    public function deleteHealthData(int $user_id, int $data_id): bool|string
     {
-        if ($userId <= 0 || $dataId <= 0) {
-            return "ID de usuario o ID de registro inválido.";
-        }
+        // La consulta se asegura de que solo el usuario propietario pueda borrar su registro
+        $sql = "DELETE FROM metricas 
+                WHERE id = :data_id AND user_id = :user_id";
 
         try {
-            // 2. CORRECCIÓN: Borrar de 'metricas'
-            $stmt = $this->pdo->prepare(
-                "DELETE FROM metricas WHERE id = ? AND user_id = ?"
-            );
-            $stmt->execute([$dataId, $userId]);
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'data_id' => $data_id,
+                'user_id' => $user_id
+            ]);
 
-            // 3. Verificar si el borrado fue exitoso
+            // Comprobar si realmente se borró algo
             if ($stmt->rowCount() > 0) {
-                return true; // Borrado exitoso
+                return true;
             } else {
+                // No se borró nada, probablemente porque el ID no existía o no pertenecía al usuario
                 return "No se encontró el registro o no tiene permiso para borrarlo.";
             }
-
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return "Error al borrar los datos: " . $e->getMessage();
         }
     }
