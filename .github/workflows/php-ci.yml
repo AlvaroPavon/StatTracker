@@ -22,7 +22,6 @@ jobs:
         image: mysql:8.0 
         env:
           MYSQL_DATABASE: ${{ env.DB_DATABASE }}
-          # Permite la contraseña vacía para el entorno de CI
           MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
         ports:
           - 3306:3306 
@@ -41,7 +40,7 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
           
-      # 3. CORRECCIÓN: Instalar el cliente MySQL en el runner principal (para usar el comando 'mysql')
+      # 3. Instalar el cliente MySQL en el runner principal
       - name: Install MySQL Client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
@@ -69,6 +68,10 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
       
-      # 7. Ejecutar PHPUnit
+      # 7. NUEVA CORRECCIÓN: Dar permiso de ejecución al binario de PHPUnit
+      - name: Set execute permission for PHPUnit
+        run: chmod +x vendor/bin/phpunit
+      
+      # 8. Ejecutar PHPUnit
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
