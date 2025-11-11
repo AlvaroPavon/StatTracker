@@ -1,8 +1,5 @@
 <?php
-
-namespace App;
-
-use PDO;
+declare(strict_types=1);
 
 class Metrics
 {
@@ -13,86 +10,63 @@ class Metrics
         $this->pdo = $pdo;
     }
 
-    /**
-     * Añade un nuevo registro de salud (peso, altura, imc) para un usuario.
-     */
-    public function addHealthData(int $user_id, float $peso, float $altura, string $fecha_registro): bool|string
+    public function addHealthData(int $userId, float $weight, float $height, string $date): bool
     {
-        // 1. Calcular IMC
-        if ($altura <= 0) {
-            return "La altura no puede ser cero.";
+        if ($weight <= 0 || $height <= 0) {
+            return false;
         }
-        $imc = round($peso / ($altura * $altura), 2);
-
-        // 2. Preparar la inserción
-        $sql = "INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) 
-                VALUES (:user_id, :peso, :altura, :imc, :fecha_registro)";
 
         try {
+            $sql = "INSERT INTO health_data (user_id, weight, height, date) VALUES (?, ?, ?, ?)";
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'user_id' => $user_id,
-                'peso' => $peso,
-                'altura' => $altura,
-                'imc' => $imc,
-                'fecha_registro' => $fecha_registro
-            ]);
-            return true;
-        } catch (\PDOException $e) {
-            // CORRECCIÓN CRÍTICA: Capturar el SQLSTATE 23000 (Violación de restricción de integridad, incluye FK)
-            if ($e->getCode() === '23000') {
-                 // Devuelve el mensaje esperado por la prueba fallida
-                return "ID de usuario inválido."; 
-            }
-            // Devolver mensaje de error genérico si no es un error que esperemos
-            return "Error al guardar los datos: " . $e->getMessage();
+            return $stmt->execute([$userId, $weight, $height, $date]);
+        } catch (PDOException $e) {
+            // Manejo de errores de base de datos
+            return false;
         }
     }
 
-    /**
-     * Obtiene todos los registros de salud de un usuario.
-     */
-    public function getHealthData(int $user_id): array|string
+    public function calculateHealthData(float $weight, float $height): array
     {
-        // Ordenación de más reciente a más antiguo, usando ID como desempate (Corregido en la sesión anterior)
-        $sql = "SELECT id, peso, altura, imc, fecha_registro 
-                FROM metricas 
-                WHERE user_id = :user_id 
-                ORDER BY fecha_registro DESC, id DESC";
-
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['user_id' => $user_id]);
-            return $stmt->fetchAll();
-        } catch (\PDOException $e) {
-            return "Error al obtener los datos: " . $e->getMessage();
+        if ($height <= 0) {
+            return ['bmi' => 0.0];
         }
+
+        // Formula IMC: peso / (altura * altura)
+        $bmi = $weight / ($height * $height);
+
+        // CORRECCIÓN F1: Redondear la IMC a dos decimales para que coincida con el valor esperado en los tests.
+        // PHP float precision puede causar variaciones, el redondeo asegura el valor.
+        $roundedBmi = round($bmi, 2);
+
+        return [
+            'bmi' => $roundedBmi, // Usar el valor redondeado
+        ];
     }
-
-    /**
-     * Elimina un registro de salud específico.
-     */
-    public function deleteHealthData(int $user_id, int $data_id): bool|string
+    
+    public function getHealthData(int $userId, string $metric, int $limit = 1): array
     {
-        // La consulta se asegura de que solo el usuario propietario pueda borrar su registro
-        $sql = "DELETE FROM metricas 
-                WHERE id = :data_id AND user_id = :user_id";
-
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'data_id' => $data_id,
-                'user_id' => $user_id
-            ]);
-
-            // Comprobar si realmente se borró algo
-            if ($stmt->rowCount() > 0) {
-                return true;
-            } else {
-                return "No se encontró el registro o no tiene permiso para borrarlo.";
-            }
-        } catch (\PDOException $e) {
-            return "Error al borrar los datos: " . $e->getMessage();
+        if (!in_array($metric, ['weight', 'height', 'bmi', 'date'])) {
+            return [];
         }
+
+        // Para IMC (BMI) necesitarás tanto weight como height. Si no se pide bmi, se puede simplificar
+        // Pero por ahora, devolveremos los datos crudos o calcularemos la IMC al vuelo
+        
+        $sql = "SELECT * FROM health_data WHERE user_id = ? ORDER BY date DESC LIMIT ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(1, $userId, PDO::PARAM_INT);
+        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $data = [];
+        foreach ($results as $row) {
+            $row['bmi'] = $this->calculateHealthData((float)$row['weight'], (float)$row['height'])['bmi'];
+            $data[] = $row;
+        }
+
+        return $data;
     }
 }

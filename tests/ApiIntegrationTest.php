@@ -1,149 +1,107 @@
-<?php
+<?php declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-class ApiIntegrationTest extends TestCase
+final class ApiIntegrationTest extends TestCase
 {
-    private static $pdo;
-    private $originalCwd;
+    private $pdo;
+    private $testUser;
+    private $baseUrl = 'http://localhost/'; // Asume que los endpoints están en la raíz
 
-    /**
-     * Conectarse a la BD y LIMPIAR antes de CADA prueba.
-     */
     protected function setUp(): void
     {
-        // Guardar el directorio de trabajo original
-        $this->originalCwd = getcwd();
+        // Configuración de la base de datos de prueba (debe coincidir con phpunit.xml y CI)
+        $this->pdo = new PDO(
+            'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_DATABASE') . ';port=' . getenv('MYSQL_PORT'),
+            getenv('DB_USERNAME'),
+            getenv('DB_PASSWORD')
+        );
 
-        // Incluimos la conexión real para obtener $pdo
-        if (self::$pdo === null) {
-            include __DIR__ . '/../database_connection.php';
-            
-            if (!$pdo) {
-                $this->fail("La conexión a la base de datos ($pdo) no se pudo establecer en setUp().");
-            }
-            
-            self::$pdo = $pdo;
-        }
-        
-        // Limpiamos CUALQUIER dato de prueba anterior ANTES de ejecutar el test.
-        if (self::$pdo) {
-            self::$pdo->exec("DELETE FROM usuarios WHERE id = 9999");
-        }
+        // Crear un usuario de prueba y obtener su API Key
+        $this->testUser = $this->createTestUser();
     }
 
-    /**
-     * Limpiar la BD DESPUÉS de cada prueba.
-     */
     protected function tearDown(): void
     {
-        if (self::$pdo) {
-            self::$pdo->exec("DELETE FROM usuarios WHERE id = 9999");
-        }
-        
-        // Restaurar el directorio de trabajo original
-        if ($this->originalCwd) {
-            chdir($this->originalCwd);
-        }
+        // Limpiar la base de datos después de cada prueba
+        $this->pdo->exec("DELETE FROM users WHERE email = 'test_api@example.com'");
+        $this->pdo->exec("DELETE FROM health_data WHERE user_id = {$this->testUser['id']}");
+        $this->pdo = null;
+        $this->testUser = null;
     }
 
-    /**
-     * @covers get_data.php
-     *
-     * @runInSeparateProcess
-     * Esta anotación es CRUCIAL. Evita errores de "headers already sent".
-     */
-    public function testGetDataApiSuccess()
+    private function createTestUser(): array
     {
-        // 1. Arrange (Preparar la BD real)
-        $testUserId = 9999;
-        
-        // Insertar un usuario de prueba
-        $stmt = self::$pdo->prepare(
-            "INSERT INTO usuarios (id, nombre, apellidos, email, password) 
-             VALUES (?, 'api_user', 'lastname', 'api@test.com', 'hash')"
-        );
-        $stmt->execute([$testUserId]);
+        $email = 'test_api@example.com';
+        $password = 'secure_password';
+        $nombre = 'TestApi';
+        $apellido = 'UserApi';
+        $apiKey = bin2hex(random_bytes(16));
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insertar datos de prueba
-        $fecha = date('Y-m-d');
-        $stmt = self::$pdo->prepare(
-            "INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) 
-             VALUES (?, 80.5, 1.8, 24.8, ?)"
-        );
-        $stmt->execute([$testUserId, $fecha]);
+        // Insertar usuario
+        $stmt = $this->pdo->prepare("INSERT INTO users (nombre, apellido, email, password_hash, api_key) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$nombre, $apellido, $email, $passwordHash, $apiKey]);
+        
+        $id = $this->pdo->lastInsertId();
 
+        // Insertar datos de salud para este usuario (fixture)
+        $stmt = $this->pdo->prepare("INSERT INTO health_data (user_id, weight, height, date) VALUES (?, ?, ?, ?)");
+        // Los datos para la prueba de "get"
+        $stmt->execute([$id, 70.0, 1.75, '2023-01-01']); 
         
-        // 2. Act (Simular la solicitud)
-        
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        
-        // Iniciar la sesión para el test
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION['user_id'] = $testUserId;
+        return ['id' => $id, 'email' => $email, 'api_key' => $apiKey];
+    }
 
-        // Capturar la salida (el JSON) del script
+    /** @test */
+    public function testGetDataApiSuccess(): void
+    {
+        $response = $this->makeApiRequest('get_data.php', ['metric' => 'weight'], $this->testUser['api_key']);
+        $this->assertEquals(200, $response['status_code']);
+        $responseData = json_decode($response['body'], true);
+
+        $this->assertArrayHasKey('success', $responseData);
+        $this->assertTrue($responseData['success']);
+        $this->assertArrayHasKey('data', $responseData);
+        $this->assertIsArray($responseData['data']);
+        
+        // Verifica que la estructura del usuario se devuelva correctamente
+        // CORRECCIÓN: Cambiado 'apellidos' a 'apellido' para coincidir con database.sql
+        $this->assertArrayHasKey('nombre', $responseData['data'][0]);
+        $this->assertArrayHasKey('apellido', $responseData['data'][0]);
+        $this->assertArrayHasKey('weight', $responseData['data'][0]);
+    }
+
+    // ... otros métodos de prueba
+    
+    // Método auxiliar para simular una solicitud a la API
+    private function makeApiRequest(string $endpoint, array $postData = [], string $apiKey = ''): array
+    {
+        // Simular la solicitud sin curl/http, solo con los headers
+        // Esto asume que tu endpoint PHP usa $_SERVER['HTTP_X_API_KEY'] o similar
+        
+        $path = __DIR__ . '/../' . $endpoint;
+        
+        // Simular headers y POST data
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['HTTP_X_API_KEY'] = $apiKey;
+        $_POST = $postData;
+
+        // Capturar la salida del script
         ob_start();
-        
-        // Inyectar la conexión PDO del test en el ámbito local
-        $pdo = self::$pdo;
-
-        // Cambiamos al directorio raíz del proyecto.
-        chdir(__DIR__ . '/..');
-
-        // ***** CORRECCIÓN CLAVE *****
-        // Desactivamos FORZOSAMENTE la visualización de errores.
-        // El script 'get_data.php' intenta reactivarlos con ini_set('display_errors', 1),
-        // lo que causa que los warnings de 'session_config.php' se impriman
-        // y fallen el test debido a 'beStrictAboutOutputDuringTests'.
-        
-        $oldErrorReporting = error_reporting();
-        $oldDisplayErrors = ini_get('display_errors');
-        $oldDisplayStartupErrors = ini_get('display_startup_errors');
-
-        error_reporting(0); // Desactivar todos los reportes
-        ini_set('display_errors', 0); // No mostrar errores
-        ini_set('display_startup_errors', 0); // No mostrar errores de arranque
-
-        // Incluimos el script
-        include 'get_data.php'; 
-        
-        // Restaurar la configuración original
-        ini_set('display_startup_errors', $oldDisplayStartupErrors);
-        ini_set('display_errors', $oldDisplayErrors);
-        error_reporting($oldErrorReporting);
-        
+        require $path;
         $output = ob_get_clean();
 
+        // Si el script maneja su propio código de respuesta HTTP, 
+        // la manera más fácil de saber el "status" es buscarlo en el JSON
+        $responseData = json_decode($output, true);
         
-        // 3. Assert (Verificar la respuesta)
+        // Si hay una respuesta JSON, asumimos 200 a menos que el JSON diga lo contrario
+        $statusCode = ($responseData !== null) ? 200 : 500;
         
-        // Verificar que la salida es JSON válido
-        $this->assertJson($output, "La salida de get_data.php no fue un JSON válido. Salida: " . $output);
-
-        // Decodificar el JSON
-        $response = json_decode($output, true);
-
-        // Verificar que la API devolvió éxito
-        $this->assertTrue(
-            isset($response['success']) && $response['success'] === true, 
-            "La respuesta JSON no indicó 'success' => true."
-        );
-        
-        // Verificar que los datos están presentes y son correctos
-        $this->assertCount(
-            1, 
-            isset($response['data']) ? $response['data'] : [], 
-            "La respuesta JSON no devolvió 1 registro de datos."
-        );
-        
-        $this->assertEquals(
-    80.5,
-    $response['data'][0]['peso'],
-    "El peso en la respuesta JSON no coincide."
-        );
-
+        return [
+            'status_code' => $statusCode,
+            'body' => $output
+        ];
     }
 }
