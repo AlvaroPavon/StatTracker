@@ -11,24 +11,24 @@ env:
   DB_DATABASE: testing_db 
   DB_USERNAME: root
   DB_PASSWORD: '' 
-  # Necesario para que MySQL sepa dónde escuchar las conexiones dentro del runner
-  # El puerto 3306 es el puerto estándar de MySQL
+  # Mantenemos esta variable para usarla en los comandos shell (pasos 3 y 4)
   MYSQL_PORT: 3306 
   
 jobs:
   build:
     runs-on: ubuntu-latest
     
-    # 1. MODIFICACIÓN CRÍTICA: Uso de 'services' para MySQL
+    # 1. CORRECCIÓN CRÍTICA: Uso de 'services' con mapeo de puertos simplificado
     services:
       mysql:
         image: mysql:8.0 # Usamos una imagen Docker oficial de MySQL
         env:
           MYSQL_DATABASE: ${{ env.DB_DATABASE }}
           MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
-        # Mapea el puerto del contenedor (3306) al host (127.0.0.1:3306)
+        # Mapea el puerto del contenedor (3306) al host (3306). 
+        # La notación '3306:3306' es una sintaxis de string que el parser acepta aquí.
         ports:
-          - ${{ env.MYSQL_PORT }}:3306 
+          - 3306:3306 
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
 
@@ -44,12 +44,12 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
           
-      # 3. Esperar a que MySQL esté listo y funcione
+      # 3. Esperar a que MySQL esté listo - La conexión ahora es segura.
       - name: Wait for MySQL
-        # Intentamos una conexión directa, esperando hasta que tenga éxito
+        # Usamos el puerto 3306 que mapeamos en la sección 'services'
         run: while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do sleep 1; done
         
-      # 4. Importar el esquema de la base de datos (usando las credenciales y el puerto del servicio)
+      # 4. Importar el esquema de la base de datos
       - name: Import database schema (database.sql)
         run: |
           mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} ${{ env.DB_DATABASE }} < database.sql
