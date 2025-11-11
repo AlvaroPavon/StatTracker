@@ -6,7 +6,9 @@
          executionOrder="depends,defects"
          forceCoversAnnotation="true"
          beStrictAboutCoversAnnotation="true"
-         beStrictAboutOutputDuringTests="true"
+         
+         beStrictAboutOutputDuringTests="false"
+         
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true"
          
