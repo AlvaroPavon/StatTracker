@@ -11,22 +11,21 @@ env:
   DB_DATABASE: testing_db 
   DB_USERNAME: root
   DB_PASSWORD: '' 
-  # Mantenemos esta variable para usarla en los comandos shell (pasos 3 y 4)
   MYSQL_PORT: 3306 
   
 jobs:
   build:
     runs-on: ubuntu-latest
     
-    # 1. CORRECCIÓN CRÍTICA: Uso de 'services' con mapeo de puertos simplificado
     services:
       mysql:
-        image: mysql:8.0 # Usamos una imagen Docker oficial de MySQL
+        image: mysql:8.0 
         env:
           MYSQL_DATABASE: ${{ env.DB_DATABASE }}
-          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
-        # Mapea el puerto del contenedor (3306) al host (3306). 
-        # La notación '3306:3306' es una sintaxis de string que el parser acepta aquí.
+          # CORRECCIÓN CRÍTICA: Permite la contraseña vacía de forma explícita
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
+          # Opcional: Se puede comentar o quitar la línea de MYSQL_ROOT_PASSWORD
+          # ya que usamos la variable de arriba para la seguridad en CI.
         ports:
           - 3306:3306 
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
@@ -44,9 +43,8 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
           
-      # 3. Esperar a que MySQL esté listo - La conexión ahora es segura.
+      # 3. Esperar a que MySQL esté listo
       - name: Wait for MySQL
-        # Usamos el puerto 3306 que mapeamos en la sección 'services'
         run: while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do sleep 1; done
         
       # 4. Importar el esquema de la base de datos
