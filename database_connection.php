@@ -1,9 +1,10 @@
 <?php
-// Configuración de la base de datos
-$host = 'localhost';      // Servidor de base de datos (XAMPP usa 'localhost')
-$dbname = 'proyecto_imc'; // El nombre de la base de datos
-$username = 'root';       // Usuario de MySQL (XAMPP usa 'root')
-$password = '';           // Contraseña de MySQL (XAMPP la deja vacía)
+// MODIFICADO: Configuración de la base de datos
+// Priorizamos variables de entorno (usadas por GitHub Actions) y si no existen, usamos valores locales por defecto
+$host = getenv('DB_HOST') ?: 'localhost';          // Servidor de base de datos
+$dbname = getenv('DB_DATABASE') ?: 'proyecto_imc'; // El nombre de la base de datos
+$username = getenv('DB_USERNAME') ?: 'root';       // Usuario de MySQL
+$password = getenv('DB_PASSWORD') ?: '';           // Contraseña de MySQL
 
 /**
  * Data Source Name (DSN)
@@ -28,8 +29,9 @@ try {
 } catch (\PDOException $e) {
     /**
      * Si la conexión falla, el script se detiene.
-     * Esto será capturado por nuestro Test.
      */
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    // Loguear el error para depuración
+    error_log("Fallo de conexión a la BD: " . $e->getMessage());
+    throw new \PDOException("Error de conexión a la base de datos.", (int)$e->getCode());
 }
 ?>
