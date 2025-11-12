@@ -99,8 +99,8 @@ $csrf_token = $_SESSION['csrf_token'];
 <div id="main-content" class="hidden">
 <div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 group/design-root">
 
-    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg
-                transition-all duration-300 hover:shadow-xl
+    <div class="w-full max-w-md liquid-glass-strong liquid-shine water-drop-effect p-8 rounded-xl
+                transition-all duration-300
                 animate__animated animate__fadeInUp">
 
         <div class="flex flex-col items-center mb-8 animate__animated animate__fadeInDown">
