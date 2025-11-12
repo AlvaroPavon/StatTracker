@@ -587,6 +587,23 @@ try {
     });
 </script>
 
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
+<!-- Welcome Screen Script -->
+<script src="js/welcome-screen.js"></script>
+
+<?php if ($showWelcomeScreen): ?>
+<script>
+    // Mostrar pantalla de bienvenida después del login
+    document.addEventListener('DOMContentLoaded', function() {
+        const userName = '<?php echo addslashes($nombreUsuario); ?>';
+        
+        // Mostrar welcome screen por 3 segundos
+        showWelcomeScreen(userName, 3000);
+    });
+</script>
+<?php endif; ?>
 
 </body>
 </html>
