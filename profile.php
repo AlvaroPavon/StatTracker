@@ -269,7 +269,7 @@ try {
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
                             <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
-                                <span class="truncate">Guardar Cambios</span>
+                                <span class="truncate relative z-10">Guardar Cambios</span>
                             </button>
                         </div>
                     </form>
@@ -299,7 +299,7 @@ try {
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
                             <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
-                                <span class="truncate">Actualizar Contraseña</span>
+                                <span class="truncate relative z-10">Actualizar Contraseña</span>
                             </button>
                         </div>
                     </form>
