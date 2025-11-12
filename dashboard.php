@@ -325,8 +325,8 @@ try {
                         style="--animate-delay: 0.2s;">
             <h2 class="text-gray-900 dark:text-gray-100 text-xl font-bold p-6">Registros de Peso</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="border-b border-t border-white/20 dark:border-white/10 bg-transparent">
+                <table class="glass-table w-full text-left">
+                    <thead class="border-b border-t border-white/20 dark:border-white/10">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Fecha</th>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Peso</th>
