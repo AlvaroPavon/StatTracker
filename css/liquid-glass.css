@@ -1,0 +1,414 @@
+/* 
+ * LIQUID GLASS EFFECT - iOS Style
+ * Efecto de vidrio líquido con blur intenso y transparencias
+ */
+
+/* Variables globales para el efecto glass */
+:root {
+    --glass-bg-light: rgba(255, 255, 255, 0.08);
+    --glass-bg-dark: rgba(15, 23, 42, 0.08);
+    --glass-border-light: rgba(255, 255, 255, 0.25);
+    --glass-border-dark: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    --blur-strength: 40px;
+}
+
+/* Efecto principal de vidrio líquido */
+.liquid-glass {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--blur-strength)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength)) saturate(180%);
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .liquid-glass {
+    background: var(--glass-bg-dark);
+    border-color: var(--glass-border-dark);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Efecto hover más intenso */
+.liquid-glass:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+}
+
+.dark .liquid-glass:hover {
+    background: rgba(15, 23, 42, 0.12);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Variantes de intensidad del glass effect */
+.liquid-glass-strong {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(50px) saturate(200%);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .liquid-glass-strong {
+    background: rgba(15, 23, 42, 0.15);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.liquid-glass-subtle {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .liquid-glass-subtle {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Efecto de refracción en bordes */
+.liquid-glass-frosted {
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-glass-frosted::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
+    );
+    animation: glassPulse 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.dark .liquid-glass-frosted::before {
+    background: radial-gradient(
+        circle at center,
+        rgba(59, 130, 246, 0.08) 0%,
+        transparent 70%
+    );
+}
+
+@keyframes glassPulse {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(10%, 10%) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Inputs con efecto glass */
+.glass-input {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.dark .glass-input {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(74, 144, 226, 0.5);
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.dark .glass-input:focus {
+    background: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+}
+
+/* Botones con efecto glass */
+.glass-button {
+    background: rgba(74, 144, 226, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.glass-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.glass-button:hover {
+    background: rgba(74, 144, 226, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+}
+
+/* Cards con efecto glass */
+.glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 
+        0 8px 32px 0 rgba(31, 38, 135, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-card {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar con efecto glass */
+.glass-sidebar {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(45px) saturate(190%);
+    -webkit-backdrop-filter: blur(45px) saturate(190%);
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 4px 0 24px rgba(31, 38, 135, 0.1);
+}
+
+.dark .glass-sidebar {
+    background: rgba(15, 23, 42, 0.1);
+    border-right-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto de brillo líquido animado */
+.liquid-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    animation: liquidShine 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes liquidShine {
+    0%, 100% {
+        transform: translate(-100%, -100%) rotate(45deg);
+    }
+    50% {
+        transform: translate(100%, 100%) rotate(45deg);
+    }
+}
+
+/* Efecto de gota de agua */
+.water-drop-effect {
+    position: relative;
+}
+
+.water-drop-effect::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.4) 0%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(255, 255, 255, 0.2) 100%
+    );
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.water-drop-effect:hover::before {
+    opacity: 1;
+}
+
+/* Textos con efecto glass */
+.glass-text {
+    color: rgba(17, 24, 39, 0.9);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-text {
+    color: rgba(249, 250, 251, 0.95);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Table con efecto glass */
+.glass-table {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+.dark .glass-table {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+.glass-table thead {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .glass-table thead {
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.glass-table tbody tr:hover {
+    background: rgba(74, 144, 226, 0.08);
+}
+
+/* Modales con efecto glass */
+.glass-modal {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(50px) saturate(200%);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(31, 38, 135, 0.3);
+}
+
+.dark .glass-modal {
+    background: rgba(15, 23, 42, 0.15);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Efecto de reflejos en superficies */
+.glass-reflect {
+    position: relative;
+}
+
+.glass-reflect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        transparent 100%
+    );
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.dark .glass-reflect::after {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 100%
+    );
+}
+
+/* Animación de ondas líquidas */
+@keyframes liquidWave {
+    0%, 100% {
+        transform: translateX(0) translateY(0);
+    }
+    25% {
+        transform: translateX(5px) translateY(-5px);
+    }
+    50% {
+        transform: translateX(-5px) translateY(5px);
+    }
+    75% {
+        transform: translateX(5px) translateY(5px);
+    }
+}
+
+.liquid-wave-effect {
+    animation: liquidWave 10s ease-in-out infinite;
+}
+
+/* Efecto de condensación */
+.glass-condensation {
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 60% 70%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%;
+}
+
+/* Gradientes especiales para fondos glass */
+.glass-gradient-1 {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+}
+
+.dark .glass-gradient-1 {
+    background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(139, 92, 246, 0.05) 100%
+    );
+}
+
+.glass-gradient-2 {
+    background: linear-gradient(
+        -45deg,
+        rgba(74, 144, 226, 0.1) 0%,
+        rgba(80, 227, 194, 0.1) 100%
+    );
+}
+
+/* Efecto de profundidad */
+.glass-depth {
+    box-shadow: 
+        0 1px 1px rgba(255, 255, 255, 0.2),
+        0 8px 32px rgba(31, 38, 135, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-depth {
+    box-shadow: 
+        0 1px 1px rgba(255, 255, 255, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+}

@@ -37,6 +37,9 @@ $csrf_token = $_SESSION['csrf_token'];
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
+    
+    <!-- Liquid Glass Effect CSS -->
+    <link rel="stylesheet" href="css/liquid-glass.css"/>
 
     <script>
       tailwind.config = {
@@ -106,8 +109,8 @@ $csrf_token = $_SESSION['csrf_token'];
             <p class="text-gray-500 dark:text-gray-400 mt-2">¡Bienvenido! Por favor, inicia sesión.</p>
         </div>
         
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg 
-                    transition-all duration-300 hover:shadow-xl
+        <div class="liquid-glass-strong liquid-shine water-drop-effect p-8 rounded-xl 
+                    transition-all duration-300
                     animate__animated animate__fadeInUp">
             
             <?php 
@@ -132,21 +135,21 @@ $csrf_token = $_SESSION['csrf_token'];
                 
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Email</p>
-                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300" 
                         placeholder="you@example.com" type="email" name="email" id="login_email" required />
                 </label>
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
-                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300"
                         placeholder="••••••••" type="password" name="password" id="login_password" required />
                 </label>
                 
-                <button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
-                        transition-all duration-300 hover:scale-105"
+                <button class="glass-button flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
+                        transition-all duration-300"
                         type="submit">
-                    <span>Iniciar Sesión</span>
+                    <span class="relative z-10">Iniciar Sesión</span>
                 </button>
             </form>
         </div>

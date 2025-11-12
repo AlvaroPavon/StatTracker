@@ -73,6 +73,10 @@ try {
         rel="stylesheet" 
         href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
+    
+    <!-- Liquid Glass Effect CSS -->
+    <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -208,7 +212,7 @@ try {
 <?php endif; ?>
 
 <div id="dashboard-content" class="flex h-screen w-full hidden">
-<aside class="flex w-64 flex-col glass-card m-4 rounded-xl">
+<aside class="flex w-64 flex-col glass-sidebar liquid-wave-effect m-4 rounded-xl">
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
@@ -257,7 +261,7 @@ try {
                         animate__animated animate__fadeInUp">
 
             <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl p-6
-                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1 glass-card">
+                        transition-all duration-300 liquid-glass glass-reflect">
                 <p class="text-gray-900 dark:text-gray-100 text-lg font-medium leading-normal">Evolución de tu IMC</G>
 
                 <div class="flex min-h-[300px] flex-1 flex-col gap-8 py-4">
@@ -265,8 +269,8 @@ try {
                 </div>
             </div>
 
-            <div class="w-full lg:w-96 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-xl">
-                <div class="p-6 rounded-xl shadow-sm h-full glass-card">
+            <div class="w-full lg:w-96 transition-all duration-300 rounded-xl">
+                <div class="p-6 rounded-xl shadow-sm h-full liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Registrar Nuevo Peso</h2>
 
                     <?php if (isset($_GET['error'])): ?>
@@ -286,28 +290,28 @@ try {
                         <div class="grid grid-cols-1 gap-6 items-end">
                            <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Altura (en Metros)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Peso (kg)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        placeholder="Ej: 70.5" type="number" step="0.1" id="peso" name="peso" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Fecha del Registro</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        type="date" id="fecha" name="fecha_registro" required />
                             </label>
                         </div>
                         <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full
-                                    transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold w-full
+                                    transition-all duration-300 dark:focus:ring-offset-slate-900"
                                     type="submit">
-                                <span class="truncate">Guardar Registro</span>
+                                <span class="truncate relative z-10">Guardar Registro</span>
                             </button>
                         </div>
                     </form>
@@ -316,13 +320,13 @@ try {
         </section>
 
         <section class="mt-8 rounded-xl
-                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                        animate__animated animate__fadeInUp glass-card overflow-hidden"
+                        transition-all duration-300
+                        animate__animated animate__fadeInUp liquid-glass-strong liquid-shine overflow-hidden"
                         style="--animate-delay: 0.2s;">
             <h2 class="text-gray-900 dark:text-gray-100 text-xl font-bold p-6">Registros de Peso</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="border-b border-t border-white/20 dark:border-white/10 bg-transparent">
+                <table class="glass-table w-full text-left">
+                    <thead class="border-b border-t border-white/20 dark:border-white/10">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Fecha</th>
                         <th scope="col" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">Peso</th>
