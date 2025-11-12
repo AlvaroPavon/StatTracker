@@ -77,6 +77,12 @@ try {
     <!-- Liquid Glass Effect CSS -->
     <link rel="stylesheet" href="css/liquid-glass.css"/>
     
+    <!-- Cursor Spotlight Effect CSS -->
+    <link rel="stylesheet" href="css/cursor-spotlight.css"/>
+    
+    <!-- Welcome Screen CSS -->
+    <link rel="stylesheet" href="css/welcome-screen.css"/>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
