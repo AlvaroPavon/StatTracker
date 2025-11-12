@@ -146,10 +146,10 @@ $csrf_token = $_SESSION['csrf_token'];
                         placeholder="••••••••" type="password" name="password" id="login_password" required />
                 </label>
                 
-                <button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
-                        transition-all duration-300 hover:scale-105"
+                <button class="glass-button flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
+                        transition-all duration-300"
                         type="submit">
-                    <span>Iniciar Sesión</span>
+                    <span class="relative z-10">Iniciar Sesión</span>
                 </button>
             </form>
         </div>
