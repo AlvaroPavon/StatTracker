@@ -344,5 +344,9 @@ document.getElementById('profile_pic_input')?.addEventListener('change', functio
         }
     });
 </script>
+
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
 </body>
 </html>
