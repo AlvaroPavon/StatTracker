@@ -128,26 +128,26 @@ $csrf_token = $_SESSION['csrf_token'];
 
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Nombre</p>
-                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
                     placeholder="Ej: Jane" type="text" name="nombre" id="reg_nombre" required />
             </label>
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Apellidos</p>
-                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
                     placeholder="Ej: Doe" type="text" name="apellidos" id="reg_apellidos" required />
             </label>
 
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Email</p>
-                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
                     placeholder="you@example.com" type="email" name="email" id="reg_email" required />
             </label>
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
-                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
                     placeholder="••••••••" type="password" name="password" id="reg_password" minlength="8" required />
             </label>
