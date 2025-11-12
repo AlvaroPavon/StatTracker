@@ -145,7 +145,7 @@ try {
 <body class="font-display text-gray-900 dark:text-gray-100 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
 
 <div id="dashboard-content" class="flex h-screen w-full hidden">
-<aside class="flex w-64 flex-col glass-card m-4 rounded-xl">
+<aside class="flex w-64 flex-col glass-sidebar liquid-wave-effect m-4 rounded-xl">
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
