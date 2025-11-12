@@ -43,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // CORRECCIÓN: Guardar 'nombre' (de la BD 'usuarios') en la sesión.
         $_SESSION['user_id'] = $result['id'];
         $_SESSION['nombre'] = $result['nombre']; // Antes era 'username'
+        
+        // Activar pantalla de bienvenida
+        $_SESSION['show_welcome_screen'] = true;
 
         // Redirigir al dashboard
         header("Location: dashboard.php");

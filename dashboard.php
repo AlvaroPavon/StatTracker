@@ -25,9 +25,15 @@ $csrf_token = $_SESSION['csrf_token']; //
 
 // 7. Comprobar si debemos mostrar el splash de bienvenida
 $showSplash = false; //
+$showWelcomeScreen = false; //
 if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
     $showSplash = true; //
     unset($_SESSION['show_welcome_splash']); //
+}
+// Nueva pantalla de bienvenida
+if (isset($_SESSION['show_welcome_screen']) && $_SESSION['show_welcome_screen'] === true) {
+    $showWelcomeScreen = true;
+    unset($_SESSION['show_welcome_screen']);
 }
 
 // 8. Obtener datos del usuario (nombre y foto) para la barra lateral
@@ -76,6 +82,12 @@ try {
     
     <!-- Liquid Glass Effect CSS -->
     <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
+    <!-- Cursor Spotlight Effect CSS -->
+    <link rel="stylesheet" href="css/cursor-spotlight.css"/>
+    
+    <!-- Welcome Screen CSS -->
+    <link rel="stylesheet" href="css/welcome-screen.css"/>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -575,6 +587,23 @@ try {
     });
 </script>
 
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
+<!-- Welcome Screen Script -->
+<script src="js/welcome-screen.js"></script>
+
+<?php if ($showWelcomeScreen): ?>
+<script>
+    // Mostrar pantalla de bienvenida después del login
+    document.addEventListener('DOMContentLoaded', function() {
+        const userName = '<?php echo addslashes($nombreUsuario); ?>';
+        
+        // Mostrar welcome screen por 3 segundos
+        showWelcomeScreen(userName, 3000);
+    });
+</script>
+<?php endif; ?>
 
 </body>
 </html>
