@@ -73,6 +73,10 @@ try {
         rel="stylesheet" 
         href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
+    
+    <!-- Liquid Glass Effect CSS -->
+    <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
