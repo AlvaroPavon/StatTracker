@@ -25,9 +25,15 @@ $csrf_token = $_SESSION['csrf_token']; //
 
 // 7. Comprobar si debemos mostrar el splash de bienvenida
 $showSplash = false; //
+$showWelcomeScreen = false; //
 if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
     $showSplash = true; //
     unset($_SESSION['show_welcome_splash']); //
+}
+// Nueva pantalla de bienvenida
+if (isset($_SESSION['show_welcome_screen']) && $_SESSION['show_welcome_screen'] === true) {
+    $showWelcomeScreen = true;
+    unset($_SESSION['show_welcome_screen']);
 }
 
 // 8. Obtener datos del usuario (nombre y foto) para la barra lateral
