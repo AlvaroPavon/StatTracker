@@ -67,6 +67,9 @@ try {
     <!-- Liquid Glass Effect CSS -->
     <link rel="stylesheet" href="css/liquid-glass.css"/>
     
+    <!-- Cursor Spotlight Effect CSS -->
+    <link rel="stylesheet" href="css/cursor-spotlight.css"/>
+    
     <script>
         window.csrfToken = "<?php echo $csrf_token; ?>";
     </script>
