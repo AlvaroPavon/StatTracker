@@ -152,9 +152,9 @@ $csrf_token = $_SESSION['csrf_token'];
                     placeholder="••••••••" type="password" name="password" id="reg_password" minlength="8" required />
             </label>
 
-            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold hover:bg-primary/90 mt-4 w-full
-                        transition-all duration-300 hover:scale-105" type="submit">
-                <span class="truncate">Registrarse</span>
+            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold mt-4 w-full
+                        transition-all duration-300" type="submit">
+                <span class="truncate relative z-10">Registrarse</span>
             </button>
         </form>
         <div class="mt-6 text-center">
