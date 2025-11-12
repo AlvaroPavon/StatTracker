@@ -167,6 +167,12 @@ $csrf_token = $_SESSION['csrf_token'];
 
 </div>
 
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
+<!-- Welcome Screen Script -->
+<script src="js/welcome-screen.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const splashScreen = document.getElementById('splash-screen');
