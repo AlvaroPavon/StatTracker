@@ -40,6 +40,9 @@ $csrf_token = $_SESSION['csrf_token'];
     
     <!-- Liquid Glass Effect CSS -->
     <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
+    <!-- Cursor Spotlight Effect CSS -->
+    <link rel="stylesheet" href="css/cursor-spotlight.css"/>
 
     <script>
       tailwind.config = {
