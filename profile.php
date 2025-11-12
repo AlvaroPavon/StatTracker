@@ -223,7 +223,7 @@ try {
                                        file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                                 type="file" name="profile_pic" id="profile_pic_input" accept="image/png, image/jpeg" />
                         </label>
-                        <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full mt-4
+                        <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold w-full mt-4
                                 transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
                                 type="submit">
                             <span class="truncate">Actualizar Foto</span>
@@ -267,7 +267,7 @@ try {
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
                                 <span class="truncate">Guardar Cambios</span>
                             </button>
@@ -297,7 +297,7 @@ try {
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
                                 <span class="truncate">Actualizar Contraseña</span>
                             </button>
