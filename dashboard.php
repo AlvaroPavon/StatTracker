@@ -269,8 +269,8 @@ try {
                 </div>
             </div>
 
-            <div class="w-full lg:w-96 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-xl">
-                <div class="p-6 rounded-xl shadow-sm h-full glass-card">
+            <div class="w-full lg:w-96 transition-all duration-300 rounded-xl">
+                <div class="p-6 rounded-xl shadow-sm h-full liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Registrar Nuevo Peso</h2>
 
                     <?php if (isset($_GET['error'])): ?>
