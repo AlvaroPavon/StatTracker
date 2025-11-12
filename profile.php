@@ -244,7 +244,7 @@ try {
                     </div>
                 <?php endif; ?>
 
-                <div class="p-6 rounded-xl shadow-sm glass-card">
+                <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Actualizar Información</h2>
                     <form action="update_profile.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
