@@ -261,7 +261,7 @@ try {
                         animate__animated animate__fadeInUp">
 
             <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl p-6
-                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1 glass-card">
+                        transition-all duration-300 liquid-glass glass-reflect">
                 <p class="text-gray-900 dark:text-gray-100 text-lg font-medium leading-normal">Evolución de tu IMC</G>
 
                 <div class="flex min-h-[300px] flex-1 flex-col gap-8 py-4">
