@@ -1,0 +1,236 @@
+/* 
+ * CURSOR SPOTLIGHT EFFECT
+ * Efecto de sombra/luz que sigue al cursor
+ */
+
+/* Ocultar cursor por defecto en desktop */
+@media (min-width: 768px) {
+    body.spotlight-enabled {
+        cursor: none;
+    }
+    
+    body.spotlight-enabled * {
+        cursor: none !important;
+    }
+}
+
+/* Contenedor del spotlight */
+.cursor-spotlight {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: screen;
+}
+
+/* Spotlight principal - luz brillante */
+.spotlight-main {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(
+        circle,
+        rgba(74, 144, 226, 0.4) 0%,
+        rgba(74, 144, 226, 0.2) 20%,
+        rgba(74, 144, 226, 0.1) 40%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+    filter: blur(20px);
+}
+
+/* Spotlight al hacer hover en elementos interactivos */
+.spotlight-main.active {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(
+        circle,
+        rgba(74, 144, 226, 0.6) 0%,
+        rgba(74, 144, 226, 0.3) 20%,
+        rgba(74, 144, 226, 0.15) 40%,
+        transparent 70%
+    );
+}
+
+/* Spotlight secundario - sombra suave */
+.spotlight-secondary {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(
+        circle,
+        rgba(80, 227, 194, 0.15) 0%,
+        rgba(80, 227, 194, 0.08) 30%,
+        transparent 60%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(40px);
+}
+
+/* Punto del cursor */
+.cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(74, 144, 226, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
+    transition: transform 0.1s ease, background 0.3s ease;
+}
+
+/* Cursor al hacer hover */
+.cursor-dot.active {
+    transform: translate(-50%, -50%) scale(1.5);
+    background: rgba(80, 227, 194, 0.9);
+    box-shadow: 0 0 30px rgba(80, 227, 194, 0.8);
+}
+
+/* Anillo del cursor */
+.cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(74, 144, 226, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Anillo al hacer hover */
+.cursor-ring.active {
+    width: 60px;
+    height: 60px;
+    border-color: rgba(80, 227, 194, 0.7);
+    border-width: 3px;
+}
+
+/* Efecto de trail/estela */
+.cursor-trail {
+    position: fixed;
+    pointer-events: none;
+    width: 6px;
+    height: 6px;
+    background: rgba(74, 144, 226, 0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: trailFade 0.6s ease-out forwards;
+    z-index: 9998;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+}
+
+/* Modo oscuro - colores ajustados */
+.dark .spotlight-main {
+    background: radial-gradient(
+        circle,
+        rgba(96, 165, 250, 0.3) 0%,
+        rgba(96, 165, 250, 0.15) 20%,
+        rgba(96, 165, 250, 0.08) 40%,
+        transparent 70%
+    );
+}
+
+.dark .spotlight-main.active {
+    background: radial-gradient(
+        circle,
+        rgba(96, 165, 250, 0.5) 0%,
+        rgba(96, 165, 250, 0.25) 20%,
+        rgba(96, 165, 250, 0.12) 40%,
+        transparent 70%
+    );
+}
+
+/* Overlay oscuro para efecto spotlight */
+.spotlight-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 9997;
+    transition: opacity 0.3s ease;
+}
+
+.dark .spotlight-overlay {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+/* Desactivar en dispositivos móviles */
+@media (max-width: 767px) {
+    .cursor-spotlight,
+    .spotlight-overlay {
+        display: none !important;
+    }
+}
+
+/* Efectos de partículas al hacer click */
+.cursor-particle {
+    position: fixed;
+    pointer-events: none;
+    width: 4px;
+    height: 4px;
+    background: rgba(74, 144, 226, 0.8);
+    border-radius: 50%;
+    z-index: 9998;
+    animation: particleExplode 0.8s ease-out forwards;
+}
+
+@keyframes particleExplode {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+}
+
+/* Efecto glow en elementos interactivos */
+button:hover,
+a:hover,
+input:hover,
+[role="button"]:hover {
+    position: relative;
+}
+
+button:hover::after,
+a:hover::after,
+[role="button"]:hover::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle,
+        rgba(74, 144, 226, 0.1) 0%,
+        transparent 70%
+    );
+    border-radius: inherit;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
