@@ -290,7 +290,7 @@ try {
                         <div class="grid grid-cols-1 gap-6 items-end">
                            <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2">Altura (en Metros)</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
                                        placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" required />
                             </label>
