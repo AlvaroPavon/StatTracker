@@ -64,6 +64,9 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
+    <!-- Liquid Glass Effect CSS -->
+    <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
     <script>
         window.csrfToken = "<?php echo $csrf_token; ?>";
     </script>
