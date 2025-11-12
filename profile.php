@@ -64,6 +64,9 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
+    <!-- Liquid Glass Effect CSS -->
+    <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
     <script>
         window.csrfToken = "<?php echo $csrf_token; ?>";
     </script>
@@ -142,7 +145,7 @@ try {
 <body class="font-display text-gray-900 dark:text-gray-100 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-slate-900 dark:to-gray-800">
 
 <div id="dashboard-content" class="flex h-screen w-full hidden">
-<aside class="flex w-64 flex-col glass-card m-4 rounded-xl">
+<aside class="flex w-64 flex-col glass-sidebar liquid-wave-effect m-4 rounded-xl">
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
@@ -191,7 +194,7 @@ try {
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8
                     animate__animated animate__fadeInUp">
         <div class="xl:col-span-1 flex flex-col gap-8">
-                <div class="p-6 rounded-xl shadow-sm glass-card">
+                <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Información General</h2>
                     
                     <div class="flex flex-col items-center gap-4">
@@ -216,11 +219,11 @@ try {
                         <label class="flex flex-col w-full">
                             <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Cambiar Foto de Perfil</p>
                             <input class
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
+                                class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
                                        file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                                 type="file" name="profile_pic" id="profile_pic_input" accept="image/png, image/jpeg" />
                         </label>
-                        <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full mt-4
+                        <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold w-full mt-4
                                 transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
                                 type="submit">
                             <span class="truncate">Actualizar Foto</span>
@@ -241,7 +244,7 @@ try {
                     </div>
                 <?php endif; ?>
 
-                <div class="p-6 rounded-xl shadow-sm glass-card">
+                <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Actualizar Información</h2>
                     <form action="update_profile.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
@@ -249,54 +252,54 @@ try {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nombre</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="text" name="nombre" value="<?php echo $nombreUsuario; ?>" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Apellidos</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="text" name="apellidos" value="<?php echo $apellidosUsuario; ?>" required />
                             </label>
                             <label class="flex flex-col w-full md:col-span-2">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Email</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="email" name="email" value="<?php echo $emailUsuario; ?>" required />
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
-                                <span class="truncate">Guardar Cambios</span>
+                                <span class="truncate relative z-10">Guardar Cambios</span>
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <div class="p-6 rounded-xl shadow-sm glass-card">
+                <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Cambiar Contraseña</h2>
                     <form action="change_password.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                         <div class="grid grid-cols-1 gap-6">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Contraseña Actual</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="current_password" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nueva Contraseña</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="new_password" minlength="8" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Confirmar Nueva Contraseña</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="confirm_password" minlength="8" required />
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold
                                     transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900" type="submit">
-                                <span class="truncate">Actualizar Contraseña</span>
+                                <span class="truncate relative z-10">Actualizar Contraseña</span>
                             </button>
                         </div>
                     </form>
