@@ -188,5 +188,9 @@ $csrf_token = $_SESSION['csrf_token'];
         }, 2500); // 2.5 segundos de duración total del splash
     });
 </script>
+
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
 </body>
 </html>
