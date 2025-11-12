@@ -320,8 +320,8 @@ try {
         </section>
 
         <section class="mt-8 rounded-xl
-                        transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                        animate__animated animate__fadeInUp glass-card overflow-hidden"
+                        transition-all duration-300
+                        animate__animated animate__fadeInUp liquid-glass-strong liquid-shine overflow-hidden"
                         style="--animate-delay: 0.2s;">
             <h2 class="text-gray-900 dark:text-gray-100 text-xl font-bold p-6">Registros de Peso</h2>
             <div class="overflow-x-auto">
