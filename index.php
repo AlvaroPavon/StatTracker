@@ -40,6 +40,12 @@ $csrf_token = $_SESSION['csrf_token'];
     
     <!-- Liquid Glass Effect CSS -->
     <link rel="stylesheet" href="css/liquid-glass.css"/>
+    
+    <!-- Cursor Spotlight Effect CSS -->
+    <link rel="stylesheet" href="css/cursor-spotlight.css"/>
+    
+    <!-- Welcome Screen CSS -->
+    <link rel="stylesheet" href="css/welcome-screen.css"/>
 
     <script>
       tailwind.config = {
@@ -160,6 +166,12 @@ $csrf_token = $_SESSION['csrf_token'];
     </div>
 
 </div>
+
+<!-- Cursor Spotlight Script -->
+<script src="js/cursor-spotlight.js"></script>
+
+<!-- Welcome Screen Script -->
+<script src="js/welcome-screen.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
