@@ -212,7 +212,7 @@ try {
 <?php endif; ?>
 
 <div id="dashboard-content" class="flex h-screen w-full hidden">
-<aside class="flex w-64 flex-col glass-card m-4 rounded-xl">
+<aside class="flex w-64 flex-col glass-sidebar liquid-wave-effect m-4 rounded-xl">
    <div class="flex h-full flex-col justify-between p-4">
         <div class="flex flex-col gap-6">
             <div class="flex items-center gap-3 px-2">
