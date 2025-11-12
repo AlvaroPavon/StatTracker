@@ -194,7 +194,7 @@ try {
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8
                     animate__animated animate__fadeInUp">
         <div class="xl:col-span-1 flex flex-col gap-8">
-                <div class="p-6 rounded-xl shadow-sm glass-card">
+                <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Información General</h2>
                     
                     <div class="flex flex-col items-center gap-4">
