@@ -135,7 +135,7 @@ $csrf_token = $_SESSION['csrf_token'];
                 
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Email</p>
-                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-gray-700 h-12 placeholder:text-gray-400 p-3 text-base font-normal
+                    <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300" 
                         placeholder="you@example.com" type="email" name="email" id="login_email" required />
                 </label>
