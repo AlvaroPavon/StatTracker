@@ -308,10 +308,10 @@ try {
                             </label>
                         </div>
                         <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
-                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 w-full
-                                    transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
+                            <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold w-full
+                                    transition-all duration-300 dark:focus:ring-offset-slate-900"
                                     type="submit">
-                                <span class="truncate">Guardar Registro</span>
+                                <span class="truncate relative z-10">Guardar Registro</span>
                             </button>
                         </div>
                     </form>
