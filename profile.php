@@ -219,7 +219,7 @@ try {
                         <label class="flex flex-col w-full">
                             <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Cambiar Foto de Perfil</p>
                             <input class
-                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
+                                class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
                                        file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                                 type="file" name="profile_pic" id="profile_pic_input" accept="image/png, image/jpeg" />
                         </label>
@@ -252,17 +252,17 @@ try {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nombre</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="text" name="nombre" value="<?php echo $nombreUsuario; ?>" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Apellidos</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="text" name="apellidos" value="<?php echo $apellidosUsuario; ?>" required />
                             </label>
                             <label class="flex flex-col w-full md:col-span-2">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Email</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        type="email" name="email" value="<?php echo $emailUsuario; ?>" required />
                             </label>
                         </div>
@@ -282,17 +282,17 @@ try {
                         <div class="grid grid-cols-1 gap-6">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Contraseña Actual</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="current_password" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nueva Contraseña</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="new_password" minlength="8" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Confirmar Nueva Contraseña</p>
-                                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/10 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
+                                <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
                                        placeholder="••••••••" type="password" name="confirm_password" minlength="8" required />
                             </label>
                         </div>
