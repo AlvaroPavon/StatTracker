@@ -109,8 +109,8 @@ $csrf_token = $_SESSION['csrf_token'];
             <p class="text-gray-500 dark:text-gray-400 mt-2">¡Bienvenido! Por favor, inicia sesión.</p>
         </div>
         
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl border border-border-light dark:border-border-dark shadow-lg 
-                    transition-all duration-300 hover:shadow-xl
+        <div class="liquid-glass-strong liquid-shine water-drop-effect p-8 rounded-xl 
+                    transition-all duration-300
                     animate__animated animate__fadeInUp">
             
             <?php 
