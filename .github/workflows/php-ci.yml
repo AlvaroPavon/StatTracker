@@ -1,10 +1,11 @@
-name: PHP CI (Generate & Push Coverage)
+name: PHP CI (Auto-Generate & Push Coverage)
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
+# IMPORTANTE: Da permisos al robot para escribir en tu repositorio
 permissions:
   contents: write
 
@@ -33,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # PASO CRÍTICO 1: Activar Xdebug (antes tenías 'none')
+      # 1. Activamos Xdebug aquí (antes tenías 'none')
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -57,15 +58,19 @@ jobs:
       - name: Set execute permission for PHPUnit
         run: chmod +x vendor/bin/phpunit
       
-      # PASO CRÍTICO 2: Generar el reporte HTML explícitamente
+      # 2. Generamos la carpeta 'coverage' explícitamente
       - name: Run PHPUnit and Generate Coverage
         run: vendor/bin/phpunit --coverage-html coverage
         
-      # PASO CRÍTICO 3: Forzar la subida de la carpeta generada
+      # 3. Forzamos la subida de la carpeta al repositorio
       - name: Commit Coverage Report
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Añadimos la carpeta coverage (el -f fuerza la inclusión aunque esté en .gitignore)
           git add -f coverage/
+          
+          # Hacemos commit y push solo si hay cambios
           git commit -m "📊 Auto-update: Informe de cobertura actualizado [skip ci]" || echo "No changes to commit"
           git push
