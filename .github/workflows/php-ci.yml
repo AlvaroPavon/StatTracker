@@ -1,11 +1,11 @@
-name: PHP CI (Auto-Generate & Push Coverage)
+name: PHP CI (Auto-Generate Coverage)
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
-# IMPORTANTE: Da permisos al robot para escribir en tu repositorio
+# 1. Permiso para que el robot pueda subir la carpeta
 permissions:
   contents: write
 
@@ -15,7 +15,7 @@ env:
   DB_USERNAME: root
   DB_PASSWORD: '' 
   MYSQL_PORT: 3306 
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,13 +34,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Activamos Xdebug aquí (antes tenías 'none')
+      # 2. AQUÍ ESTÁ LA CLAVE: Activamos Xdebug
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2' 
           extensions: mbstring, pdo, pdo_mysql
-          coverage: xdebug
+          coverage: xdebug  # <--- Si esto dice 'none', no funcionará nunca
           
       - name: Install MySQL Client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
@@ -50,6 +50,7 @@ jobs:
         
       - name: Import database schema
         run: |
+          # Nota: Asegúrate de que tu database.sql no tenga 'CREATE DATABASE' dentro
           mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} ${{ env.DB_DATABASE }} < database.sql
         
       - name: Install dependencies
@@ -58,19 +59,22 @@ jobs:
       - name: Set execute permission for PHPUnit
         run: chmod +x vendor/bin/phpunit
       
-      # 2. Generamos la carpeta 'coverage' explícitamente
+      # 3. GENERAR LA CARPETA (Si este paso no se ejecuta así, no hay carpeta)
       - name: Run PHPUnit and Generate Coverage
         run: vendor/bin/phpunit --coverage-html coverage
         
-      # 3. Forzamos la subida de la carpeta al repositorio
+      # 4. SUBIR LA CARPETA AUTOMÁTICAMENTE
       - name: Commit Coverage Report
+        if: success() # Solo si los tests pasan
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Añadimos la carpeta coverage (el -f fuerza la inclusión aunque esté en .gitignore)
+          # Forzamos la subida de la carpeta coverage
           git add -f coverage/
           
-          # Hacemos commit y push solo si hay cambios
-          git commit -m "📊 Auto-update: Informe de cobertura actualizado [skip ci]" || echo "No changes to commit"
+          # Hacemos commit si hay cambios
+          git commit -m "📊 Auto-update: Informe de cobertura [skip ci]" || echo "No changes to commit"
+          
+          # Subimos los cambios a la rama principal
           git push origin HEAD:main
