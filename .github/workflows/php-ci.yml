@@ -34,12 +34,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. AQUÍ ESTÁ LA CLAVE: Activamos Xdebug
+      # 2. AQUÍ ESTÁ LA CLAVE: Activamos Xdebug y extensiones necesarias
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2' 
-          extensions: mbstring, pdo, pdo_mysql
+          extensions: mbstring, pdo, pdo_mysql, pdo_sqlite, sqlite3
           coverage: xdebug  # <--- Si esto dice 'none', no funcionará nunca
           
       - name: Install MySQL Client
