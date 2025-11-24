@@ -2671,7 +2671,7 @@ Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producc
 
 ## 🔄 Historial de Versiones
 
-### v1.0 (Enero 2025)
+### v1.0 (Noviembre 2025)
 * ✨ Implementación inicial del MVP
 * ✅ Sistema de autenticación completo
 * ✅ Gestión de métricas de salud
