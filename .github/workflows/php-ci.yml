@@ -76,12 +76,11 @@ jobs:
       - name: Run PHPUnit and Generate Coverage
         run: vendor/bin/phpunit --coverage-html coverage
         
-      # 4. MAGIA: Detectar cambios en la carpeta coverage y hacer commit automático
+      # 4. Forzar commit aunque esté en gitignore
       - name: Commit Coverage Report
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "📊 Auto-update: Informe de cobertura actualizado [skip ci]"
-          file_pattern: coverage/
-          branch: main
-          skip_dirty_check: false    
-          create_branch: false
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f coverage/  # El -f fuerza la subida aunque esté ignorado
+          git commit -m "📊 Auto-update: Informe de cobertura actualizado [skip ci]" || echo "No changes to commit"
+          git push
