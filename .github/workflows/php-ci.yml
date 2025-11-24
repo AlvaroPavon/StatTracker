@@ -73,4 +73,4 @@ jobs:
           
           # Hacemos commit y push solo si hay cambios
           git commit -m "📊 Auto-update: Informe de cobertura actualizado [skip ci]" || echo "No changes to commit"
-          git push
+          git push origin HEAD:main
