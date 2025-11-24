@@ -1,0 +1,39 @@
+graph TD
+    A["<b>StatTracker - Dashboard</b>"] --> B[Barra de Navegación]
+    B --> B1["Logo | Bienvenido, [Nombre] | [Mi Perfil] [Cerrar Sesión]"]
+    
+    A --> C[Panel Principal]
+    C --> D[Sección: Añadir Datos]
+    C --> E[Sección: Historial]
+    
+    D --> D1["Peso kg: ___"]
+    D --> D2["Altura m: ___"]
+    D --> D3["Fecha: [selector]"]
+    D --> D4["[Añadir Datos]"]
+    
+    E --> E1[Tabla de Registros]
+    E1 --> E2["| ID | Peso | Altura | IMC | Fecha | Acciones |"]
+    E2 --> E3["| 1  | 75.0 | 1.75   | 24.49 | 2025-01-15 | [Eliminar] |"]
+    E2 --> E4["| 2  | 74.5 | 1.75   | 24.33 | 2025-01-08 | [Eliminar] |"]
+    E2 --> E5["| 3  | 76.0 | 1.75   | 24.82 | 2025-01-01 | [Eliminar] |"]
+    
+    D4 --> F{Validación}
+    F -->|OK| G["Datos guardados ✓"]
+    F -->|Error| H["Error: Verifica los datos"]
+    G --> E1
+    H --> D
+    
+    E3 --> I["Click Eliminar"]
+    I --> J["Confirmación: ¿Eliminar registro?"]
+    J -->|Sí| K["Registro eliminado"]
+    J -->|No| E1
+    K --> E1
+    
+    B1 --> L[Mi Perfil]
+    B1 --> M[Cerrar Sesión]
+    M --> N[Login]
+    
+    style A fill:#4a90e2,color:#fff
+    style D4 fill:#28a745,color:#fff
+    style G fill:#28a745,color:#fff
+    style H fill:#dc3545,color:#fff
