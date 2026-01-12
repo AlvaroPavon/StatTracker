@@ -144,20 +144,22 @@ $minPassword = Security::MIN_PASSWORD;
                 </div>
             <?php endif; ?>
 
-            <form class="flex flex-col gap-6" action="login.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+            <form class="flex flex-col gap-6" action="login.php" method="POST" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
                 
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Email</p>
                     <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300" 
-                        placeholder="you@example.com" type="email" name="email" id="login_email" required />
+                        placeholder="you@example.com" type="email" name="email" id="login_email" 
+                        maxlength="<?php echo $maxEmail; ?>" autocomplete="email" required />
                 </label>
                 <label class="flex flex-col w-full">
                     <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
                     <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                         transition-all duration-300"
-                        placeholder="••••••••" type="password" name="password" id="login_password" required />
+                        placeholder="••••••••" type="password" name="password" id="login_password" 
+                        minlength="<?php echo $minPassword; ?>" maxlength="<?php echo $maxPassword; ?>" autocomplete="current-password" required />
                 </label>
                 
                 <button class="glass-button flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
