@@ -305,26 +305,28 @@ try {
                         Registro eliminado con éxito.
                     </div>
 
-                    <form action="add_data.php" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                    <form action="add_data.php" method="POST" id="form-registro">
+                        <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
                         <div class="grid grid-cols-1 gap-6 items-end">
                            <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2">Altura (en Metros)</p>
+                                <p class="text-base font-medium leading-normal pb-2">Altura (metros) <span class="text-xs text-gray-500">(<?php echo $minAltura; ?>-<?php echo $maxAltura; ?>)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
-                                       placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" required />
+                                       placeholder="Ej: 1.75" type="number" step="0.01" id="altura" name="altura" 
+                                       min="<?php echo $minAltura; ?>" max="<?php echo $maxAltura; ?>" required />
                             </label>
                             <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2">Peso (kg)</p>
+                                <p class="text-base font-medium leading-normal pb-2">Peso (kg) <span class="text-xs text-gray-500">(<?php echo $minPeso; ?>-<?php echo $maxPeso; ?>)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
-                                       placeholder="Ej: 70.5" type="number" step="0.1" id="peso" name="peso" required />
+                                       placeholder="Ej: 70.5" type="number" step="0.1" id="peso" name="peso" 
+                                       min="<?php echo $minPeso; ?>" max="<?php echo $maxPeso; ?>" required />
                             </label>
                             <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2">Fecha del Registro</p>
+                                <p class="text-base font-medium leading-normal pb-2">Fecha del Registro <span class="text-xs text-gray-500">(no futura)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal
                                        transition-all duration-300"
-                                       type="date" id="fecha" name="fecha_registro" required />
+                                       type="date" id="fecha" name="fecha_registro" max="<?php echo date('Y-m-d'); ?>" required />
                             </label>
                         </div>
                         <div class="flex flex-wrap items-center justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
