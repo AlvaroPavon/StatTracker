@@ -2,23 +2,31 @@
 // 1. Cargar el autoloader de Composer
 require 'vendor/autoload.php';
 
-// 2. Cargar la conexión a la BD ($pdo)
+// 2. Cargar la configuración de sesión ANTES de iniciarla
+require 'session_config.php';
+
+// 3. Cargar la conexión a la BD ($pdo)
 require 'db.php'; 
 
-// 3. Usar el namespace de nuestra clase
+// 4. Usar namespaces
 use App\Auth;
+use App\Security;
+use App\SecurityHeaders;
 
-// 4. Iniciar la sesión
+// 5. Aplicar headers de seguridad
+SecurityHeaders::apply();
+
+// 6. Iniciar la sesión
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 5. Comprobar si el formulario fue enviado
+// 7. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // 6. Validar CSRF token
-    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $_SESSION['login_error'] = "Error de seguridad (CSRF). Por favor, inténtelo de nuevo desde el formulario.";
+    // 8. Validar CSRF token
+    if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+        $_SESSION['login_error'] = "Error de seguridad. Por favor, inténtelo de nuevo.";
         header("Location: index.php");
         exit();
     }
@@ -28,21 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // 7. Instanciar nuestra clase de lógica
+    // 9. Instanciar nuestra clase de lógica
     $auth = new Auth($pdo);
 
-    // 8. Llamar a la lógica de login (Auth::login ahora devuelve [id, nombre])
+    // 10. Llamar a la lógica de login
     $result = $auth->login($email, $password);
 
-    // 9. Comprobar el resultado
+    // 11. Comprobar el resultado
     if (is_array($result)) {
         // ÉXITO
-
         session_regenerate_id(true);
 
-        // CORRECCIÓN: Guardar 'nombre' (de la BD 'usuarios') en la sesión.
         $_SESSION['user_id'] = $result['id'];
-        $_SESSION['nombre'] = $result['nombre']; // Antes era 'username'
+        $_SESSION['nombre'] = $result['nombre'];
         
         // Activar pantalla de bienvenida
         $_SESSION['show_welcome_screen'] = true;

@@ -3,6 +3,8 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use App\Metrics;
+use App\Security;
+use App\SecurityHeaders;
 
 // 2. Iniciar sesión solo si no está activa
 if (session_status() === PHP_SESSION_NONE) {
@@ -13,10 +15,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // 3. Cargar conexión a la BD ($pdo)
 require __DIR__ . '/db.php';
 
-// 4. Forzar salida JSON
-if (!headers_sent()) {
-    header('Content-Type: application/json');
-}
+// 4. Aplicar headers de seguridad para JSON
+SecurityHeaders::applyJsonHeaders();
 
 /**
  * Función auxiliar para devolver respuestas JSON limpias
@@ -26,40 +26,31 @@ function send_json_response(array $data, int $statusCode = 200): void
     if (!headers_sent()) {
         http_response_code($statusCode);
     }
-    echo json_encode($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
 }
-
-/**
- * IMPORTANTE:
- * En vez de usar `exit()` al final del archivo,
- * retornamos desde este script. Así PHPUnit no
- * mata el proceso cuando se ejecuta en tests.
- */
 
 // 5. Validar sesión
 if (!isset($_SESSION['user_id'])) {
     send_json_response(
-        ['success' => false, 'message' => 'Error: No autorizado. Inicie sesión.'],
+        ['success' => false, 'message' => 'No autorizado. Inicie sesión.'],
         401
     );
     return;
 }
 
-// 6. MODIFICACIÓN (SEGURIDAD): Validar Token CSRF
-// El dashboard envía el token por GET, aquí lo validamos.
-if (!isset($_GET['token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+// 6. Validar Token CSRF
+if (!Security::validateCsrfToken($_GET['token'] ?? null)) {
     send_json_response(
-        ['success' => false, 'message' => 'Error: Token CSRF no válido o ausente.'],
-        403 // 403 Forbidden
+        ['success' => false, 'message' => 'Error de seguridad.'],
+        403
     );
     return;
 }
 
-
 // 7. Validar método HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     send_json_response(
-        ['success' => false, 'message' => 'Error: Método no permitido, se esperaba GET.'],
+        ['success' => false, 'message' => 'Método no permitido.'],
         405
     );
     return;
@@ -83,6 +74,4 @@ if (is_array($result)) {
     ], 500);
 }
 
-return; // <-- En vez de exit()
-
-// MODIFICACIÓN (BUG): Se eliminó la llave '}' extra que estaba aquí y causaba el error.
+return;
