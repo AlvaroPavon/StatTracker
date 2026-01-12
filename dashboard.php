@@ -47,31 +47,29 @@ if (isset($_SESSION['show_welcome_screen']) && $_SESSION['show_welcome_screen'] 
 }
 
 // 8. Obtener datos del usuario (nombre y foto) para la barra lateral
-$nombreUsuario = ''; // Default empty
-$profilePic = null; // Default null
-$userHasProfilePic = false; // Flag for checking if user has a pic
+$nombreUsuario = '';
+$profilePic = null;
+$userHasProfilePic = false;
 
 try {
-    $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id"); //
-    $stmt->execute(['id' => $user_id]); //
-    $usuario = $stmt->fetch(); //
+    $stmt = $pdo->prepare("SELECT nombre, profile_pic FROM usuarios WHERE id = :id");
+    $stmt->execute(['id' => $user_id]);
+    $usuario = $stmt->fetch();
 
     if ($usuario) {
-        $nombreUsuario = htmlspecialchars($usuario['nombre']); //
+        $nombreUsuario = Security::escapeHtml($usuario['nombre']);
 
-        if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) { //
-            $profilePic = 'uploads/' . $usuario['profile_pic']; //
-            $userHasProfilePic = true; // Set flag to true
+        if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) {
+            $profilePic = 'uploads/' . Security::escapeHtml($usuario['profile_pic']);
+            $userHasProfilePic = true;
         }
     } else {
-         // Fallback if user data couldn't be fetched (should ideally not happen)
-         $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario');
+         $nombreUsuario = Security::escapeHtml($_SESSION['nombre'] ?? 'Usuario');
     }
 
-
 } catch (PDOException $e) {
-    // Fallback if DB query fails
-    $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario'); //
+    error_log("Error en dashboard: " . $e->getMessage());
+    $nombreUsuario = Security::escapeHtml($_SESSION['nombre'] ?? 'Usuario');
 }
 
 ?>
