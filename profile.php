@@ -228,15 +228,15 @@ try {
                     <hr class="my-6 border-white/20 dark:border-white/10">
 
                     <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
                         <input type="hidden" name="form_type" value="photo">
                         
                         <label class="flex flex-col w-full">
-                            <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Cambiar Foto de Perfil</p>
-                            <input class
-                                class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
+                            <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Cambiar Foto de Perfil <span class="text-xs text-gray-500">(máx. <?php echo $maxFileSize; ?>MB)</span></p>
+                            <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300
                                        file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                                type="file" name="profile_pic" id="profile_pic_input" accept="image/png, image/jpeg" />
+                                type="file" name="profile_pic" id="profile_pic_input" accept="image/png, image/jpeg, image/gif, image/webp" />
+                            <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF, WebP</p>
                         </label>
                         <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 text-white text-sm font-bold w-full mt-4
                                 transition-all duration-300 hover:scale-105 dark:focus:ring-offset-slate-900"
@@ -250,35 +250,38 @@ try {
             <div class="xl:col-span-2 flex flex-col gap-8">
                 <?php if (isset($_GET['success'])): ?>
                     <div class="p-4 text-sm text-green-900 dark:text-green-100 bg-green-500/20 rounded-lg border border-green-500/30" role="alert">
-                        <?php echo htmlspecialchars($_GET['success']); ?>
+                        <?php echo Security::escapeHtml($_GET['success']); ?>
                     </div>
                 <?php endif; ?>
                 <?php if (isset($_GET['error'])): ?>
                     <div class="p-4 text-sm text-red-900 dark:text-red-100 bg-red-500/20 rounded-lg border border-red-500/30" role="alert">
-                        <?php echo htmlspecialchars($_GET['error']); ?>
+                        <?php echo Security::escapeHtml($_GET['error']); ?>
                     </div>
                 <?php endif; ?>
 
                 <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Actualizar Información</h2>
                     <form action="update_profile.php" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
                         <input type="hidden" name="form_type" value="details">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nombre</p>
+                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nombre <span class="text-xs text-gray-500">(máx. <?php echo $maxNombre; ?>)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       type="text" name="nombre" value="<?php echo $nombreUsuario; ?>" required />
+                                       type="text" name="nombre" value="<?php echo $nombreUsuario; ?>" 
+                                       maxlength="<?php echo $maxNombre; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" required />
                             </label>
                             <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Apellidos</p>
+                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Apellidos <span class="text-xs text-gray-500">(máx. <?php echo $maxApellidos; ?>)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       type="text" name="apellidos" value="<?php echo $apellidosUsuario; ?>" required />
+                                       type="text" name="apellidos" value="<?php echo $apellidosUsuario; ?>" 
+                                       maxlength="<?php echo $maxApellidos; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" required />
                             </label>
                             <label class="flex flex-col w-full md:col-span-2">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Email</p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       type="email" name="email" value="<?php echo $emailUsuario; ?>" required />
+                                       type="email" name="email" value="<?php echo $emailUsuario; ?>" 
+                                       maxlength="<?php echo $maxEmail; ?>" required />
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
@@ -293,22 +296,25 @@ try {
                 <div class="p-6 rounded-xl shadow-sm liquid-glass-strong water-drop-effect">
                     <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Cambiar Contraseña</h2>
                     <form action="change_password.php" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
                         <div class="grid grid-cols-1 gap-6">
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Contraseña Actual</p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       placeholder="••••••••" type="password" name="current_password" required />
+                                       placeholder="••••••••" type="password" name="current_password" 
+                                       maxlength="<?php echo $maxPassword; ?>" autocomplete="current-password" required />
                             </label>
                             <label class="flex flex-col w-full">
-                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nueva Contraseña</p>
+                                <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Nueva Contraseña <span class="text-xs text-gray-500">(<?php echo $minPassword; ?>-<?php echo $maxPassword; ?> caracteres)</span></p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       placeholder="••••••••" type="password" name="new_password" minlength="8" required />
+                                       placeholder="Mínimo 1 mayúscula, 1 minúscula y 1 número" type="password" name="new_password" 
+                                       minlength="<?php echo $minPassword; ?>" maxlength="<?php echo $maxPassword; ?>" autocomplete="new-password" required />
                             </label>
                             <label class="flex flex-col w-full">
                                 <p class="text-base font-medium leading-normal pb-2 text-gray-900 dark:text-gray-100">Confirmar Nueva Contraseña</p>
                                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-600 dark:placeholder:text-gray-400 p-3 text-base font-normal transition-all duration-300"
-                                       placeholder="••••••••" type="password" name="confirm_password" minlength="8" required />
+                                       placeholder="••••••••" type="password" name="confirm_password" 
+                                       minlength="<?php echo $minPassword; ?>" maxlength="<?php echo $maxPassword; ?>" autocomplete="new-password" required />
                             </label>
                         </div>
                         <div class="flex justify-end gap-4 mt-6 border-t border-white/20 dark:border-white/10 pt-6">
