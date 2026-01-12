@@ -21,3 +21,7 @@ Thumbs.db
 
 # Keep coverage directory for GitHub Actions to commit
 !coverage/
+-e 
+# Environment files
+*.env
+*.env.*
