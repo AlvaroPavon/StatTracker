@@ -1,33 +1,43 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php'
-require 'db.php'; //
+// 1. Cargar autoloader y clases
+require 'vendor/autoload.php';
+require __DIR__ . '/session_config.php';
+require 'db.php';
 
-// 2. MODIFICACIÓN (BUG CSRF): Incluir 'session_config.php' ANTES de session_start()
-require __DIR__ . '/session_config.php'; //
+use App\Security;
+use App\SecurityHeaders;
+
+// 2. Aplicar headers de seguridad
+SecurityHeaders::apply();
 
 // 3. Iniciar la sesión
-session_start(); //
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// 4. Refinamiento de Seguridad: Proteger la página
-if (!isset($_SESSION['user_id'])) { //
-    header('Location: index.php'); //
-    exit; // Detener la ejecución del script //
+// 4. Proteger la página
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
 }
 
 // 5. Obtener el ID del usuario
-$user_id = $_SESSION['user_id']; //
+$user_id = $_SESSION['user_id'];
 
-// 6. REFINAMIENTO (CSRF): Obtener el token de la sesión para usarlo
-if (empty($_SESSION['csrf_token'])) { //
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); //
-}
-$csrf_token = $_SESSION['csrf_token']; //
+// 6. Generar token CSRF
+$csrf_token = Security::generateCsrfToken();
+
+// Constantes de validación para el frontend
+$minAltura = Security::MIN_ALTURA;
+$maxAltura = Security::MAX_ALTURA;
+$minPeso = Security::MIN_PESO;
+$maxPeso = Security::MAX_PESO;
 
 // 7. Comprobar si debemos mostrar el splash de bienvenida
-$showSplash = false; //
-$showWelcomeScreen = false; //
-if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) { //
-    $showSplash = true; //
+$showSplash = false;
+$showWelcomeScreen = false;
+if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) {
+    $showSplash = true;
     unset($_SESSION['show_welcome_splash']); //
 }
 // Nueva pantalla de bienvenida
