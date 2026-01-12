@@ -212,5 +212,8 @@ $minPassword = Security::MIN_PASSWORD;
         }, 2500); // 2.5 segundos de duración total del splash
     });
 </script>
+
+<!-- Script de Validación de Formularios -->
+<script src="js/form-validation.js"></script>
 </body>
 </html>
