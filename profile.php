@@ -366,5 +366,8 @@ document.getElementById('profile_pic_input')?.addEventListener('change', functio
 <!-- Cursor Spotlight Script -->
 <script src="js/cursor-spotlight.js"></script>
 
+<!-- Script de Validación de Formularios -->
+<script src="js/form-validation.js"></script>
+
 </body>
 </html>
