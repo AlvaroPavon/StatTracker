@@ -1,25 +1,39 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
+// 1. Cargar autoloader y clases
+require 'vendor/autoload.php';
+require 'session_config.php';
 require 'db.php';
 
-// 2. Iniciar la sesión
-session_start();
+use App\Security;
+use App\SecurityHeaders;
 
-// 3. Refinamiento de Seguridad: Proteger la página
+// 2. Aplicar headers de seguridad
+SecurityHeaders::apply();
+
+// 3. Iniciar la sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 4. Proteger la página
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
-    exit; // Detener la ejecución del script
+    exit;
 }
 
-// 4. Obtener el ID del usuario y el token CSRF
+// 5. Obtener el ID del usuario y generar token CSRF
 $user_id = $_SESSION['user_id'];
+$csrf_token = Security::generateCsrfToken();
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+// Constantes de validación para el frontend
+$maxNombre = Security::MAX_NOMBRE;
+$maxApellidos = Security::MAX_APELLIDOS;
+$maxEmail = Security::MAX_EMAIL;
+$maxPassword = Security::MAX_PASSWORD;
+$minPassword = Security::MIN_PASSWORD;
+$maxFileSize = Security::MAX_FILE_SIZE / 1024 / 1024; // En MB
 
-// 5. Obtener datos completos del usuario
+// 6. Obtener datos completos del usuario
 $nombreUsuario = '';
 $apellidosUsuario = '';
 $emailUsuario = '';
@@ -32,23 +46,21 @@ try {
     $usuario = $stmt->fetch();
 
     if ($usuario) {
-        $nombreUsuario = htmlspecialchars($usuario['nombre']);
-        $apellidosUsuario = htmlspecialchars($usuario['apellidos'] ?? ''); // Manejar apellidos nulos
-        $emailUsuario = htmlspecialchars($usuario['email']);
+        $nombreUsuario = Security::escapeHtml($usuario['nombre']);
+        $apellidosUsuario = Security::escapeHtml($usuario['apellidos'] ?? '');
+        $emailUsuario = Security::escapeHtml($usuario['email']);
 
         if (!empty($usuario['profile_pic']) && file_exists('uploads/' . $usuario['profile_pic'])) {
-            $profilePic = 'uploads/' . $usuario['profile_pic'];
+            $profilePic = 'uploads/' . Security::escapeHtml($usuario['profile_pic']);
             $userHasProfilePic = true;
         }
     } else {
-         // Fallback si los datos no se pueden cargar
-         $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario');
+         $nombreUsuario = Security::escapeHtml($_SESSION['nombre'] ?? 'Usuario');
          $emailUsuario = 'Error al cargar email';
     }
 
 } catch (PDOException $e) {
-    // Fallback si la consulta falla
-    $nombreUsuario = htmlspecialchars($_SESSION['user_nombre'] ?? 'Usuario');
+    $nombreUsuario = Security::escapeHtml($_SESSION['nombre'] ?? 'Usuario');
     error_log('Error en profile.php: ' . $e->getMessage());
 }
 
