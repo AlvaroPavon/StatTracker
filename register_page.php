@@ -129,40 +129,47 @@ $minPassword = Security::MIN_PASSWORD;
         if (isset($_SESSION['register_error'])): ?>
             <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300 animate__animated animate__shakeX" role="alert">
                 <?php 
-                echo htmlspecialchars($_SESSION['register_error']); 
-                // Limpiamos el error para que no se muestre de nuevo
+                echo Security::escapeHtml($_SESSION['register_error']); 
                 unset($_SESSION['register_error']);
                 ?>
             </div>
         <?php endif; ?>
 
-        <form class="flex flex-col gap-4" action="register.php" method="POST">
-            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+        <form class="flex flex-col gap-4" action="register.php" method="POST" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
 
             <label class="flex flex-col w-full">
-                <p class="text-base font-medium leading-normal pb-2">Nombre</p>
+                <p class="text-base font-medium leading-normal pb-2">Nombre <span class="text-xs text-gray-500">(máx. <?php echo $maxNombre; ?> caracteres)</span></p>
                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
-                    placeholder="Ej: Jane" type="text" name="nombre" id="reg_nombre" required />
+                    placeholder="Ej: María" type="text" name="nombre" id="reg_nombre" 
+                    maxlength="<?php echo $maxNombre; ?>" autocomplete="given-name" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" title="Solo letras, espacios y guiones" required />
             </label>
             <label class="flex flex-col w-full">
-                <p class="text-base font-medium leading-normal pb-2">Apellidos</p>
+                <p class="text-base font-medium leading-normal pb-2">Apellidos <span class="text-xs text-gray-500">(máx. <?php echo $maxApellidos; ?> caracteres)</span></p>
                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
-                    placeholder="Ej: Doe" type="text" name="apellidos" id="reg_apellidos" required />
+                    placeholder="Ej: García López" type="text" name="apellidos" id="reg_apellidos" 
+                    maxlength="<?php echo $maxApellidos; ?>" autocomplete="family-name"
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" title="Solo letras, espacios y guiones" required />
             </label>
 
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Email</p>
                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
-                    placeholder="you@example.com" type="email" name="email" id="reg_email" required />
+                    placeholder="correo@ejemplo.com" type="email" name="email" id="reg_email" 
+                    maxlength="<?php echo $maxEmail; ?>" autocomplete="email" required />
             </label>
             <label class="flex flex-col w-full">
-                <p class="text-base font-medium leading-normal pb-2">Contraseña</p>
+                <p class="text-base font-medium leading-normal pb-2">Contraseña <span class="text-xs text-gray-500">(<?php echo $minPassword; ?>-<?php echo $maxPassword; ?> caracteres)</span></p>
                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
-                    placeholder="••••••••" type="password" name="password" id="reg_password" minlength="8" required />
+                    placeholder="Mínimo 1 mayúscula, 1 minúscula y 1 número" type="password" name="password" id="reg_password" 
+                    minlength="<?php echo $minPassword; ?>" maxlength="<?php echo $maxPassword; ?>" 
+                    autocomplete="new-password" required />
+                <p class="text-xs text-gray-500 mt-1">Debe contener mayúsculas, minúsculas y números</p>
             </label>
 
             <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold mt-4 w-full
