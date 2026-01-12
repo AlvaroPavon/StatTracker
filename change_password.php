@@ -5,54 +5,59 @@ require 'vendor/autoload.php';
 // 2. Cargar la conexión a la BD ($pdo)
 require 'db.php'; 
 
-// 3. Usar el namespace de nuestra clase
+// 3. Usar namespaces
 use App\User;
+use App\Security;
+use App\SecurityHeaders;
 
-// 4. Iniciar la sesión
+// 4. Cargar configuración de sesión
+require 'session_config.php';
+
+// 5. Aplicar headers de seguridad
+SecurityHeaders::apply();
+
+// 6. Iniciar la sesión
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 5. Autenticación
+// 7. Autenticación
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php'); // No autorizado
+    header('Location: index.php');
     exit;
 }
 
-// 6. Verificar que la solicitud sea por método POST
+// 8. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // 7. Validar el token CSRF
-    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        header('Location: profile.php?error=' . urlencode("Error de seguridad (CSRF). Intente de nuevo."));
+    // 9. Validar el token CSRF
+    if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+        header('Location: profile.php?error=' . urlencode("Error de seguridad. Intente de nuevo."));
         exit;
     }
 
-    // 8. Obtener ID de usuario y contraseñas
+    // 10. Obtener ID de usuario y contraseñas
     $user_id = (int)$_SESSION['user_id'];
-    $old_password = $_POST['old_password'] ?? '';
+    $old_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
-    $confirm_new_password = $_POST['confirm_new_password'] ?? '';
+    $confirm_new_password = $_POST['confirm_password'] ?? '';
 
-    // 9. Instanciar nuestra clase de lógica
+    // 11. Instanciar nuestra clase de lógica
     $user = new User($pdo);
 
-    // 10. Llamar a la lógica (ya corregida para usar la tabla 'usuarios')
+    // 12. Llamar a la lógica
     $result = $user->changePassword($user_id, $old_password, $new_password, $confirm_new_password);
     
-    // 11. Comprobar el resultado y redirigir
+    // 13. Comprobar el resultado y redirigir
     if ($result === true) {
-        // ÉXITO
         header('Location: profile.php?success=' . urlencode("Contraseña actualizada con éxito."));
         exit;
     } else {
-        // ERROR: $result es un string con el mensaje de error
         header('Location: profile.php?error=' . urlencode($result));
         exit;
     }
 
 } else {
-    // Si alguien intenta acceder directamente
     header('Location: profile.php');
     exit;
 }
