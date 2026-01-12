@@ -1,25 +1,33 @@
 <?php
-// 1. REFINAMIENTO DE ARQUITECTURA: Incluir 'db.php' ANTES de session_start()
-// (db.php ahora incluye session_config.php y database_connection.php)
+// 1. Cargar autoloader y clases de seguridad
+require 'vendor/autoload.php';
+require 'session_config.php';
 require 'db.php';
 
-// 2. Iniciar la sesión
-// MODIFICACIÓN: Asegurarnos de que solo se inicie si no está activa
+use App\Security;
+use App\SecurityHeaders;
+
+// 2. Aplicar headers de seguridad
+SecurityHeaders::apply();
+
+// 3. Iniciar la sesión
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 3. Refinamiento: Redirigir si el usuario ya está logueado
+// 4. Redirigir si el usuario ya está logueado
 if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
-    exit; // Detener la ejecución del script
+    exit;
 }
 
-// 4. REFINAMIENTO DE SEGURIDAD (CSRF): Generar Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
+// 5. Generar Token CSRF
+$csrf_token = Security::generateCsrfToken();
+
+// Constantes de validación para el frontend
+$maxEmail = Security::MAX_EMAIL;
+$maxPassword = Security::MAX_PASSWORD;
+$minPassword = Security::MIN_PASSWORD;
 ?>
 <!DOCTYPE html>
 <html lang="es">
