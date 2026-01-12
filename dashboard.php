@@ -607,13 +607,16 @@ try {
 <script>
     // Mostrar pantalla de bienvenida después del login
     document.addEventListener('DOMContentLoaded', function() {
-        const userName = '<?php echo addslashes($nombreUsuario); ?>';
+        const userName = '<?php echo Security::escapeJs($nombreUsuario); ?>';
         
         // Mostrar welcome screen por 3 segundos
         showWelcomeScreen(userName, 3000);
     });
 </script>
 <?php endif; ?>
+
+<!-- Script de Validación de Formularios -->
+<script src="js/form-validation.js"></script>
 
 </body>
 </html>
