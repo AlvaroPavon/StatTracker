@@ -26,6 +26,15 @@ try {
      */
     $pdo = new PDO($dsn, $username, $password, $options);
     
+    /**
+     * Migración automática: Verificar y añadir columna 'apellidos' si no existe
+     * Esto permite que instalaciones antiguas funcionen sin ejecutar SQL manual
+     */
+    $checkColumn = $pdo->query("SHOW COLUMNS FROM usuarios LIKE 'apellidos'");
+    if ($checkColumn->rowCount() === 0) {
+        $pdo->exec("ALTER TABLE usuarios ADD COLUMN apellidos VARCHAR(100) NOT NULL DEFAULT '' AFTER nombre");
+    }
+    
 } catch (\PDOException $e) {
     /**
      * Si la conexión falla, el script se detiene.
