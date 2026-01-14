@@ -18,44 +18,61 @@ use App\SessionManager;
 use App\RateLimiter;
 use App\InputSanitizer;
 
-// 7. Comprobar si el formulario fue enviado
+// 4. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // 8. Validar CSRF token
+    // 5. Validar CSRF token
     if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
         $_SESSION['login_error'] = "Error de seguridad. Por favor, inténtelo de nuevo.";
         header("Location: index.php");
         exit();
     }
-    unset($_SESSION['csrf_token']);
 
-    // Obtenemos los datos
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    // 6. Sanitizar y obtener datos
+    $email = InputSanitizer::sanitizeEmail($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? ''; // No sanitizar contraseña
 
-    // 9. Instanciar nuestra clase de lógica
+    // 7. Rate Limiting avanzado (por IP y email)
+    $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+    $rateLimiter = new RateLimiter('login', $email . ':' . $clientIp);
+    $rateCheck = $rateLimiter->isAllowed();
+    
+    if (!$rateCheck['allowed']) {
+        SecurityAudit::logLoginBlocked($email);
+        $_SESSION['login_error'] = $rateCheck['message'];
+        header("Location: index.php");
+        exit();
+    }
+
+    // 8. Instanciar nuestra clase de lógica
     $auth = new Auth($pdo);
 
-    // 10. Llamar a la lógica de login
+    // 9. Llamar a la lógica de login
     $result = $auth->login($email, $password);
 
-    // 11. Comprobar el resultado
+    // 10. Comprobar el resultado
     if (is_array($result)) {
-        // ÉXITO
-        session_regenerate_id(true);
-
-        $_SESSION['user_id'] = $result['id'];
-        $_SESSION['nombre'] = $result['nombre'];
+        // ÉXITO - Registrar intento exitoso
+        $rateLimiter->recordAttempt(true);
+        
+        // Usar SessionManager para autenticación segura
+        SessionManager::authenticate($result['id'], $result['nombre']);
         
         // Activar pantalla de bienvenida
         $_SESSION['show_welcome_screen'] = true;
 
+        // Regenerar token CSRF después del login
+        Security::regenerateCsrfToken();
+        
         // Redirigir al dashboard
         header("Location: dashboard.php");
         exit();
 
     } else {
-        // ERROR
+        // ERROR - Registrar intento fallido
+        $rateLimiter->recordAttempt(false);
+        SecurityAudit::logLoginFailed($email, $result);
+        
         $_SESSION['login_error'] = $result;
         header("Location: index.php");
         exit();
