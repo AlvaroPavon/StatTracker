@@ -1,0 +1,170 @@
+name: 🔒 OWASP Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Ejecutar cada domingo a las 2:00 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  owasp-scan:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo, pdo_mysql
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔍 OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: depcheck
+        with:
+          project: 'StatTracker'
+          path: '.'
+          format: 'HTML'
+          args: >-
+            --scan "./**/*.php"
+            --scan "./**/*.js"
+            --scan "./composer.json"
+            --scan "./composer.lock"
+            --exclude "**/vendor/**"
+            --exclude "**/node_modules/**"
+            --failOnCVSS 8
+            --enableRetired
+        continue-on-error: true
+
+      - name: 📤 Subir reporte OWASP
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: reports/
+          retention-days: 30
+
+  code-security:
+    name: Análisis de Código de Seguridad
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔐 Verificar configuración de seguridad PHP
+        run: |
+          echo "🔍 Verificando configuraciones de seguridad..."
+          
+          # Buscar display_errors habilitado
+          if grep -rni "display_errors.*on" --include="*.php" --exclude-dir=vendor . 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: display_errors puede estar habilitado"
+          else
+            echo "✅ display_errors no está habilitado explícitamente"
+          fi
+          
+          # Buscar error_reporting muy permisivo sin control
+          if grep -rni "error_reporting\s*\(\s*-1\s*\)" --include="*.php" --exclude-dir=vendor . 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: error_reporting muy permisivo encontrado"
+          else
+            echo "✅ error_reporting configurado correctamente"
+          fi
+
+      - name: 🛡️ Verificar protección CSRF
+        run: |
+          echo "🔍 Verificando protección CSRF en formularios..."
+          
+          # Buscar formularios POST sin CSRF
+          for file in $(find . -name "*.php" -not -path "./vendor/*"); do
+            if grep -l "method=[\"']POST" "$file" > /dev/null 2>&1; then
+              if ! grep -l "csrf_token" "$file" > /dev/null 2>&1; then
+                echo "⚠️ Posible falta de CSRF en: $file"
+              fi
+            fi
+          done
+          echo "✅ Verificación CSRF completada"
+
+      - name: 🔒 Verificar Prepared Statements
+        run: |
+          echo "🔍 Buscando posibles consultas SQL inseguras..."
+          
+          # Buscar concatenación directa en queries
+          if grep -rniE "(query|exec)\s*\(\s*[\"'].*\\\$" --include="*.php" --exclude-dir=vendor . 2>/dev/null; then
+            echo "⚠️ ADVERTENCIA: Posibles queries con concatenación de variables"
+          else
+            echo "✅ No se encontraron queries con concatenación directa"
+          fi
+          
+          # Verificar uso de prepare()
+          PREPARE_COUNT=$(grep -rni "prepare\s*(" --include="*.php" --exclude-dir=vendor . 2>/dev/null | wc -l)
+          echo "📊 Prepared statements encontrados: $PREPARE_COUNT"
+
+      - name: 🔑 Verificar hashing de contraseñas
+        run: |
+          echo "🔍 Verificando manejo de contraseñas..."
+          
+          # Buscar password_hash
+          if grep -rni "password_hash" --include="*.php" --exclude-dir=vendor . > /dev/null 2>&1; then
+            echo "✅ password_hash() está siendo utilizado"
+          else
+            echo "⚠️ ADVERTENCIA: No se encontró password_hash()"
+          fi
+          
+          # Buscar algoritmos débiles
+          if grep -rniE "md5\s*\(|sha1\s*\(" --include="*.php" --exclude-dir=vendor . 2>/dev/null | grep -i password; then
+            echo "❌ ERROR: Se encontraron hashes débiles para contraseñas"
+            exit 1
+          else
+            echo "✅ No se encontraron hashes débiles para contraseñas"
+          fi
+
+      - name: 📊 Generar resumen de seguridad
+        run: |
+          echo "# 📊 Resumen de Seguridad - StatTracker" > security-summary.md
+          echo "Fecha: $(date -u)" >> security-summary.md
+          echo "" >> security-summary.md
+          
+          echo "## Clases de Seguridad" >> security-summary.md
+          for class in Security SecurityHeaders SecurityAudit SecurityFirewall SessionManager InputSanitizer RateLimiter; do
+            if [ -f "src/${class}.php" ]; then
+              echo "- ✅ ${class}.php presente" >> security-summary.md
+            else
+              echo "- ❌ ${class}.php NO encontrado" >> security-summary.md
+            fi
+          done
+          
+          echo "" >> security-summary.md
+          echo "## Archivos .htaccess" >> security-summary.md
+          for htaccess in .htaccess src/.htaccess logs/.htaccess uploads/.htaccess; do
+            if [ -f "$htaccess" ]; then
+              echo "- ✅ ${htaccess} presente" >> security-summary.md
+            else
+              echo "- ⚠️ ${htaccess} NO encontrado" >> security-summary.md
+            fi
+          done
+          
+          cat security-summary.md
+
+      - name: 📤 Subir resumen
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-summary
+          path: security-summary.md
+          retention-days: 30
