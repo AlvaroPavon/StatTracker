@@ -1,6 +1,5 @@
-name: 📦 Crear Release de Producción
+name: Crear Release de Produccion
 
-# Se activa cuando publicas un release desde GitHub Desktop o Web
 on:
   release:
     types: [published]
@@ -13,85 +12,51 @@ jobs:
       contents: write
 
     steps:
-      - name: 📥 Descargar código fuente
+      - name: Descargar codigo fuente
         uses: actions/checkout@v4
 
-      - name: 🐘 Configurar PHP 8.2
+      - name: Configurar PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, pdo, pdo_mysql
+          extensions: mbstring, intl, pdo, pdo_mysql, openssl, sodium
           coverage: none
 
-      - name: 📋 Obtener versión del release
+      - name: Obtener version del release
         id: version
         run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: 🔧 Instalar dependencias de producción
+      - name: Instalar dependencias de produccion
         run: |
           composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
-          echo "✅ Dependencias de producción instaladas"
+          echo "Dependencias de produccion instaladas"
 
-      - name: 🧹 Limpiar archivos de desarrollo
+      - name: Limpiar archivos de desarrollo
         run: |
-          echo "🗑️ Eliminando archivos de desarrollo..."
-          
-          # Directorios de desarrollo
-          rm -rf tests/
-          rm -rf docs/
-          rm -rf coverage/
-          rm -rf .github/
-          rm -rf .git/
-          rm -rf .phpunit.cache/
-          rm -rf node_modules/
-          
-          # Archivos de configuración de desarrollo
-          rm -f phpunit.xml
-          rm -f composer.lock
-          rm -f package.json
-          rm -f package-lock.json
-          rm -f .gitignore
-          rm -f .gitattributes
-          rm -f .editorconfig
-          rm -f .php-cs-fixer.php
-          rm -f phpstan.neon
-          rm -f phpstan.neon.dist
-          
-          # Documentación solo de desarrollo
-          rm -f CUMPLIMIENTO_REQUISITOS.md
-          
-          # Crear directorio uploads vacío con .gitkeep
+          echo "Eliminando archivos de desarrollo..."
+          rm -rf tests/ docs/ coverage/ .github/ .git/ .phpunit.cache/ node_modules/ || true
+          rm -f phpunit.xml composer.lock package.json package-lock.json .gitignore .gitattributes .editorconfig .php-cs-fixer.php phpstan.neon phpstan.neon.dist CUMPLIMIENTO_REQUISITOS.md || true
           mkdir -p uploads
           touch uploads/.gitkeep
-          
-          # Eliminar archivos de ejemplo o test en uploads
           find uploads -type f ! -name '.gitkeep' -delete 2>/dev/null || true
-          
-          echo "✅ Archivos de desarrollo eliminados"
+          echo "Archivos de desarrollo eliminados"
 
-      - name: 📝 Crear archivo de versión
+      - name: Crear archivo de version
         run: |
           echo "${{ steps.version.outputs.tag }}" > VERSION
-          echo "Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> VERSION
-          echo "✅ Archivo VERSION creado"
+          echo "Build Date: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> VERSION
+          echo "Archivo VERSION creado"
 
-      - name: 📦 Crear archivo ZIP de producción
+      - name: Crear archivo ZIP de produccion
+        id: zip
         run: |
           VERSION="${{ steps.version.outputs.tag }}"
           ZIP_NAME="StatTracker-${VERSION}.zip"
-          
-          # Crear ZIP excluyendo archivos ocultos residuales
-          zip -r "$ZIP_NAME" . \
-            -x "*.git*" \
-            -x "*.DS_Store" \
-            -x "*Thumbs.db" \
-            -x "*.log"
-          
-          echo "✅ Archivo $ZIP_NAME creado"
+          zip -r "$ZIP_NAME" . -x "*.git*" -x "*.DS_Store" -x "*Thumbs.db" -x "*.log"
+          echo "Archivo $ZIP_NAME creado"
           echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
-        id: zip
 
-      - name: 📤 Subir archivo al Release
+      - name: Subir archivo al Release
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.zip.outputs.zip_name }}
@@ -99,7 +64,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: ✅ Release completado
+      - name: Release completado
         run: |
-          echo "🎉 Release ${{ steps.version.outputs.tag }} publicado exitosamente!"
-          echo "📦 Archivo: ${{ steps.zip.outputs.zip_name }}"
+          echo "Release ${{ steps.version.outputs.tag }} publicado exitosamente!"
+          echo "Archivo: ${{ steps.zip.outputs.zip_name }}"
