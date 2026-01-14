@@ -28,6 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    // 5.1 Validar Honeypot (detección de bots)
+    $honeypotResult = \App\Honeypot::validate();
+    if (!$honeypotResult['valid']) {
+        // Es un bot - registrar y bloquear silenciosamente
+        SecurityAudit::log('BOT_REGISTER_ATTEMPT', null, [
+            'reason' => $honeypotResult['reason'],
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? ''
+        ], 'WARNING');
+        
+        // Simular un error genérico
+        $_SESSION['register_error'] = "Ha ocurrido un error. Por favor, inténtelo de nuevo.";
+        header("Location: register_page.php");
+        exit();
+    }
+
     // 6. Rate Limiting para registro
     $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
     $rateLimiter = new RateLimiter('register', $clientIp);
