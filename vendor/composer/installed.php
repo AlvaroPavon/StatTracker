@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'alvaropavon/stat-tracker',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '3c3cc57611930f792735150c3862559ca342f76a',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'alvaropavon/stat-tracker' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '3c3cc57611930f792735150c3862559ca342f76a',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
