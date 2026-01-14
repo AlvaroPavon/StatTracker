@@ -1,0 +1,105 @@
+# =============================================================================
+# StatTracker - Configuración de Apache para Seguridad
+# =============================================================================
+
+# ======================= Prevenir acceso a archivos sensibles =======================
+
+# Bloquear acceso a archivos de configuración
+<FilesMatch "^\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|sql)$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear acceso a composer y package files
+<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon|\.gitignore)$">
+    Require all denied
+</FilesMatch>
+
+# ======================= Proteger directorios sensibles =======================
+
+# Bloquear acceso directo a src/
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^src/ - [F,L]
+    RewriteRule ^tests/ - [F,L]
+    RewriteRule ^vendor/ - [F,L]
+    RewriteRule ^logs/ - [F,L]
+    RewriteRule ^docs/ - [F,L]
+    RewriteRule ^coverage/ - [F,L]
+</IfModule>
+
+# ======================= Headers de Seguridad (Backup si PHP no los envía) =======================
+
+<IfModule mod_headers.c>
+    # Prevenir clickjacking
+    Header always set X-Frame-Options "DENY"
+    
+    # Prevenir MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Activar XSS filter
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Eliminar headers que exponen información
+    Header unset X-Powered-By
+    Header unset Server
+    
+    # Permissions Policy
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+end IfModule>
+
+# ======================= Prevenir listado de directorios =======================
+
+Options -Indexes
+
+# ======================= Limitar métodos HTTP =======================
+
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)$
+    RewriteRule .* - [F]
+</IfModule>
+
+# ======================= Prevenir acceso a archivos de backup =======================
+
+<FilesMatch "\.(bak|backup|old|orig|save|swp|tmp)$">
+    Require all denied
+</FilesMatch>
+
+# ======================= Configuración de PHP (si se permite) =======================
+
+<IfModule mod_php.c>
+    # Ocultar versión de PHP
+    php_flag expose_php Off
+    
+    # Desactivar funciones peligrosas
+    php_admin_value disable_functions "exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source"
+    
+    # Limitar tamaño de uploads
+    php_value upload_max_filesize 2M
+    php_value post_max_size 3M
+    
+    # Configuración de sesión
+    php_value session.cookie_httponly 1
+    php_value session.cookie_samesite "Strict"
+    php_value session.use_only_cookies 1
+</IfModule>
+
+# ======================= Compresión (mejora rendimiento) =======================
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# ======================= Cache de archivos estáticos =======================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
