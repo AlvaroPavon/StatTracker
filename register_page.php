@@ -138,6 +138,9 @@ $minPassword = Security::MIN_PASSWORD;
 
         <form class="flex flex-col gap-4" action="register.php" method="POST" autocomplete="off">
             <input type="hidden" name="csrf_token" value="<?php echo Security::escapeHtml($csrf_token); ?>">
+            
+            <!-- Honeypot anti-bot (campos ocultos) -->
+            <?php echo $honeypot_html; ?>
 
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Nombre <span class="text-xs text-gray-500">(máx. <?php echo $maxNombre; ?> caracteres)</span></p>
@@ -178,6 +181,9 @@ $minPassword = Security::MIN_PASSWORD;
                 <span class="truncate relative z-10">Registrarse</span>
             </button>
         </form>
+        
+        <!-- JavaScript check anti-bot -->
+        <?php echo $js_check; ?>
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600 dark:text-gray-300">
                 ¿Ya tienes una cuenta? <a class="font-medium text-primary hover:underline" href="index.php">Inicia sesión aquí</a>
