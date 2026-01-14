@@ -1,28 +1,21 @@
 <?php
-// 1. Cargar autoloader y clases
-require 'vendor/autoload.php';
-require 'session_config.php';
-require 'db.php';
+/**
+ * profile.php - Perfil del usuario
+ * @package StatTracker
+ */
+
+// 1. Inicializar seguridad
+require __DIR__ . '/security_init.php';
+require __DIR__ . '/db.php';
 
 use App\Security;
-use App\SecurityHeaders;
+use App\SessionManager;
 
-// 2. Aplicar headers de seguridad
-SecurityHeaders::apply();
+// 2. Proteger la página
+require_auth();
 
-// 3. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 4. Proteger la página
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit;
-}
-
-// 5. Obtener el ID del usuario y generar token CSRF
-$user_id = $_SESSION['user_id'];
+// 3. Obtener el ID del usuario y generar token CSRF
+$user_id = SessionManager::getUserId();
 $csrf_token = Security::generateCsrfToken();
 
 // Constantes de validación para el frontend
