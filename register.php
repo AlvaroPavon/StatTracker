@@ -18,36 +18,49 @@ use App\SessionManager;
 use App\RateLimiter;
 use App\InputSanitizer;
 
-// 7. Comprobar si el formulario fue enviado
+// 4. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // 8. Validar CSRF token
+    // 5. Validar CSRF token
     if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
         $_SESSION['register_error'] = "Error de seguridad. Por favor, inténtelo de nuevo.";
         header("Location: register_page.php");
         exit();
     }
-    unset($_SESSION['csrf_token']);
 
-    // 9. Obtener datos del formulario
-    $nombre = $_POST['nombre'] ?? '';
-    $apellidos = $_POST['apellidos'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    // 6. Rate Limiting para registro
+    $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+    $rateLimiter = new RateLimiter('register', $clientIp);
+    $rateCheck = $rateLimiter->isAllowed();
+    
+    if (!$rateCheck['allowed']) {
+        $_SESSION['register_error'] = $rateCheck['message'];
+        header("Location: register_page.php");
+        exit();
+    }
 
-    // 10. Instanciar nuestra clase de lógica
+    // 7. Sanitizar datos del formulario
+    $nombre = InputSanitizer::sanitizeString($_POST['nombre'] ?? '');
+    $apellidos = InputSanitizer::sanitizeString($_POST['apellidos'] ?? '');
+    $email = InputSanitizer::sanitizeEmail($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? ''; // No sanitizar contraseña
+
+    // 8. Instanciar nuestra clase de lógica
     $auth = new Auth($pdo);
 
-    // 11. Llamar a la lógica de registro
+    // 9. Llamar a la lógica de registro
     $result = $auth->register($nombre, $apellidos, $email, $password);
 
-    // 12. Comprobar el resultado
+    // 10. Comprobar el resultado
     if (is_int($result)) {
         // ÉXITO: $result es el nuevo user_id
-        $_SESSION['user_id'] = $result;
-        $_SESSION['nombre'] = $nombre;
+        $rateLimiter->recordAttempt(true);
         
-        session_regenerate_id(true);
+        // Usar SessionManager para autenticación segura
+        SessionManager::authenticate($result, $nombre);
+        
+        // Registrar evento
+        SecurityAudit::log('REGISTER', $result, ['email' => substr($email, 0, 3) . '***']);
 
         // Redirigir al dashboard
         header("Location: dashboard.php");
@@ -55,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     } else {
         // ERROR: $result es un string con el mensaje de error
+        $rateLimiter->recordAttempt(false);
         $_SESSION['register_error'] = $result;
         header("Location: register_page.php");
         exit();
