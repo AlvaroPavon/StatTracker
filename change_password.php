@@ -1,58 +1,67 @@
 <?php
-// 1. Cargar el autoloader de Composer
-require 'vendor/autoload.php';
+/**
+ * change_password.php - Cambio de contraseña seguro
+ * @package StatTracker
+ */
 
-// 2. Cargar la conexión a la BD ($pdo)
-require 'db.php'; 
+// 1. Inicializar seguridad
+require __DIR__ . '/security_init.php';
+require __DIR__ . '/db.php';
 
-// 3. Usar namespaces
 use App\User;
 use App\Security;
-use App\SecurityHeaders;
+use App\SessionManager;
+use App\SecurityAudit;
+use App\RateLimiter;
 
-// 4. Cargar configuración de sesión
-require 'session_config.php';
+// 2. Verificar autenticación
+require_auth();
 
-// 5. Aplicar headers de seguridad
-SecurityHeaders::apply();
-
-// 6. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 7. Autenticación
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit;
-}
-
-// 8. Verificar que la solicitud sea por método POST
+// 3. Verificar que la solicitud sea por método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // 9. Validar el token CSRF
-    if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-        header('Location: profile.php?error=' . urlencode("Error de seguridad. Intente de nuevo."));
+    // 4. Validar el token CSRF
+    verify_csrf_or_die();
+    
+    // 5. Rate limiting para cambio de contraseña
+    $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+    $rateLimiter = new RateLimiter('password_reset', $clientIp);
+    $rateCheck = $rateLimiter->isAllowed();
+    
+    if (!$rateCheck['allowed']) {
+        header('Location: profile.php?error=' . urlencode($rateCheck['message']));
         exit;
     }
 
-    // 10. Obtener ID de usuario y contraseñas
-    $user_id = (int)$_SESSION['user_id'];
+    // 6. Obtener ID de usuario y contraseñas
+    $user_id = SessionManager::getUserId();
     $old_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
     $confirm_new_password = $_POST['confirm_password'] ?? '';
 
-    // 11. Instanciar nuestra clase de lógica
+    // 7. Instanciar nuestra clase de lógica
     $user = new User($pdo);
 
-    // 12. Llamar a la lógica
+    // 8. Llamar a la lógica
     $result = $user->changePassword($user_id, $old_password, $new_password, $confirm_new_password);
     
-    // 13. Comprobar el resultado y redirigir
+    // 9. Comprobar el resultado y redirigir
     if ($result === true) {
+        // Registrar cambio de contraseña exitoso
+        SecurityAudit::log('PASSWORD_CHANGE', $user_id, ['success' => true]);
+        $rateLimiter->recordAttempt(true);
+        
+        // Regenerar sesión después del cambio de contraseña
+        SessionManager::regenerateId();
+        Security::regenerateCsrfToken();
+        
         header('Location: profile.php?success=' . urlencode("Contraseña actualizada con éxito."));
         exit;
     } else {
+        // Registrar intento fallido
+        SecurityAudit::log('PASSWORD_CHANGE', $user_id, ['success' => false, 'reason' => $result], 'WARNING');
+        $rateLimiter->recordAttempt(false);
+        
         header('Location: profile.php?error=' . urlencode($result));
         exit;
     }
