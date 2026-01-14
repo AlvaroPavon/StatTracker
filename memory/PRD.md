@@ -18,7 +18,7 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - ✅ CSP (Content Security Policy)
 - ✅ SRI (Subresource Integrity)
 - ✅ Honeypots
-- ✅ Rate Limiting
+- ✅ Rate Limiting (por IP y por cuenta)
 - ✅ Protección CSRF
 - ✅ Protección XSS
 - ✅ Protección SQL Injection
@@ -27,6 +27,13 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - ✅ Criptografía con libsodium (CryptoFortress)
 - ✅ Supply Chain Security
 - ✅ Documentación SECURITY.md
+- ✅ **Account Lockout** (bloqueo por cuenta, no solo por IP)
+- ✅ **Honey Accounts** (cuentas trampa para detectar atacantes)
+- ✅ **Behavioral Analysis** (detección de bots)
+- ✅ **Request Signing** (anti-replay attacks)
+- ✅ **2FA/MFA** (autenticación de dos factores TOTP)
+- ✅ **Global Rate Limiting** (anti-DDoS)
+- ✅ **IP Range Blocking** (bloqueo de TOR, proxies)
 
 ### Clases de Seguridad Creadas
 - `SecurityFirewall`
@@ -40,6 +47,8 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - `SupplyChainGuard`
 - `CryptoFortress`
 - `SubresourceIntegrity`
+- `ImpenetrableDefense` (NUEVO)
+- `TwoFactorAuth` (NUEVO)
 
 ### GitHub Actions Workflows
 - `php-ci.yml` - CI principal
