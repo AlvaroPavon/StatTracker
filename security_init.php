@@ -24,6 +24,7 @@ use App\SessionManager;
 use App\AdvancedProtection;
 use App\SecurityAudit;
 use App\ErrorHandler;
+use App\UltimateShield;
 
 // ==================== FASE 0: Manejador de Errores Seguro ====================
 
@@ -31,6 +32,41 @@ use App\ErrorHandler;
 ErrorHandler::init();
 
 // ==================== FASE 1: Configuración inicial ====================
+
+// Zona horaria
+date_default_timezone_set('Europe/Madrid');
+
+// Configuración de errores (NUNCA mostrar en producción)
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/logs/php_errors.log');
+error_reporting(E_ALL);
+
+// Limitar información expuesta
+ini_set('expose_php', 0);
+
+// Configuración adicional de seguridad PHP
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.use_strict_mode', 1);
+ini_set('session.use_only_cookies', 1);
+
+// ==================== FASE 2: UltimateShield - Máxima Protección ====================
+
+// Iniciar sesión primero para UltimateShield
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Ejecutar TODAS las verificaciones de seguridad
+$ultimateResult = UltimateShield::protect();
+
+// Si se detectan amenazas, bloquear INMEDIATAMENTE
+if (!$ultimateResult['safe']) {
+    UltimateShield::block($ultimateResult['threats']);
+    exit; // Nunca llegará aquí pero por seguridad
+}
 
 // Zona horaria
 date_default_timezone_set('Europe/Madrid');
