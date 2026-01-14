@@ -1,23 +1,34 @@
-# 🔐 StatTracker - Guía de Seguridad
+# 🔐 StatTracker - Guía de Seguridad Completa
 
-Este documento detalla las medidas de seguridad implementadas en StatTracker para proteger contra los ataques más comunes de OWASP Top 10.
+Este documento detalla las medidas de seguridad implementadas en StatTracker para proteger contra los ataques más comunes de OWASP Top 10 y más.
 
-## 📋 Índice de Protecciones
+## 📋 Índice de Protecciones (23 vectores cubiertos)
 
-| Ataque | Clase/Archivo | Estado |
-|--------|---------------|--------|
-| SQL Injection | `SecurityFirewall`, Prepared Statements | ✅ |
-| XSS (Cross-Site Scripting) | `InputSanitizer`, `SecurityFirewall`, CSP | ✅ |
-| CSRF (Cross-Site Request Forgery) | `Security::validateCsrfToken()` | ✅ |
-| Session Hijacking | `SessionManager` | ✅ |
-| Session Fixation | `SessionManager::regenerateId()` | ✅ |
-| Brute Force | `RateLimiter` | ✅ |
-| Path Traversal | `SecurityFirewall`, `InputSanitizer` | ✅ |
-| Command Injection | `SecurityFirewall` | ✅ |
-| File Upload Attacks | `Security::validateImage()` | ✅ |
-| Clickjacking | `SecurityHeaders` (X-Frame-Options) | ✅ |
-| MIME Sniffing | `SecurityHeaders` (X-Content-Type-Options) | ✅ |
-| Bot Detection | `Honeypot` | ✅ |
+| # | Ataque | Clase/Archivo | Estado |
+|---|--------|---------------|--------|
+| 1 | SQL Injection | `SecurityFirewall`, Prepared Statements | ✅ |
+| 2 | XSS (Cross-Site Scripting) | `InputSanitizer`, `SecurityFirewall`, CSP | ✅ |
+| 3 | CSRF (Cross-Site Request Forgery) | `Security::validateCsrfToken()` | ✅ |
+| 4 | Session Hijacking | `SessionManager` (fingerprinting) | ✅ |
+| 5 | Session Fixation | `SessionManager::regenerateId()` | ✅ |
+| 6 | Brute Force | `RateLimiter` | ✅ |
+| 7 | Path Traversal | `SecurityFirewall` | ✅ |
+| 8 | Command Injection | `SecurityFirewall` | ✅ |
+| 9 | File Upload Attacks | `Security::validateImage()` | ✅ |
+| 10 | Clickjacking | `SecurityHeaders` (X-Frame-Options) | ✅ |
+| 11 | MIME Sniffing | `SecurityHeaders` (X-Content-Type-Options) | ✅ |
+| 12 | Bot Detection | `Honeypot` | ✅ |
+| 13 | User Enumeration | Mensajes genéricos en Auth | ✅ |
+| 14 | Account Lockout DOS | `AdvancedProtection` | ✅ |
+| 15 | HTTP Parameter Pollution | `AdvancedProtection` | ✅ |
+| 16 | Open Redirect | `AdvancedProtection::validateRedirectUrl()` | ✅ |
+| 17 | Host Header Injection | `AdvancedProtection` | ✅ |
+| 18 | Slow HTTP Attacks | `AdvancedProtection` | ✅ |
+| 19 | LFI/RFI (File Inclusion) | `SecurityFirewall` | ✅ |
+| 20 | Information Disclosure | `ErrorHandler` | ✅ |
+| 21 | Race Conditions | `AdvancedProtection::acquireLock()` | ✅ |
+| 22 | Scanner Detection | `SecurityFirewall` (User-Agent) | ✅ |
+| 23 | Anonymous Proxy Detection | `AdvancedProtection` | ✅ |
 
 ---
 
