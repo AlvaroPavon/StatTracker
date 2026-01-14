@@ -23,6 +23,12 @@ use App\SecurityHeaders;
 use App\SessionManager;
 use App\AdvancedProtection;
 use App\SecurityAudit;
+use App\ErrorHandler;
+
+// ==================== FASE 0: Manejador de Errores Seguro ====================
+
+// Inicializar manejador de errores (PRIMERO)
+ErrorHandler::init();
 
 // ==================== FASE 1: Configuración inicial ====================
 
