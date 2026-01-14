@@ -27,6 +27,8 @@ use App\ErrorHandler;
 use App\UltimateShield;
 use App\SupplyChainGuard;
 use App\CryptoFortress;
+use App\ImpenetrableDefense;
+use App\TwoFactorAuth;
 
 // ==================== FASE 0: Verificaciones Críticas de Integridad ====================
 
