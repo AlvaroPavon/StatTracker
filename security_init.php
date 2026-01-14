@@ -1,8 +1,8 @@
 <?php
 /**
- * security_init.php - Inicializador de Seguridad
+ * security_init.php - Inicializador de Seguridad COMPLETO
  * Este archivo debe incluirse AL PRINCIPIO de cada script PHP
- * Activa el WAF (Web Application Firewall) y las protecciones de sesión
+ * Activa TODAS las capas de protección
  * 
  * @package App
  */
@@ -21,13 +21,15 @@ if (!class_exists('App\\SecurityFirewall')) {
 use App\SecurityFirewall;
 use App\SecurityHeaders;
 use App\SessionManager;
+use App\AdvancedProtection;
+use App\SecurityAudit;
 
 // ==================== FASE 1: Configuración inicial ====================
 
 // Zona horaria
 date_default_timezone_set('Europe/Madrid');
 
-// Configuración de errores (NO mostrar en producción)
+// Configuración de errores (NUNCA mostrar en producción)
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 ini_set('log_errors', 1);
@@ -37,9 +39,29 @@ error_reporting(E_ALL);
 // Limitar información expuesta
 ini_set('expose_php', 0);
 
-// ==================== FASE 2: WAF - Análisis de petición ====================
+// ==================== FASE 2: Validaciones Pre-WAF ====================
 
-// Analizar la petición entrante
+// Verificar Host Header Injection
+if (!AdvancedProtection::validateHostHeader()) {
+    http_response_code(400);
+    exit('Bad Request');
+}
+
+// Verificar HTTP Parameter Pollution
+if (!AdvancedProtection::checkParameterPollution()) {
+    http_response_code(400);
+    exit('Bad Request');
+}
+
+// Verificar timing de request (Slow HTTP attacks)
+if (!AdvancedProtection::checkRequestTiming()) {
+    http_response_code(408);
+    exit('Request Timeout');
+}
+
+// ==================== FASE 3: WAF - Análisis de petición ====================
+
+// Analizar la petición entrante con el Web Application Firewall
 $firewallResult = SecurityFirewall::analyze();
 
 // Si la petición es maliciosa, bloquear
@@ -50,43 +72,57 @@ if (!$firewallResult['safe']) {
         exit;
     }
     
-    // Si hay amenazas pero no críticas, continuar pero con advertencia
-    // (podríamos también bloquear, dependiendo de la política)
+    // Para amenazas no críticas, podemos continuar pero con logging
+    // O podemos ser más estrictos y bloquear todo:
+    // SecurityFirewall::blockResponse();
+    // exit;
 }
 
-// ==================== FASE 3: Headers de Seguridad ====================
+// ==================== FASE 4: Headers de Seguridad ====================
 
-// Aplicar headers de seguridad HTTP
+// Aplicar TODOS los headers de seguridad HTTP
 SecurityHeaders::apply();
 
-// ==================== FASE 4: Sesión Segura ====================
+// ==================== FASE 5: Sesión Segura ====================
 
-// Iniciar sesión segura
+// Iniciar sesión con todas las protecciones
 SessionManager::start();
 
-// ==================== FASE 5: Validaciones adicionales ====================
+// ==================== FASE 6: Validaciones Post-Sesión ====================
 
 // Verificar que la sesión es válida si el usuario está autenticado
-if (isset($_SESSION['user_id']) && !SessionManager::validate()) {
-    // Sesión comprometida - destruir y redirigir
-    SessionManager::destroy();
-    
-    // Solo redirigir si no es una petición AJAX
-    if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-        header('Location: index.php?error=' . urlencode('Sesión inválida. Por favor, inicie sesión nuevamente.'));
-        exit;
-    } else {
-        http_response_code(401);
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Sesión expirada']);
-        exit;
+if (isset($_SESSION['user_id'])) {
+    if (!SessionManager::validate()) {
+        // Sesión comprometida - destruir y redirigir
+        $compromisedUserId = $_SESSION['user_id'];
+        SessionManager::destroy();
+        
+        SecurityAudit::log('SESSION_INVALIDATED', $compromisedUserId, [
+            'reason' => 'validation_failed'
+        ], 'WARNING');
+        
+        // Solo redirigir si no es una petición AJAX
+        if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+            header('Location: index.php?error=' . urlencode('Sesión inválida. Por favor, inicie sesión nuevamente.'));
+            exit;
+        } else {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Sesión expirada']);
+            exit;
+        }
     }
 }
 
-// ==================== FASE 6: Protección CSRF global ====================
+// Detectar proxy anónimo (solo logging, no bloquear)
+if (AdvancedProtection::detectAnonymousProxy()) {
+    // Podríamos añadir verificación adicional aquí
+}
+
+// ==================== FASE 7: Funciones Helper Globales ====================
 
 /**
- * Helper para verificar CSRF en peticiones POST
+ * Verifica CSRF en peticiones POST - OBLIGATORIO
  */
 function verify_csrf_or_die(): void
 {
@@ -96,8 +132,10 @@ function verify_csrf_or_die(): void
         // También verificar en JSON body para APIs
         if ($token === null) {
             $input = file_get_contents('php://input');
-            $data = json_decode($input, true);
-            $token = $data['csrf_token'] ?? $data['token'] ?? null;
+            if (!empty($input)) {
+                $data = json_decode($input, true);
+                $token = $data['csrf_token'] ?? $data['token'] ?? null;
+            }
         }
         
         if (!\App\Security::validateCsrfToken($token)) {
@@ -117,7 +155,7 @@ function verify_csrf_or_die(): void
 }
 
 /**
- * Helper para requerir autenticación
+ * Requiere autenticación - redirige si no está logueado
  */
 function require_auth(): void
 {
@@ -134,11 +172,17 @@ function require_auth(): void
 }
 
 /**
- * Helper para obtener input sanitizado
+ * Obtiene input sanitizado de forma segura
  */
 function get_safe_input(string $key, string $method = 'POST', string $type = 'string'): mixed
 {
-    $source = $method === 'POST' ? $_POST : $_GET;
+    $source = match(strtoupper($method)) {
+        'POST' => $_POST,
+        'GET' => $_GET,
+        'COOKIE' => $_COOKIE,
+        default => $_REQUEST
+    };
+    
     $value = $source[$key] ?? null;
     
     if ($value === null) {
@@ -150,6 +194,68 @@ function get_safe_input(string $key, string $method = 'POST', string $type = 'st
         'float' => \App\InputSanitizer::sanitizeFloat($value),
         'email' => \App\InputSanitizer::sanitizeEmail($value),
         'url' => \App\InputSanitizer::sanitizeUrl($value),
+        'html' => \App\InputSanitizer::sanitizeForHtml($value),
         default => \App\InputSanitizer::sanitizeString($value)
     };
+}
+
+/**
+ * Valida un ID numérico de forma segura
+ */
+function get_safe_id(string $key, string $method = 'POST'): ?int
+{
+    $value = get_safe_input($key, $method, 'int');
+    return AdvancedProtection::validateNumericId($value);
+}
+
+/**
+ * Valida y sanitiza una URL de redirección
+ */
+function get_safe_redirect(string $key = 'redirect'): string
+{
+    $url = $_GET[$key] ?? $_POST[$key] ?? 'index.php';
+    return AdvancedProtection::validateRedirectUrl($url);
+}
+
+/**
+ * Adquiere un lock para operaciones críticas
+ */
+function acquire_operation_lock(string $operation): bool
+{
+    return AdvancedProtection::acquireLock($operation);
+}
+
+/**
+ * Libera un lock de operación
+ */
+function release_operation_lock(string $operation): void
+{
+    AdvancedProtection::releaseLock($operation);
+}
+
+/**
+ * Envía respuesta JSON de forma segura
+ */
+function send_json(array $data, int $status = 200): void
+{
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    exit;
+}
+
+/**
+ * Envía respuesta de error JSON
+ */
+function send_error(string $message, int $status = 400): void
+{
+    send_json(['success' => false, 'message' => $message], $status);
+}
+
+/**
+ * Registra un evento de seguridad
+ */
+function log_security_event(string $event, array $details = [], string $severity = 'INFO'): void
+{
+    SecurityAudit::log($event, $_SESSION['user_id'] ?? null, $details, $severity);
 }
