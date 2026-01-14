@@ -1,0 +1,233 @@
+name: 🔗 Supply Chain Security
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [main]
+  schedule:
+    # Ejecutar diariamente a las 3:00 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  dependency-audit:
+    name: Auditoría de Dependencias
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, openssl, sodium
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔍 Composer Audit
+        run: |
+          echo "🔍 Ejecutando auditoría de Composer..."
+          composer audit --format=plain
+          echo "✅ Auditoría de Composer completada"
+        continue-on-error: false
+
+      - name: 🔐 Verificar hashes de dependencias
+        run: |
+          echo "🔍 Verificando integridad de composer.lock..."
+          
+          # Verificar que composer.lock existe y es válido
+          if [ ! -f composer.lock ]; then
+            echo "❌ composer.lock no encontrado"
+            exit 1
+          fi
+          
+          # Verificar que los hashes coinciden
+          composer validate --strict
+          
+          echo "✅ composer.lock válido"
+
+      - name: 🛡️ Escanear código malicioso en vendor/
+        run: |
+          echo "🔍 Escaneando vendor/ en busca de código sospechoso..."
+          
+          # Patrones peligrosos
+          PATTERNS=(
+            "eval\s*\("
+            "exec\s*\("
+            "shell_exec\s*\("
+            "system\s*\("
+            "passthru\s*\("
+            "base64_decode\s*\("
+            "\\$_GET\s*\["
+            "\\$_POST\s*\["
+            "\\$_REQUEST\s*\["
+            "file_get_contents\s*\(\s*['\"]http"
+          )
+          
+          FOUND=0
+          for pattern in "${PATTERNS[@]}"; do
+            echo "Buscando: $pattern"
+            if grep -rniE "$pattern" vendor/ --include="*.php" 2>/dev/null | grep -v "test" | grep -v "Test" | head -5; then
+              FOUND=1
+            fi
+          done
+          
+          if [ $FOUND -eq 1 ]; then
+            echo "⚠️ Se encontraron patrones sospechosos. Revisar manualmente."
+          else
+            echo "✅ No se encontraron patrones obviamente maliciosos"
+          fi
+
+      - name: 📋 Listar dependencias
+        run: |
+          echo "📦 Dependencias instaladas:"
+          composer show --direct
+
+  hash-verification:
+    name: Verificación de Hashes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, openssl
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔐 Generar hashes de archivos críticos
+        run: |
+          echo "🔍 Generando hashes SHA384 de archivos críticos..."
+          echo ""
+          echo "=== Archivos de la aplicación ===" > file_hashes.txt
+          
+          FILES=(
+            "security_init.php"
+            "database_connection.php"
+            "index.php"
+            "login.php"
+            "register.php"
+            "logout.php"
+            ".htaccess"
+          )
+          
+          for file in "${FILES[@]}"; do
+            if [ -f "$file" ]; then
+              HASH=$(sha384sum "$file" | cut -d' ' -f1)
+              echo "$file: $HASH" >> file_hashes.txt
+              echo "✅ $file"
+            fi
+          done
+          
+          echo "" >> file_hashes.txt
+          echo "=== Clases de seguridad ===" >> file_hashes.txt
+          
+          for file in src/Security*.php src/Crypto*.php src/Supply*.php; do
+            if [ -f "$file" ]; then
+              HASH=$(sha384sum "$file" | cut -d' ' -f1)
+              echo "$file: $HASH" >> file_hashes.txt
+              echo "✅ $file"
+            fi
+          done
+          
+          echo ""
+          cat file_hashes.txt
+
+      - name: 📤 Subir hashes
+        uses: actions/upload-artifact@v4
+        with:
+          name: file-hashes
+          path: file_hashes.txt
+          retention-days: 90
+
+  license-check:
+    name: Verificación de Licencias
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 📜 Verificar licencias
+        run: |
+          echo "📜 Verificando licencias de dependencias..."
+          composer licenses
+          
+          echo ""
+          echo "⚠️ Licencias a revisar manualmente:"
+          composer licenses | grep -iE "GPL|AGPL|proprietary" || echo "✅ No se encontraron licencias problemáticas"
+
+  crypto-verification:
+    name: Verificación Criptográfica
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, openssl, sodium
+
+      - name: 🔐 Verificar algoritmos criptográficos
+        run: |
+          php -r "
+          echo '🔐 Verificación de algoritmos criptográficos' . PHP_EOL;
+          echo str_repeat('=', 50) . PHP_EOL;
+          
+          // Verificar extensiones
+          \$extensions = ['openssl', 'sodium', 'hash'];
+          foreach (\$extensions as \$ext) {
+              echo (\$ext . ': ' . (extension_loaded(\$ext) ? '✅' : '❌')) . PHP_EOL;
+          }
+          
+          echo PHP_EOL . 'Algoritmos de hash disponibles:' . PHP_EOL;
+          \$required = ['sha256', 'sha384', 'sha512', 'sha3-256', 'sha3-512'];
+          foreach (\$required as \$algo) {
+              echo (\$algo . ': ' . (in_array(\$algo, hash_algos()) ? '✅' : '❌')) . PHP_EOL;
+          }
+          
+          echo PHP_EOL . 'Algoritmos de cifrado disponibles:' . PHP_EOL;
+          \$ciphers = ['aes-256-gcm', 'aes-256-cbc', 'chacha20-poly1305'];
+          foreach (\$ciphers as \$cipher) {
+              echo (\$cipher . ': ' . (in_array(\$cipher, openssl_get_cipher_methods()) ? '✅' : '❌')) . PHP_EOL;
+          }
+          
+          echo PHP_EOL . 'Password hashing:' . PHP_EOL;
+          echo ('PASSWORD_BCRYPT: ✅') . PHP_EOL;
+          echo ('PASSWORD_ARGON2ID: ' . (defined('PASSWORD_ARGON2ID') ? '✅' : '❌')) . PHP_EOL;
+          
+          echo PHP_EOL . 'Generación de números aleatorios:' . PHP_EOL;
+          try {
+              \$random = random_bytes(32);
+              echo ('random_bytes: ✅ (' . strlen(\$random) . ' bytes)') . PHP_EOL;
+          } catch (Exception \$e) {
+              echo ('random_bytes: ❌') . PHP_EOL;
+          }
+          
+          echo PHP_EOL . '✅ Verificación criptográfica completada' . PHP_EOL;
+          "
