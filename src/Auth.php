@@ -126,7 +126,8 @@ class Auth
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // 4. Verificar si el usuario existe y la contraseña es correcta
-            if ($user && password_verify($password, $user['password'])) {
+            // IMPORTANTE: Usar verificación timing-safe
+            if ($user && TimingSafe::verifyPassword($password, $user['password'])) {
                 // Éxito: Resetear intentos fallidos
                 Security::resetLoginAttempts($email);
                 
@@ -136,7 +137,11 @@ class Auth
                 ];
             } else {
                 // Fallo: Registrar intento fallido
+                // IMPORTANTE: El tiempo de respuesta es igual para usuario inexistente y contraseña incorrecta
                 Security::recordFailedLogin($email);
+                
+                // Añadir delay aleatorio para dificultar timing attacks
+                TimingSafe::randomDelay();
                 
                 // Mensaje genérico para no revelar si el email existe
                 return "Credenciales inválidas.";
