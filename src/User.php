@@ -122,10 +122,15 @@ class User
                 return "Usuario no encontrado.";
             }
 
-            // 6. Verificar contraseña anterior
-            if (password_verify($oldPassword, $user['password'])) {
+            // 6. Verificar contraseña anterior usando CryptoFortress
+            if (CryptoFortress::verifyPassword($oldPassword, $user['password'])) {
                 
-                $hashed_new_password = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 12]);
+                // Hashear nueva contraseña con máxima seguridad
+                $hashed_new_password = CryptoFortress::hashPassword($newPassword);
+                
+                // Limpiar contraseñas de memoria
+                CryptoFortress::secureClear($oldPassword);
+                CryptoFortress::secureClear($newPassword);
 
                 // 7. Actualizar contraseña
                 $stmt_update = $this->pdo->prepare("UPDATE usuarios SET password = ? WHERE id = ?");
@@ -134,6 +139,10 @@ class User
                 return true;
 
             } else {
+                // Limpiar contraseñas de memoria
+                CryptoFortress::secureClear($oldPassword);
+                CryptoFortress::secureClear($newPassword);
+                
                 return "La contraseña actual es incorrecta.";
             }
 
