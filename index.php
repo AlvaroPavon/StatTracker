@@ -1,28 +1,29 @@
 <?php
-// 1. Cargar autoloader y clases de seguridad
-require 'vendor/autoload.php';
-require 'session_config.php';
-require 'db.php';
+/**
+ * index.php - Página de login
+ * @package StatTracker
+ */
+
+// 1. Inicializar seguridad
+require __DIR__ . '/security_init.php';
+require __DIR__ . '/db.php';
 
 use App\Security;
-use App\SecurityHeaders;
+use App\SessionManager;
+use App\Honeypot;
 
-// 2. Aplicar headers de seguridad
-SecurityHeaders::apply();
-
-// 3. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 4. Redirigir si el usuario ya está logueado
-if (isset($_SESSION['user_id'])) {
+// 2. Redirigir si el usuario ya está logueado
+if (SessionManager::isAuthenticated()) {
     header('Location: dashboard.php');
     exit;
 }
 
-// 5. Generar Token CSRF
+// 3. Generar Token CSRF
 $csrf_token = Security::generateCsrfToken();
+
+// 4. Generar Honeypot
+$honeypot_html = Honeypot::generate();
+$js_check = Honeypot::generateJsCheck();
 
 // Constantes de validación para el frontend
 $maxEmail = Security::MAX_EMAIL;
