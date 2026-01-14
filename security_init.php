@@ -25,8 +25,20 @@ use App\AdvancedProtection;
 use App\SecurityAudit;
 use App\ErrorHandler;
 use App\UltimateShield;
+use App\SupplyChainGuard;
+use App\CryptoFortress;
 
-// ==================== FASE 0: Manejador de Errores Seguro ====================
+// ==================== FASE 0: Verificaciones Críticas de Integridad ====================
+
+// Verificar integridad criptográfica del sistema
+$cryptoCheck = CryptoFortress::verifyCryptoIntegrity();
+if (!$cryptoCheck['valid']) {
+    error_log('CRITICAL: Crypto integrity check failed - ' . implode(', ', $cryptoCheck['errors']));
+    http_response_code(503);
+    exit('System security check failed');
+}
+
+// ==================== FASE 0.5: Manejador de Errores Seguro ====================
 
 // Inicializar manejador de errores (PRIMERO)
 ErrorHandler::init();
