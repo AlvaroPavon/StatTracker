@@ -99,12 +99,15 @@ Este documento detalla las medidas de seguridad implementadas en StatTracker par
 |---|-----------|-------------------|-----------------|
 | 1-5 | **Inyección** | SQL, Command, LDAP, NoSQL, Template | `SecurityFirewall`, `UltimateShield` |
 | 6-10 | **XSS** | Reflected, Stored, DOM, Encoding bypass, SVG | `InputSanitizer`, CSP |
-| 11-15 | **Autenticación** | Brute Force, Credential Stuffing, Enumeration, Timing | `RateLimiter`, `CryptoFortress` |
+| 11-15 | **Autenticación** | Brute Force, Credential Stuffing, Enumeration, Timing | `RateLimiter`, `ImpenetrableDefense` |
 | 16-20 | **Sesión** | Hijacking, Fixation, Timeout, Fingerprint, Cookie | `SessionManager` |
 | 21-25 | **Criptografía** | Timing attacks, Weak hashing, Key derivation | `CryptoFortress`, `TimingSafe` |
 | 26-30 | **Supply Chain** | Dependency tampering, Autoloader hijack, Code injection | `SupplyChainGuard` |
 | 31-35 | **Archivos** | Upload malicioso, Path Traversal, LFI/RFI | `UltimateShield`, `Security` |
 | 36-40 | **Infraestructura** | Headers, Clickjacking, CORS, Cache Poisoning | `SecurityHeaders` |
+| 41-45 | **Fuerza Bruta Distribuida** | Multi-IP attacks, Botnet attacks | `ImpenetrableDefense` (account lockout) |
+| 46-50 | **Bots y Scraping** | Automated attacks, Credential stuffing | `ImpenetrableDefense` (behavior analysis) |
+| 51+ | **2FA/MFA** | Account takeover, SIM swapping bypass | `TwoFactorAuth` |
 
 ---
 
