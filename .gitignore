@@ -1,31 +1,82 @@
-# Environment files
-*.env
-*.env.*
+# =============================================================================
+# StatTracker - .gitignore
+# =============================================================================
 
-# PHP dependencies
+# ======================= Dependencias =======================
 /vendor/
+node_modules/
 
-# PHPUnit cache
-.phpunit.cache/
-
-# IDE files
+# ======================= IDE y Editores =======================
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+.project
+.buildpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
-# OS files
+# ======================= Sistema Operativo =======================
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Keep coverage directory for GitHub Actions to commit
-!coverage/
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# ======================= PHP =======================
+*.log
+*.cache
+.phpunit.cache/
+.phpunit.result.cache
+phpstan.cache/
+.php_cs.cache
+.php-cs-fixer.cache
+
+# ======================= Archivos de Configuración Local =======================
+# Descomentar si usas archivos .env locales
+# .env
+# .env.local
+# .env.*.local
+
+# ======================= Logs =======================
+logs/
+*.log
+error.log
+access.log
+
+# ======================= Archivos de Subida (solo contenido, no la carpeta) =======================
+# Mantener la carpeta pero ignorar contenido excepto .gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# ======================= Archivos Temporales =======================
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ======================= Reportes y Cobertura =======================
+# Nota: coverage/ se sube automáticamente por el CI
+# Si prefieres ignorarla localmente:
+# coverage/
+
+# ======================= Seguridad =======================
+# Nunca subir archivos con credenciales
+*.pem
+*.key
+*.cert
+*.p12
+secrets.json
+credentials.json
+
+# ======================= Base de Datos =======================
+*.sql.gz
+*.sql.bak
+db_backup/
+
+# ======================= Archivos de Build =======================
+dist/
+build/
+*.zip
+*.tar.gz
