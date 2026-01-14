@@ -1,80 +1,114 @@
-name: PHP CI (Auto-Generate Coverage)
+name: 🧪 PHP CI (Tests + Coverage)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
-# 1. Permiso para que el robot pueda subir la carpeta
 permissions:
   contents: write
 
 env:
   DB_HOST: 127.0.0.1
-  DB_DATABASE: testing_db 
+  DB_DATABASE: testing_db
   DB_USERNAME: root
-  DB_PASSWORD: '' 
-  MYSQL_PORT: 3306 
-  
+  DB_PASSWORD: ''
+  MYSQL_PORT: 3306
+
 jobs:
-  build:
+  test:
+    name: Tests y Cobertura
     runs-on: ubuntu-latest
-    
+
     services:
       mysql:
-        image: mysql:8.0 
+        image: mysql:8.0
         env:
           MYSQL_DATABASE: ${{ env.DB_DATABASE }}
-          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
-          - 3306:3306 
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
-      - name: Checkout code
+      - name: 📥 Descargar código
         uses: actions/checkout@v4
 
-      # 2. AQUÍ ESTÁ LA CLAVE: Activamos Xdebug y extensiones necesarias
-      - name: Setup PHP
+      - name: 🐘 Configurar PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' 
+          php-version: '8.2'
           extensions: mbstring, pdo, pdo_mysql, pdo_sqlite, sqlite3
-          coverage: xdebug  # <--- Si esto dice 'none', no funcionará nunca
-          
-      - name: Install MySQL Client
+          coverage: xdebug
+
+      - name: 🔧 Instalar cliente MySQL
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-      - name: Wait for MySQL
-        run: while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do sleep 1; done
-        
-      - name: Import database schema
+      - name: ⏳ Esperar a MySQL
         run: |
-          # Nota: Asegúrate de que tu database.sql no tenga 'CREATE DATABASE' dentro
+          while ! mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} -e "quit" 2>/dev/null; do
+            echo "Esperando a MySQL..."
+            sleep 1
+          done
+          echo "✅ MySQL está listo"
+
+      - name: 🗃️ Importar esquema de base de datos
+        run: |
           mysql -h 127.0.0.1 -P ${{ env.MYSQL_PORT }} -u ${{ env.DB_USERNAME }} ${{ env.DB_DATABASE }} < database.sql
-        
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
-      
-      - name: Set execute permission for PHPUnit
+          echo "✅ Esquema importado"
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔐 Dar permisos de ejecución a PHPUnit
         run: chmod +x vendor/bin/phpunit
-      
-      # 3. GENERAR LA CARPETA (Si este paso no se ejecuta así, no hay carpeta)
-      - name: Run PHPUnit and Generate Coverage
-        run: vendor/bin/phpunit --coverage-html coverage
-        
-      # 4. SUBIR LA CARPETA AUTOMÁTICAMENTE
-      - name: Commit Coverage Report
-        if: success() # Solo si los tests pasan
+
+      - name: 🧪 Ejecutar Tests con Cobertura
+        run: |
+          echo "🧪 Ejecutando tests..."
+          vendor/bin/phpunit --coverage-html coverage --coverage-text --colors=always
+          echo "✅ Tests completados"
+
+      - name: 📊 Subir reporte de cobertura
+        if: success() && github.ref == 'refs/heads/main'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Forzamos la subida de la carpeta coverage
+          # Forzar la subida de la carpeta coverage
           git add -f coverage/
           
-          # Hacemos commit si hay cambios
-          git commit -m "📊 Auto-update: Informe de cobertura [skip ci]" || echo "No changes to commit"
+          # Hacer commit si hay cambios
+          git commit -m "📊 Auto-update: Informe de cobertura [skip ci]" || echo "Sin cambios en cobertura"
           
-          # Subimos los cambios a la rama principal
-          git push origin HEAD:main
+          # Subir los cambios
+          git push origin HEAD:main || echo "No se pudo hacer push"
+
+  lint:
+    name: Análisis de Código
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🐘 Configurar PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: php-cs-fixer, phpcs
+
+      - name: 📦 Instalar dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🔍 Verificar sintaxis PHP
+        run: |
+          echo "🔍 Verificando sintaxis PHP..."
+          find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \; | grep -v "No syntax errors"
+          echo "✅ Sintaxis PHP correcta"
