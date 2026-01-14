@@ -341,24 +341,94 @@ class Security
     }
 
     /**
-     * Genera token CSRF
+     * Genera token CSRF con tiempo de expiración
      */
     public static function generateCsrfToken(): string
     {
-        if (empty($_SESSION['csrf_token'])) {
+        // Regenerar token si no existe o ha expirado (1 hora)
+        $tokenAge = $_SESSION['csrf_token_time'] ?? 0;
+        $maxAge = 3600; // 1 hora
+        
+        if (empty($_SESSION['csrf_token']) || (time() - $tokenAge) > $maxAge) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_token_time'] = time();
         }
         return $_SESSION['csrf_token'];
     }
 
     /**
-     * Valida token CSRF
+     * Valida token CSRF con logging de intentos fallidos
      */
     public static function validateCsrfToken(?string $token): bool
     {
         if (empty($token) || empty($_SESSION['csrf_token'])) {
+            // Registrar intento de CSRF inválido
+            SecurityAudit::logCsrfInvalid($_SESSION['user_id'] ?? null);
             return false;
         }
-        return hash_equals($_SESSION['csrf_token'], $token);
+        
+        $isValid = hash_equals($_SESSION['csrf_token'], $token);
+        
+        if (!$isValid) {
+            SecurityAudit::logCsrfInvalid($_SESSION['user_id'] ?? null);
+        }
+        
+        return $isValid;
+    }
+
+    /**
+     * Genera un nuevo token CSRF (forzado)
+     */
+    public static function regenerateCsrfToken(): string
+    {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $_SESSION['csrf_token_time'] = time();
+        return $_SESSION['csrf_token'];
+    }
+
+    /**
+     * Verifica la integridad de la sesión (anti-hijacking)
+     */
+    public static function validateSessionIntegrity(): bool
+    {
+        $currentFingerprint = self::generateSessionFingerprint();
+        
+        if (!isset($_SESSION['session_fingerprint'])) {
+            $_SESSION['session_fingerprint'] = $currentFingerprint;
+            return true;
+        }
+        
+        if (!hash_equals($_SESSION['session_fingerprint'], $currentFingerprint)) {
+            // Posible secuestro de sesión
+            SecurityAudit::logSessionHijackAttempt($_SESSION['user_id'] ?? null);
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Genera huella digital de la sesión
+     */
+    private static function generateSessionFingerprint(): string
+    {
+        $data = [
+            $_SERVER['HTTP_USER_AGENT'] ?? '',
+            // Nota: No incluimos IP porque puede cambiar (móviles, VPN)
+            // pero sí incluimos Accept-Language que es más estable
+            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+            $_SERVER['HTTP_ACCEPT_ENCODING'] ?? ''
+        ];
+        
+        return hash('sha256', implode('|', $data));
+    }
+
+    /**
+     * Sanitiza entrada sospechosa y registra amenazas
+     */
+    public static function auditAndSanitize(array $input, ?int $userId = null): array
+    {
+        SecurityAudit::auditInput($input, $userId);
+        return InputSanitizer::sanitizeArray($input);
     }
 }
