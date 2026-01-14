@@ -1,0 +1,23 @@
+# StatTracker Security Information
+# https://securitytxt.org/
+
+# Contact for security issues
+Contact: mailto:security@tu-dominio.com
+
+# PGP Key (if available)
+# Encryption: https://tu-dominio.com/.well-known/pgp-key.txt
+
+# Security policy
+Policy: https://tu-dominio.com/SECURITY.md
+
+# Acknowledgments page
+# Acknowledgments: https://tu-dominio.com/security/hall-of-fame
+
+# Preferred languages
+Preferred-Languages: es, en
+
+# Canonical URL
+Canonical: https://tu-dominio.com/.well-known/security.txt
+
+# Expiry date (update annually)
+Expires: 2026-01-01T00:00:00.000Z

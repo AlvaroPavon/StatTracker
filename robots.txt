@@ -1,0 +1,42 @@
+# StatTracker - robots.txt
+# Proteger páginas sensibles de indexación
+
+User-agent: *
+
+# Bloquear acceso a archivos de configuración y código
+Disallow: /src/
+Disallow: /vendor/
+Disallow: /tests/
+Disallow: /docs/
+Disallow: /logs/
+Disallow: /coverage/
+Disallow: /.git/
+Disallow: /.github/
+
+# Bloquear archivos específicos
+Disallow: /composer.json
+Disallow: /composer.lock
+Disallow: /phpunit.xml
+Disallow: /phpstan.neon
+Disallow: /*.sql
+Disallow: /*.log
+Disallow: /db.php
+Disallow: /database_connection.php
+Disallow: /session_config.php
+Disallow: /security_init.php
+
+# Bloquear endpoints de API
+Disallow: /add_data.php
+Disallow: /delete_data.php
+Disallow: /get_data.php
+Disallow: /update_profile.php
+Disallow: /change_password.php
+
+# Permitir páginas públicas
+Allow: /index.php
+Allow: /register_page.php
+Allow: /css/
+Allow: /js/
+
+# Sitemap (si lo tienes)
+# Sitemap: https://tu-dominio.com/sitemap.xml
