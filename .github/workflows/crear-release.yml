@@ -1,0 +1,60 @@
+name: Generar Release de Producción
+
+# Este flujo se activa SOLO cuando subes un tag que empiece por 'v' (ej: v1.0.0)
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permiso para subir archivos al release
+
+    steps:
+    # 1. Descargar el código del repositorio
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    # 2. Preparar PHP (versión 8.2 según tu proyecto)
+    - name: Configurar PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, intl, pdo, pdo_mysql
+
+    # 3. Instalar dependencias SOLO de producción (limpia la carpeta vendor)
+    - name: Instalar dependencias (Producción)
+      run: |
+        composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
+
+    # 4. Borrar archivos que NO sirven para producción
+    # Aquí eliminamos tests, carpetas de git, configs de desarrollo, etc.
+    - name: Limpiar archivos de desarrollo
+      run: |
+        rm -rf tests/
+        rm -rf .github/
+        rm -rf .git/
+        rm -rf docs/mockups/
+        rm -rf docs/system-test-report.md
+        rm -rf docs/coverage-analisis.md
+        rm -f phpunit.xml
+        rm -f .gitignore
+        rm -f composer.lock
+        rm -f CUMPLIMIENTO_REQUISITOS.md
+        # Mantenemos 'vendor/', 'src/', 'css/', 'js/', index.php, etc.
+
+    # 5. Crear el archivo ZIP
+    - name: Comprimir aplicación
+      run: |
+        zip -r stattracker-release.zip .
+
+    # 6. Subir el Release a GitHub
+    - name: Crear Release en GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        files: stattracker-release.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
