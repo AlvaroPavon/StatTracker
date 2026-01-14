@@ -1,53 +1,86 @@
 <?php
-// 1. Cargar el autoloader de Composer
-require 'vendor/autoload.php';
+/**
+ * update_profile.php - Actualización de perfil segura
+ * @package StatTracker
+ */
 
-// 2. Cargar la conexión a la BD ($pdo)
-require 'db.php'; 
+// 1. Inicializar seguridad
+require __DIR__ . '/security_init.php';
+require __DIR__ . '/db.php';
 
-// 3. Usar namespaces
 use App\User;
 use App\Security;
-use App\SecurityHeaders;
+use App\SessionManager;
+use App\InputSanitizer;
+use App\SecurityAudit;
+use App\RateLimiter;
 
-// 4. Cargar configuración de sesión
-require 'session_config.php';
+// 2. Verificar autenticación
+require_auth();
 
-// 5. Aplicar headers de seguridad
-SecurityHeaders::apply();
-
-// 6. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 7. Verificar que el usuario esté logueado
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
-}
-
-// 8. Verificar el método de solicitud
+// 3. Verificar el método de solicitud
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // 9. Validar CSRF token
-    if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-        header("Location: profile.php?error=" . urlencode("Error de seguridad."));
+    // 4. Validar CSRF token
+    verify_csrf_or_die();
+    
+    // 5. Rate limiting para cambios de perfil
+    $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+    $rateLimiter = new RateLimiter('api', $clientIp);
+    $rateCheck = $rateLimiter->isAllowed();
+    
+    if (!$rateCheck['allowed']) {
+        header("Location: profile.php?error=" . urlencode($rateCheck['message']));
         exit();
     }
     
-    $user_id = (int)$_SESSION['user_id'];
-    $form_type = $_POST['form_type'] ?? '';
+    $user_id = SessionManager::getUserId();
+    $form_type = InputSanitizer::sanitizeString($_POST['form_type'] ?? '');
     
-    // 10. Instanciar la clase User
+    // 6. Instanciar la clase User
     $user = new User($pdo);
     
-    // 11. Determinar qué formulario se envió
+    // 7. Determinar qué formulario se envió
     if ($form_type === 'photo' && isset($_FILES['profile_pic'])) {
         // Subida de foto de perfil
         $result = $user->updateProfilePicture($user_id, $_FILES['profile_pic']);
         
         if ($result === true) {
+            SecurityAudit::log('PROFILE_PHOTO_UPDATED', $user_id);
+            header("Location: profile.php?success=" . urlencode("Foto actualizada correctamente."));
+        } else {
+            header("Location: profile.php?error=" . urlencode($result));
+        }
+        exit();
+        
+    } elseif ($form_type === 'info') {
+        // Actualización de datos personales
+        $nombre = InputSanitizer::sanitizeString($_POST['nombre'] ?? '');
+        $apellidos = InputSanitizer::sanitizeString($_POST['apellidos'] ?? '');
+        $email = InputSanitizer::sanitizeEmail($_POST['email'] ?? '');
+        
+        $result = $user->updateProfile($user_id, $nombre, $apellidos, $email);
+        
+        if ($result === true) {
+            // Actualizar nombre en sesión
+            $_SESSION['nombre'] = $nombre;
+            SecurityAudit::log('PROFILE_INFO_UPDATED', $user_id);
+            header("Location: profile.php?success=" . urlencode("Perfil actualizado correctamente."));
+        } else {
+            header("Location: profile.php?error=" . urlencode($result));
+        }
+        exit();
+    }
+    
+    // Si no se reconoce el tipo de formulario
+    header("Location: profile.php?error=" . urlencode("Formulario no válido."));
+    exit();
+    
+} else {
+    header("Location: profile.php");
+    exit();
+}
+?>
             header("Location: profile.php?success=" . urlencode("Foto actualizada con éxito."));
             exit();
         } else {
