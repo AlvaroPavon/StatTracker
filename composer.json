@@ -18,13 +18,11 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
-        "phpstan/phpstan": "^1.0"
+        "phpunit/phpunit": "^9.0"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
-        "analyse": "vendor/bin/phpstan analyse src/ --level=5",
         "security-check": "composer audit"
     },
     "config": {
