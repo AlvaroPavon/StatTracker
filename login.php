@@ -28,6 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    // 5.1 Validar Honeypot (detección de bots)
+    $honeypotResult = \App\Honeypot::validate();
+    if (!$honeypotResult['valid']) {
+        // Es un bot - registrar y bloquear silenciosamente
+        SecurityAudit::log('BOT_LOGIN_ATTEMPT', null, [
+            'reason' => $honeypotResult['reason'],
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? ''
+        ], 'WARNING');
+        
+        // Simular un error genérico (no revelar que detectamos el bot)
+        $_SESSION['login_error'] = "Ha ocurrido un error. Por favor, inténtelo de nuevo.";
+        header("Location: index.php");
+        exit();
+    }
+
     // 6. Sanitizar y obtener datos
     $email = InputSanitizer::sanitizeEmail($_POST['email'] ?? '');
     $password = $_POST['password'] ?? ''; // No sanitizar contraseña
