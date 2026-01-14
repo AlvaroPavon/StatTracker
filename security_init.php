@@ -61,6 +61,17 @@ if (!ImpenetrableDefense::checkGlobalRateLimit()) {
 // Inicializar manejador de errores (PRIMERO)
 ErrorHandler::init();
 
+// ==================== FASE 0.7: Análisis de Comportamiento ====================
+
+// Analizar comportamiento del usuario
+$behaviorAnalysis = ImpenetrableDefense::analyzeUserBehavior();
+if ($behaviorAnalysis['score'] < 20) {
+    // Comportamiento extremadamente sospechoso - bloquear
+    SecurityAudit::log('BEHAVIOR_BLOCK', null, $behaviorAnalysis, 'CRITICAL');
+    http_response_code(403);
+    exit('Access denied');
+}
+
 // ==================== FASE 1: Configuración inicial ====================
 
 // Zona horaria
