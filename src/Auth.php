@@ -78,8 +78,11 @@ class Auth
             return "Error al procesar la solicitud. Inténtelo más tarde.";
         }
 
-        // 6. Hashear la contraseña con bcrypt (timing-safe)
-        $hashed_password = TimingSafe::hashPassword($password);
+        // 6. Hashear la contraseña con máxima seguridad (Argon2id + pepper)
+        $hashed_password = CryptoFortress::hashPassword($password);
+        
+        // Limpiar contraseña de memoria
+        CryptoFortress::secureClear($password);
         if ($hashed_password === false) {
             return "Error al procesar la contraseña.";
         }
