@@ -1,25 +1,22 @@
 <?php
-// 1. Cargar el autoloader de Composer
-require 'vendor/autoload.php';
+/**
+ * login.php - Procesamiento de login seguro
+ * @package StatTracker
+ */
 
-// 2. Cargar la configuración de sesión ANTES de iniciarla
-require 'session_config.php';
+// 1. Inicializar seguridad (WAF + Headers + Session)
+require __DIR__ . '/security_init.php';
 
-// 3. Cargar la conexión a la BD ($pdo)
-require 'db.php'; 
+// 2. Cargar la conexión a la BD ($pdo)
+require __DIR__ . '/db.php'; 
 
-// 4. Usar namespaces
+// 3. Usar namespaces
 use App\Auth;
 use App\Security;
-use App\SecurityHeaders;
-
-// 5. Aplicar headers de seguridad
-SecurityHeaders::apply();
-
-// 6. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+use App\SecurityAudit;
+use App\SessionManager;
+use App\RateLimiter;
+use App\InputSanitizer;
 
 // 7. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
