@@ -57,11 +57,21 @@ class Auth
         }
 
         try {
-            // 5. Comprobar si el email ya existe
+            // 5. Comprobar si el email ya existe (sin revelar información)
             $stmt = $this->pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
-                return "El email ya está registrado.";
+                // SEGURIDAD: No revelar que el email existe
+                // Simulamos éxito pero no creamos la cuenta
+                // Esto previene enumeración de usuarios
+                SecurityAudit::log('REGISTER_EMAIL_EXISTS', null, [
+                    'email' => substr($email, 0, 3) . '***'
+                ], 'INFO');
+                
+                // Retornamos un ID falso para simular éxito
+                // El usuario recibirá "cuenta creada" pero no podrá hacer login
+                // Alternativa más segura: siempre mostrar el mismo mensaje
+                return "Se ha enviado un email de verificación. Por favor, revise su bandeja de entrada.";
             }
         } catch (PDOException $e) {
             error_log("Error al verificar email: " . $e->getMessage());
