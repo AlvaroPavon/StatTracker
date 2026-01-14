@@ -342,3 +342,142 @@ function log_security_event(string $event, array $details = [], string $severity
 {
     SecurityAudit::log($event, $_SESSION['user_id'] ?? null, $details, $severity);
 }
+
+// ==================== FUNCIONES DE DEFENSA IMPENETRABLE ====================
+
+/**
+ * Verifica si una cuenta está bloqueada (por intentos fallidos)
+ */
+function is_account_locked(string $email): bool
+{
+    return ImpenetrableDefense::isAccountLocked($email);
+}
+
+/**
+ * Registra un intento fallido de login por cuenta
+ */
+function record_account_failure(string $email): array
+{
+    return ImpenetrableDefense::recordAccountFailure($email);
+}
+
+/**
+ * Resetea los intentos fallidos de una cuenta
+ */
+function reset_account_failures(string $email): void
+{
+    ImpenetrableDefense::resetAccountFailures($email);
+}
+
+/**
+ * Verifica si es un intento de acceso a cuenta trampa (honey account)
+ */
+function check_honey_account(string $email): bool
+{
+    return ImpenetrableDefense::checkHoneyAccount($email);
+}
+
+/**
+ * Genera un desafío Proof of Work para formularios
+ */
+function generate_pow_challenge(): array
+{
+    return ImpenetrableDefense::generatePoWChallenge();
+}
+
+/**
+ * Verifica la solución del Proof of Work
+ */
+function verify_pow_solution(string $challenge, int $timestamp, string $signature, int $nonce): bool
+{
+    return ImpenetrableDefense::verifyPoWSolution($challenge, $timestamp, $signature, $nonce);
+}
+
+/**
+ * Firma un request para anti-replay
+ */
+function sign_request(string $action): array
+{
+    return ImpenetrableDefense::signRequest($action);
+}
+
+/**
+ * Verifica la firma de un request
+ */
+function verify_request_signature(string $action, int $timestamp, string $nonce, string $signature): bool
+{
+    return ImpenetrableDefense::verifyRequestSignature($action, $timestamp, $nonce, $signature);
+}
+
+/**
+ * Ejecuta verificación completa de defensa
+ */
+function full_defense_check(): array
+{
+    return ImpenetrableDefense::fullDefenseCheck();
+}
+
+// ==================== FUNCIONES DE 2FA ====================
+
+/**
+ * Verifica si el usuario tiene 2FA habilitado
+ */
+function has_2fa_enabled(int $userId): bool
+{
+    return TwoFactorAuth::isEnabled($userId);
+}
+
+/**
+ * Verifica un código 2FA
+ */
+function verify_2fa_code(int $userId, string $code): bool
+{
+    $secret = TwoFactorAuth::getSecret($userId);
+    if (!$secret) return false;
+    return TwoFactorAuth::verifyCode($secret, $code, $userId);
+}
+
+/**
+ * Genera secreto y códigos de recuperación para configurar 2FA
+ */
+function setup_2fa(): array
+{
+    $secret = TwoFactorAuth::generateSecret();
+    $recoveryCodes = TwoFactorAuth::generateRecoveryCodes();
+    return [
+        'secret' => $secret,
+        'recovery_codes' => $recoveryCodes
+    ];
+}
+
+/**
+ * Habilita 2FA para un usuario
+ */
+function enable_2fa(int $userId, string $secret, array $recoveryCodes): bool
+{
+    return TwoFactorAuth::enable($userId, $secret, $recoveryCodes);
+}
+
+/**
+ * Deshabilita 2FA para un usuario
+ */
+function disable_2fa(int $userId): bool
+{
+    return TwoFactorAuth::disable($userId);
+}
+
+/**
+ * Usa un código de recuperación 2FA
+ */
+function use_2fa_recovery_code(int $userId, string $code): bool
+{
+    return TwoFactorAuth::useRecoveryCode($userId, $code);
+}
+
+/**
+ * Genera URI para QR code de 2FA
+ */
+function get_2fa_qr_uri(string $secret, string $accountEmail): string
+{
+    return TwoFactorAuth::getQRCodeUri($secret, $accountEmail);
+}
