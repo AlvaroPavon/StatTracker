@@ -28,19 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // 6. Validar Token CSRF
 verify_csrf_or_die();
 
-// 10. Recoger datos del formulario
-$user_id = (int)$_SESSION['user_id'];
-$altura = $_POST['altura'] ?? '';
-$peso = $_POST['peso'] ?? '';
-$fecha_registro = $_POST['fecha_registro'] ?? '';
+// 7. Recoger y sanitizar datos del formulario
+$user_id = SessionManager::getUserId();
+$altura = InputSanitizer::sanitizeFloat($_POST['altura'] ?? '');
+$peso = InputSanitizer::sanitizeFloat($_POST['peso'] ?? '');
+$fecha_registro = InputSanitizer::sanitizeString($_POST['fecha_registro'] ?? '');
 
-// 11. Las validaciones se hacen en la clase Metrics
+// 8. Las validaciones adicionales se hacen en la clase Metrics
 $metrics = new Metrics($pdo);
 
-// 12. Llamar a la lógica
-$result = $metrics->addHealthData($user_id, (float)$peso, (float)$altura, $fecha_registro); 
+// 9. Llamar a la lógica
+$result = $metrics->addHealthData($user_id, $peso, $altura, $fecha_registro); 
 
-// 13. Comprobar el resultado y redirigir
+// 10. Comprobar el resultado y redirigir
 if ($result === true) {
     // ÉXITO
     header('Location: dashboard.php');
