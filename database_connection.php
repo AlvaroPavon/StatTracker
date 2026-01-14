@@ -1,46 +1,64 @@
 <?php
-// MODIFICADO: Configuración de la base de datos
-// Priorizamos variables de entorno (usadas por GitHub Actions) y si no existen, usamos valores locales por defecto
-$host = getenv('DB_HOST') ?: 'localhost';          // Servidor de base de datos
-$dbname = getenv('DB_DATABASE') ?: 'proyecto_imc'; // El nombre de la base de datos
-$username = getenv('DB_USERNAME') ?: 'root';       // Usuario de MySQL
-$password = getenv('DB_PASSWORD') ?: '';           // Contraseña de MySQL
-
 /**
- * Data Source Name (DSN)
+ * database_connection.php - Conexión segura a la base de datos
+ * @package StatTracker
  */
+
+// Evitar acceso directo
+if (basename($_SERVER['SCRIPT_FILENAME']) === 'database_connection.php') {
+    http_response_code(403);
+    exit('Acceso denegado');
+}
+
+// Configuración de la base de datos desde variables de entorno
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_DATABASE') ?: 'proyecto_imc';
+$username = getenv('DB_USERNAME') ?: 'root';
+$password = getenv('DB_PASSWORD') ?: '';
+
+// DSN con charset seguro
 $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
 
-/**
- * Opciones de PDO
- */
+// Opciones de PDO SEGURAS
 $options = [
+    // Modo de errores: excepciones (nunca mostrar errores SQL al usuario)
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    
+    // Fetch mode por defecto
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    
+    // CRÍTICO: Desactivar emulación de prepared statements
+    // Esto fuerza prepared statements REALES en el servidor MySQL
     PDO::ATTR_EMULATE_PREPARES   => false,
+    
+    // Convertir valores numéricos a tipos PHP nativos
+    PDO::ATTR_STRINGIFY_FETCHES  => false,
+    
+    // Timeout de conexión
+    PDO::ATTR_TIMEOUT            => 5,
 ];
 
 try {
-    /**
-     * Crear la instancia de PDO (la conexión)
-     */
+    // Crear conexión
     $pdo = new PDO($dsn, $username, $password, $options);
     
-    /**
-     * Migración automática: Verificar y añadir columna 'apellidos' si no existe
-     * Esto permite que instalaciones antiguas funcionen sin ejecutar SQL manual
-     */
+    // Configuraciones adicionales de seguridad en MySQL
+    $pdo->exec("SET SESSION sql_mode = 'STRICT_ALL_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'");
+    
+    // Migración automática segura
     $checkColumn = $pdo->query("SHOW COLUMNS FROM usuarios LIKE 'apellidos'");
     if ($checkColumn->rowCount() === 0) {
         $pdo->exec("ALTER TABLE usuarios ADD COLUMN apellidos VARCHAR(100) NOT NULL DEFAULT '' AFTER nombre");
     }
     
 } catch (\PDOException $e) {
-    /**
-     * Si la conexión falla, el script se detiene.
-     */
-    // Loguear el error para depuración
-    error_log("Fallo de conexión a la BD: " . $e->getMessage());
-    throw new \PDOException("Error de conexión a la base de datos.", (int)$e->getCode());
+    // NUNCA mostrar detalles del error de BD al usuario
+    error_log("DB Connection Error: " . $e->getMessage());
+    
+    // Mensaje genérico
+    throw new \PDOException("Error de conexión. Inténtelo más tarde.", 0);
 }
+
+// Limpiar variables sensibles de memoria
+unset($password);
 ?>
