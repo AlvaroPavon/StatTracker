@@ -78,8 +78,8 @@ class Auth
             return "Error al procesar la solicitud. Inténtelo más tarde.";
         }
 
-        // 6. Hashear la contraseña con bcrypt
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+        // 6. Hashear la contraseña con bcrypt (timing-safe)
+        $hashed_password = TimingSafe::hashPassword($password);
         if ($hashed_password === false) {
             return "Error al procesar la contraseña.";
         }
