@@ -1,43 +1,32 @@
 <?php
-// 1. Cargar el autoloader de Composer
-require __DIR__ . '/vendor/autoload.php';
+/**
+ * add_data.php - Agregar métricas de salud (API segura)
+ * @package StatTracker
+ */
 
-// 2. Cargar la configuración de sesión ANTES de session_start()
-require __DIR__ . '/session_config.php';
+// 1. Inicializar seguridad (WAF + Headers + Session)
+require __DIR__ . '/security_init.php';
 
-// 3. Cargar la conexión a la BD ($pdo)
+// 2. Cargar la conexión a la BD ($pdo)
 require __DIR__ . '/db.php'; 
 
-// 4. Usar namespaces
+// 3. Usar namespaces
 use App\Metrics;
 use App\Security;
-use App\SecurityHeaders;
+use App\InputSanitizer;
+use App\SessionManager;
 
-// 5. Aplicar headers de seguridad
-SecurityHeaders::apply();
+// 4. Verificar que el usuario esté logueado
+require_auth();
 
-// 6. Iniciar la sesión
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 7. Verificar que el usuario esté logueado
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php?error=No+autorizado');
-    exit();
-}
-
-// 8. Verificar el método de solicitud (debe ser POST)
+// 5. Verificar el método de solicitud (debe ser POST)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: dashboard.php?error=Método+no+permitido');
     exit();
 }
 
-// 9. Validar Token CSRF
-if (!Security::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-    header('Location: dashboard.php?error=Error+de+seguridad');
-    exit();
-}
+// 6. Validar Token CSRF
+verify_csrf_or_die();
 
 // 10. Recoger datos del formulario
 $user_id = (int)$_SESSION['user_id'];
