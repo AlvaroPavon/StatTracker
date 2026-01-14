@@ -129,10 +129,21 @@ class Auth
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // 4. Verificar si el usuario existe y la contraseña es correcta
-            // IMPORTANTE: Usar verificación timing-safe
-            if ($user && TimingSafe::verifyPassword($password, $user['password'])) {
+            // IMPORTANTE: Usar CryptoFortress para verificación ultra-segura
+            if ($user && CryptoFortress::verifyPassword($password, $user['password'])) {
                 // Éxito: Resetear intentos fallidos
                 Security::resetLoginAttempts($email);
+                
+                // Limpiar contraseña de memoria
+                CryptoFortress::secureClear($password);
+                
+                // Verificar si el hash necesita actualización
+                if (CryptoFortress::needsRehash($user['password'])) {
+                    // Rehash con algoritmo más fuerte
+                    $newHash = CryptoFortress::hashPassword($password);
+                    $updateStmt = $this->pdo->prepare("UPDATE usuarios SET password = ? WHERE id = ?");
+                    $updateStmt->execute([$newHash, $user['id']]);
+                }
                 
                 return [
                     'id' => (int)$user['id'],
@@ -140,11 +151,10 @@ class Auth
                 ];
             } else {
                 // Fallo: Registrar intento fallido
-                // IMPORTANTE: El tiempo de respuesta es igual para usuario inexistente y contraseña incorrecta
                 Security::recordFailedLogin($email);
                 
-                // Añadir delay aleatorio para dificultar timing attacks
-                TimingSafe::randomDelay();
+                // Limpiar contraseña de memoria
+                CryptoFortress::secureClear($password);
                 
                 // Mensaje genérico para no revelar si el email existe
                 return "Credenciales inválidas.";
