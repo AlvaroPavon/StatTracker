@@ -1,34 +1,19 @@
-# 🔐 StatTracker - Guía de Seguridad Completa
+# 🔐 StatTracker - Guía de Seguridad MÁXIMA
 
-Este documento detalla las medidas de seguridad implementadas en StatTracker para proteger contra los ataques más comunes de OWASP Top 10 y más.
+Este documento detalla las medidas de seguridad implementadas en StatTracker para proteger contra TODOS los vectores de ataque conocidos, incluyendo Supply Chain y Cryptographic attacks.
 
-## 📋 Índice de Protecciones (23 vectores cubiertos)
+## 📋 Índice de Protecciones (40+ vectores cubiertos)
 
-| # | Ataque | Clase/Archivo | Estado |
-|---|--------|---------------|--------|
-| 1 | SQL Injection | `SecurityFirewall`, Prepared Statements | ✅ |
-| 2 | XSS (Cross-Site Scripting) | `InputSanitizer`, `SecurityFirewall`, CSP | ✅ |
-| 3 | CSRF (Cross-Site Request Forgery) | `Security::validateCsrfToken()` | ✅ |
-| 4 | Session Hijacking | `SessionManager` (fingerprinting) | ✅ |
-| 5 | Session Fixation | `SessionManager::regenerateId()` | ✅ |
-| 6 | Brute Force | `RateLimiter` | ✅ |
-| 7 | Path Traversal | `SecurityFirewall` | ✅ |
-| 8 | Command Injection | `SecurityFirewall` | ✅ |
-| 9 | File Upload Attacks | `Security::validateImage()` | ✅ |
-| 10 | Clickjacking | `SecurityHeaders` (X-Frame-Options) | ✅ |
-| 11 | MIME Sniffing | `SecurityHeaders` (X-Content-Type-Options) | ✅ |
-| 12 | Bot Detection | `Honeypot` | ✅ |
-| 13 | User Enumeration | Mensajes genéricos en Auth | ✅ |
-| 14 | Account Lockout DOS | `AdvancedProtection` | ✅ |
-| 15 | HTTP Parameter Pollution | `AdvancedProtection` | ✅ |
-| 16 | Open Redirect | `AdvancedProtection::validateRedirectUrl()` | ✅ |
-| 17 | Host Header Injection | `AdvancedProtection` | ✅ |
-| 18 | Slow HTTP Attacks | `AdvancedProtection` | ✅ |
-| 19 | LFI/RFI (File Inclusion) | `SecurityFirewall` | ✅ |
-| 20 | Information Disclosure | `ErrorHandler` | ✅ |
-| 21 | Race Conditions | `AdvancedProtection::acquireLock()` | ✅ |
-| 22 | Scanner Detection | `SecurityFirewall` (User-Agent) | ✅ |
-| 23 | Anonymous Proxy Detection | `AdvancedProtection` | ✅ |
+| # | Categoría | Ataques Bloqueados | Clase Principal |
+|---|-----------|-------------------|-----------------|
+| 1-5 | **Inyección** | SQL, Command, LDAP, NoSQL, Template | `SecurityFirewall`, `UltimateShield` |
+| 6-10 | **XSS** | Reflected, Stored, DOM, Encoding bypass, SVG | `InputSanitizer`, CSP |
+| 11-15 | **Autenticación** | Brute Force, Credential Stuffing, Enumeration, Timing | `RateLimiter`, `CryptoFortress` |
+| 16-20 | **Sesión** | Hijacking, Fixation, Timeout, Fingerprint, Cookie | `SessionManager` |
+| 21-25 | **Criptografía** | Timing attacks, Weak hashing, Key derivation | `CryptoFortress`, `TimingSafe` |
+| 26-30 | **Supply Chain** | Dependency tampering, Autoloader hijack, Code injection | `SupplyChainGuard` |
+| 31-35 | **Archivos** | Upload malicioso, Path Traversal, LFI/RFI | `UltimateShield`, `Security` |
+| 36-40 | **Infraestructura** | Headers, Clickjacking, CORS, Cache Poisoning | `SecurityHeaders` |
 
 ---
 
