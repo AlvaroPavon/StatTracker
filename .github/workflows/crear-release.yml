@@ -1,60 +1,48 @@
 name: Generar Release de Producción
 
-# Este flujo se activa SOLO cuando subes un tag que empiece por 'v' (ej: v1.0.0)
+# Se activa cuando creas un tag v* (ej: v1.0.0)
 on:
   push:
     tags:
       - 'v*'
 
 jobs:
-  build-release:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Permiso para subir archivos al release
+      contents: write
 
     steps:
-    # 1. Descargar el código del repositorio
-    - name: Checkout del código
+    - name: Descargar código
       uses: actions/checkout@v4
 
-    # 2. Preparar PHP (versión 8.2 según tu proyecto)
     - name: Configurar PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'
+        php-version: '8.2' # Ajustado a tu versión probable
         extensions: mbstring, intl, pdo, pdo_mysql
 
-    # 3. Instalar dependencias SOLO de producción (limpia la carpeta vendor)
-    - name: Instalar dependencias (Producción)
-      run: |
-        composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
+    - name: Instalar dependencias limpias (Producción)
+      run: composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 
-    # 4. Borrar archivos que NO sirven para producción
-    # Aquí eliminamos tests, carpetas de git, configs de desarrollo, etc.
-    - name: Limpiar archivos de desarrollo
+    - name: Borrar archivos de desarrollo
+      # Aquí borramos lo que NO queremos que vea el cliente final
       run: |
         rm -rf tests/
+        rm -rf docs/
         rm -rf .github/
         rm -rf .git/
-        rm -rf docs/mockups/
-        rm -rf docs/system-test-report.md
-        rm -rf docs/coverage-analisis.md
+        rm -f .gitattributes .gitconfig .gitignore
         rm -f phpunit.xml
-        rm -f .gitignore
-        rm -f composer.lock
-        rm -f CUMPLIMIENTO_REQUISITOS.md
-        # Mantenemos 'vendor/', 'src/', 'css/', 'js/', index.php, etc.
+        rm -f composer.lock package.json
+        rm -f CUMPLIMIENTO_REQUISITOS.md INSTALACION_XAMPP.md
+        # Nota: Mantenemos database.sql para que puedan instalar la BD
 
-    # 5. Crear el archivo ZIP
-    - name: Comprimir aplicación
-      run: |
-        zip -r stattracker-release.zip .
+    - name: Crear archivo ZIP
+      run: zip -r stattracker-v1.0.zip .
 
-    # 6. Subir el Release a GitHub
-    - name: Crear Release en GitHub
+    - name: Publicar Release en GitHub
       uses: softprops/action-gh-release@v1
       with:
-        files: stattracker-release.zip
+        files: stattracker-v1.0.zip
         generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
