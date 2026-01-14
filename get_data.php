@@ -1,21 +1,21 @@
 <?php
-// 1. Autoloader (Composer)
-require __DIR__ . '/vendor/autoload.php';
+/**
+ * get_data.php - Obtener métricas de salud (API JSON segura)
+ * @package StatTracker
+ */
+
+// 1. Inicializar seguridad (WAF + Headers + Session)
+require __DIR__ . '/security_init.php';
+
+// 2. Cargar la conexión a la BD ($pdo)
+require __DIR__ . '/db.php';
 
 use App\Metrics;
 use App\Security;
 use App\SecurityHeaders;
+use App\SessionManager;
 
-// 2. Iniciar sesión solo si no está activa
-if (session_status() === PHP_SESSION_NONE) {
-    require __DIR__ . '/session_config.php';
-    session_start();
-}
-
-// 3. Cargar conexión a la BD ($pdo)
-require __DIR__ . '/db.php';
-
-// 4. Aplicar headers de seguridad para JSON
+// 3. Aplicar headers de seguridad para JSON
 SecurityHeaders::applyJsonHeaders();
 
 /**
@@ -29,8 +29,8 @@ function send_json_response(array $data, int $statusCode = 200): void
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
 }
 
-// 5. Validar sesión
-if (!isset($_SESSION['user_id'])) {
+// 4. Validar sesión
+if (!SessionManager::isAuthenticated()) {
     send_json_response(
         ['success' => false, 'message' => 'No autorizado. Inicie sesión.'],
         401
@@ -38,7 +38,7 @@ if (!isset($_SESSION['user_id'])) {
     return;
 }
 
-// 6. Validar Token CSRF
+// 5. Validar Token CSRF
 if (!Security::validateCsrfToken($_GET['token'] ?? null)) {
     send_json_response(
         ['success' => false, 'message' => 'Error de seguridad.'],
@@ -47,7 +47,7 @@ if (!Security::validateCsrfToken($_GET['token'] ?? null)) {
     return;
 }
 
-// 7. Validar método HTTP
+// 6. Validar método HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     send_json_response(
         ['success' => false, 'message' => 'Método no permitido.'],
@@ -56,12 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     return;
 }
 
-// 8. Obtener el ID de usuario y lógica principal
-$user_id = (int) $_SESSION['user_id'];
+// 7. Obtener el ID de usuario y lógica principal
+$user_id = SessionManager::getUserId();
 $metrics = new Metrics($pdo);
 $result = $metrics->getHealthData($user_id);
 
-// 9. Respuesta final
+// 8. Respuesta final
 if (is_array($result)) {
     send_json_response([
         'success' => true,
