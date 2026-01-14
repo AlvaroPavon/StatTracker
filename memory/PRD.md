@@ -53,13 +53,20 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 ### Issue #1: composer.lock desincronizado (Diciembre 2025)
 - **Problema:** `phpstan/phpstan` fue añadido a `composer.json` pero `composer.lock` no se actualizó
 - **Causa:** El agente anterior no ejecutó `composer update`
-- **Solución:** Se añadió manualmente la entrada de `phpstan/phpstan` al `composer.lock` y se actualizó el `content-hash`
+- **Solución:** Se removió `phpstan/phpstan` de `composer.json` para sincronizar con `composer.lock` existente
 
 ## Validación Pendiente por Usuario
 
-1. **Subir composer.lock a GitHub** - El usuario debe hacer commit del archivo actualizado
+1. **Subir cambios a GitHub** - Hacer commit del `composer.json` actualizado
 2. **Verificar workflows** - Confirmar que GitHub Actions se ejecutan correctamente
 3. **Crear release de prueba** - Validar workflow `release-production.yml`
+
+## Tareas Post-Fix (Opcional)
+Para re-añadir phpstan correctamente, ejecutar en tu máquina local:
+```bash
+composer require --dev phpstan/phpstan
+```
+Esto actualizará ambos archivos (`composer.json` y `composer.lock`) correctamente.
 
 ## Arquitectura de Archivos
 ```
