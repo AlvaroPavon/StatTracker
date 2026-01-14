@@ -40,7 +40,23 @@ if (!$cryptoCheck['valid']) {
     exit('System security check failed');
 }
 
-// ==================== FASE 0.5: Manejador de Errores Seguro ====================
+// ==================== FASE 0.5: Defensa Impenetrable ====================
+
+// Verificar IP en rangos bloqueados
+$clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+if (ImpenetrableDefense::isIpInBlockedRange($clientIp)) {
+    http_response_code(403);
+    exit('Access denied');
+}
+
+// Control de tasa global (anti-DDoS)
+if (!ImpenetrableDefense::checkGlobalRateLimit()) {
+    http_response_code(429);
+    header('Retry-After: 60');
+    exit('Too many requests');
+}
+
+// ==================== FASE 0.6: Manejador de Errores Seguro ====================
 
 // Inicializar manejador de errores (PRIMERO)
 ErrorHandler::init();
