@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         exit();
         
-    } elseif ($form_type === 'info') {
+    } elseif ($form_type === 'info' || $form_type === 'details') {
         // Actualización de datos personales
         $nombre = InputSanitizer::sanitizeString($_POST['nombre'] ?? '');
         $apellidos = InputSanitizer::sanitizeString($_POST['apellidos'] ?? '');
@@ -76,39 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header("Location: profile.php?error=" . urlencode("Formulario no válido."));
     exit();
     
-} else {
-    header("Location: profile.php");
-    exit();
-}
-?>
-            header("Location: profile.php?success=" . urlencode("Foto actualizada con éxito."));
-            exit();
-        } else {
-            header("Location: profile.php?error=" . urlencode($result));
-            exit();
-        }
-        
-    } elseif ($form_type === 'details') {
-        // Actualización de datos del perfil
-        $nombre = $_POST['nombre'] ?? '';
-        $apellidos = $_POST['apellidos'] ?? '';
-        $email = $_POST['email'] ?? '';
-
-        $result = $user->updateProfile($user_id, $nombre, $apellidos, $email);
-
-        if ($result === true) {
-            $_SESSION['nombre'] = $nombre;
-            header("Location: profile.php?success=" . urlencode("Perfil actualizado con éxito."));
-            exit();
-        } else {
-            header("Location: profile.php?error=" . urlencode($result));
-            exit();
-        }
-    } else {
-        header("Location: profile.php?error=" . urlencode("Formulario inválido."));
-        exit();
-    }
-
 } else {
     header("Location: profile.php");
     exit();
