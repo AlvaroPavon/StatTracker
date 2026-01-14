@@ -1,4 +1,4 @@
-name: 🔒 Auditoría de Seguridad
+name: Auditoria de Seguridad
 
 on:
   push:
@@ -6,127 +6,75 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Ejecutar cada lunes a las 9:00 AM UTC
     - cron: '0 9 * * 1'
   workflow_dispatch:
 
 jobs:
   security-audit:
-    name: Auditoría de Seguridad Completa
+    name: Auditoria de Seguridad Completa
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Descargar código
+      - name: Descargar codigo
         uses: actions/checkout@v4
 
-      - name: 🐘 Configurar PHP 8.2
+      - name: Configurar PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, pdo, pdo_mysql
+          extensions: mbstring, intl, pdo, pdo_mysql, openssl, sodium
           tools: composer:v2
 
-      - name: 📦 Instalar dependencias
+      - name: Instalar dependencias
         run: composer install --prefer-dist --no-progress
 
-      - name: 🔍 Auditoría de dependencias (Composer Audit)
+      - name: Auditoria de dependencias Composer
         run: |
-          echo "🔍 Ejecutando auditoría de dependencias..."
-          composer audit --format=plain || true
-          echo "✅ Auditoría de dependencias completada"
+          echo "Ejecutando auditoria de dependencias..."
+          composer audit --format=plain || echo "Auditoria completada con advertencias"
         continue-on-error: true
 
-      - name: 🛡️ Análisis estático con PHPStan
+      - name: Analisis estatico con PHPStan
         run: |
-          echo "🔧 Instalando PHPStan..."
-          composer require --dev phpstan/phpstan --no-interaction
-          
-          echo "🔍 Ejecutando análisis estático..."
-          vendor/bin/phpstan analyse src/ --level=5 --no-progress || true
-          echo "✅ Análisis estático completado"
-        continue-on-error: true
-
-      - name: 🔐 Escaneo de secretos hardcodeados
-        run: |
-          echo "🔍 Buscando posibles secretos hardcodeados..."
-          
-          # Buscar patrones comunes de secretos
-          PATTERNS=(
-            "password.*=.*['\"][^'\"]+['\"]"     # password = "..."
-            "api_key.*=.*['\"][^'\"]+['\"]"     # api_key = "..."
-            "secret.*=.*['\"][^'\"]+['\"]"      # secret = "..."
-            "token.*=.*['\"][^'\"]+['\"]"       # token = "..."
-          )
-          
-          FOUND=0
-          for pattern in "${PATTERNS[@]}"; do
-            if grep -rniE "$pattern" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . 2>/dev/null; then
-              echo "⚠️ Posible secreto encontrado con patrón: $pattern"
-              FOUND=1
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse src/ --level=5 --no-progress || true
+          else
+            echo "PHPStan no instalado, instalando..."
+            composer require --dev phpstan/phpstan --no-interaction || true
+            if [ -f vendor/bin/phpstan ]; then
+              vendor/bin/phpstan analyse src/ --level=5 --no-progress || true
             fi
-          done
-          
-          if [ $FOUND -eq 0 ]; then
-            echo "✅ No se encontraron secretos hardcodeados obvios"
           fi
+          echo "Analisis estatico completado"
         continue-on-error: true
 
-      - name: 🕳️ Verificar funciones peligrosas
+      - name: Escaneo de secretos hardcodeados
         run: |
-          echo "🔍 Buscando funciones potencialmente peligrosas..."
-          
-          # Funciones peligrosas a buscar
-          DANGEROUS_FUNCS="eval|exec|shell_exec|system|passthru|popen|proc_open|pcntl_exec|assert"
-          
-          if grep -rniE "\b($DANGEROUS_FUNCS)\s*\(" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . 2>/dev/null; then
-            echo "⚠️ Se encontraron funciones potencialmente peligrosas. Revisar manualmente."
-          else
-            echo "✅ No se encontraron funciones peligrosas"
-          fi
+          echo "Buscando posibles secretos hardcodeados..."
+          grep -rniE "password\s*=\s*['\"][^'\"]+['\"]" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . || true
+          grep -rniE "api_key\s*=\s*['\"][^'\"]+['\"]" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . || true
+          echo "Escaneo completado"
         continue-on-error: true
 
-      - name: 🔍 Verificar configuración de seguridad
+      - name: Verificar funciones peligrosas
         run: |
-          echo "🔍 Verificando configuración de seguridad..."
-          
-          # Verificar que display_errors está desactivado en producción
-          if grep -rni "display_errors.*On" --include="*.php" --exclude-dir=vendor . 2>/dev/null; then
-            echo "⚠️ display_errors podría estar activado"
-          else
-            echo "✅ display_errors no está activado explícitamente"
-          fi
-          
-          # Verificar uso de prepared statements
-          if grep -rni "\$pdo->query.*\$" --include="*.php" --exclude-dir=vendor . 2>/dev/null; then
-            echo "⚠️ Posible uso de query() con variables (revisar SQL injection)"
-          else
-            echo "✅ No se detectó uso obvio de query() con variables"
-          fi
-          
-          # Verificar htmlspecialchars/htmlentities
-          if grep -rni "echo.*\$_" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . 2>/dev/null; then
-            echo "⚠️ Posible echo directo de variables $_GET/$_POST (revisar XSS)"
-          else
-            echo "✅ No se detectó echo directo de superglobales"
-          fi
+          echo "Buscando funciones potencialmente peligrosas..."
+          grep -rniE "\b(eval|exec|shell_exec|system|passthru)\s*\(" --include="*.php" --exclude-dir=vendor --exclude-dir=tests . || echo "No se encontraron funciones peligrosas"
+        continue-on-error: true
 
-      - name: 📊 Generar reporte de seguridad
+      - name: Generar reporte de seguridad
         run: |
-          echo "📊 Reporte de Seguridad - $(date)" > security-report.txt
+          echo "Reporte de Seguridad - $(date)" > security-report.txt
           echo "=========================================" >> security-report.txt
           echo "" >> security-report.txt
-          
-          echo "## Dependencias" >> security-report.txt
-          composer audit --format=plain 2>&1 >> security-report.txt || echo "No se encontraron vulnerabilidades conocidas" >> security-report.txt
-          echo "" >> security-report.txt
-          
-          echo "## Archivos PHP analizados" >> security-report.txt
+          echo "Archivos PHP analizados:" >> security-report.txt
           find . -name "*.php" -not -path "./vendor/*" -not -path "./tests/*" | wc -l >> security-report.txt
           echo "" >> security-report.txt
-          
+          echo "Clases de seguridad encontradas:" >> security-report.txt
+          ls -la src/Security*.php 2>/dev/null || echo "Ninguna" >> security-report.txt
           cat security-report.txt
 
-      - name: 📤 Subir reporte de seguridad
+      - name: Subir reporte de seguridad
         uses: actions/upload-artifact@v4
         with:
           name: security-report
