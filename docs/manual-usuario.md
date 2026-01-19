@@ -184,8 +184,25 @@ Los usuarios pueden eliminar registros específicos de su historial:
 
 1. Accede a la página de login de StatTracker
 2. Introduce tu email y contraseña
-3. Haz clic en **"Iniciar Sesión"**
-4. Serás redirigido al panel principal (Dashboard)
+3. **Si es tu 4º intento o posterior**, resuelve el CAPTCHA matemático
+4. Haz clic en **"Iniciar Sesión"**
+5. Serás redirigido al panel principal (Dashboard)
+
+> **Nota sobre alertas de seguridad**: Si inicias sesión desde un dispositivo nuevo o ubicación diferente, verás una alerta amarilla en el dashboard. Esto es normal si eres tú, pero si no reconoces la actividad, cambia tu contraseña inmediatamente.
+
+### Cierre Automático de Sesión
+
+Para proteger tu cuenta cuando dejas el ordenador desatendido:
+
+1. Después de **15 minutos sin actividad** (sin mover el ratón, teclear, etc.), aparecerá una ventana de advertencia
+2. La ventana muestra una cuenta regresiva de 60 segundos
+3. **Opciones**:
+   * **"Continuar sesión"**: Haz clic para seguir usando la aplicación
+   * **"Cerrar sesión ahora"**: Cierra sesión inmediatamente
+   * **No hacer nada**: La sesión se cerrará automáticamente cuando llegue a 0
+4. Si la sesión se cierra, al volver a la página de login verás: *"Tu sesión se cerró automáticamente por inactividad"*
+
+> **Tip**: La actividad incluye mover el ratón, hacer scroll, escribir o hacer clic. No necesitas hacer nada especial, simplemente usar la aplicación reinicia el contador.
 
 ### Uso del Dashboard
 
