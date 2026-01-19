@@ -29,6 +29,8 @@ $maxPeso = Security::MAX_PESO;
 // 7. Comprobar si debemos mostrar el splash de bienvenida
 $showSplash = false;
 $showWelcomeScreen = false;
+$securityAlert = null;
+
 if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] === true) {
     $showSplash = true;
     unset($_SESSION['show_welcome_splash']); //
@@ -37,6 +39,11 @@ if (isset($_SESSION['show_welcome_splash']) && $_SESSION['show_welcome_splash'] 
 if (isset($_SESSION['show_welcome_screen']) && $_SESSION['show_welcome_screen'] === true) {
     $showWelcomeScreen = true;
     unset($_SESSION['show_welcome_screen']);
+}
+// Alerta de seguridad por login sospechoso
+if (isset($_SESSION['security_alert'])) {
+    $securityAlert = $_SESSION['security_alert'];
+    unset($_SESSION['security_alert']);
 }
 
 // 8. Obtener datos del usuario (nombre y foto) para la barra lateral
