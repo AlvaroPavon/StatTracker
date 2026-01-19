@@ -69,16 +69,16 @@ class SecurityFirewall
         '/<img[^>]*onerror/i',
         '/<body[^>]*onload/i',
         '/&#x?[0-9a-fA-F]+;/',  // HTML entities
-        '/\\u00[0-9a-fA-F]{2}/i', // Unicode escapes
+        '/\\\\u00[0-9a-fA-F]{2}/i', // Unicode escapes
     ];
     
     // Patrones de Path Traversal
     private const PATH_TRAVERSAL_PATTERNS = [
-        '/\.\.[\\\/]/',
+        '/\.\.[\/\\\\]/',
         '/\.\.\./',
-        '/%2e%2e[\\\/]/i',
+        '/%2e%2e[\/\\\\]/i',
         '/%252e%252e/i',
-        '/\.\.\\//',
+        '/\.\.\//',
         '/\.\.%2f/i',
         '/\.\.%5c/i',
         '/etc\/passwd/i',
