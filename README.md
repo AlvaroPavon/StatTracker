@@ -1,6 +1,6 @@
 # StatTracker 📊
 
-![Version](https://img.shields.io/badge/version-1.1-blue)
+![Version](https://img.shields.io/badge/version-1.2-blue)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-777BB4?logo=php)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
