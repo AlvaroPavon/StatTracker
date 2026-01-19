@@ -87,6 +87,17 @@ Los usuarios registrados pueden acceder al sistema mediante:
 * Verificación de credenciales cifradas
 * Sesión persistente después del login
 * Mensaje de error genérico para evitar enumeration attacks
+* **CAPTCHA matemático después de 3 intentos fallidos**
+* **Alerta de seguridad si se detecta actividad sospechosa**
+
+### R002.1: Cierre Automático de Sesión
+
+El sistema cierra automáticamente la sesión después de **15 minutos de inactividad** para proteger tu cuenta:
+
+* Se muestra una advertencia 60 segundos antes del cierre
+* Puedes hacer clic en "Continuar sesión" para extenderla
+* Si no respondes, la sesión se cierra automáticamente
+* Al volver a iniciar sesión, verás un mensaje indicando que la sesión expiró por inactividad
 
 ### R003: Gestión de Perfil
 
