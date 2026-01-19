@@ -1,46 +1,39 @@
 # StatTracker 📊
 
-![Version](https://img.shields.io/badge/version-1.0-blue)
-![PHP](https://img.shields.io/badge/PHP-7.4+-777BB4?logo=php)
+![Version](https://img.shields.io/badge/version-1.1-blue)
+![PHP](https://img.shields.io/badge/PHP-8.0+-777BB4?logo=php)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-10%20layers-red)
 
-## 📖 Visión General 
+## 📖 Visión General
 
-**StatTracker** es una aplicación web moderna y segura para el registro, seguimiento y gestión de estadísticas de salud personales. Permite a los usuarios monitorizar sus métricas corporales (peso, altura, IMC) a lo largo del tiempo de manera sencilla y efectiva.
+**StatTracker** es una aplicación web moderna y **ultra-segura** para el registro, seguimiento y gestión de estadísticas de salud personales. Diseñada como laboratorio de seguridad, implementa **10 capas de defensa** contra ataques.
 
 ### ✨ Características Principales
 
-* 🔐 **Sistema de autenticación seguro** - Registro y login con contraseñas cifradas
-* 📈 **Registro de métricas** - Peso, altura con cálculo automático de IMC
-* 📊 **Historial completo** - Visualización de toda la evolución de tus datos
-* 👤 **Gestión de perfil** - Actualiza tu información y contraseña
-* 🔒 **Privacidad garantizada** - Cada usuario solo accede a sus propios datos
-* ✅ **Código probado** - Más de 85% de cobertura con tests unitarios
+| Categoría | Características |
+|-----------|----------------|
+| **Funcionalidad** | 📈 Registro de métricas • 📊 Cálculo automático de IMC • 📁 Historial completo • 👤 Gestión de perfil |
+| **Seguridad** | 🔐 Contraseñas con Argon2id • 🛡️ WAF integrado • 🔒 Rate Limiting • 🚫 Anti-DDoS • 🔑 2FA/MFA |
+| **Calidad** | ✅ 85%+ cobertura de tests • 📝 Documentación completa • 🏗️ Arquitectura MVC |
 
 ### 🎯 ¿Para quién es esta aplicación?
 
-* Personas que desean monitorizar su estado físico
-* Usuarios siguiendo programas de pérdida/ganancia de peso
-* Profesionales de la salud registrando datos de pacientes
-* Cualquier persona interesada en llevar un control de sus métricas corporales
+* **Usuarios**: Personas que desean monitorizar su estado físico
+* **Desarrolladores**: Ejemplo de implementación de seguridad en PHP
+* **Estudiantes**: Laboratorio de pruebas de penetración (con permisos)
 
 ---
 
 ## 🛠️ Requisitos del Sistema
 
-### Para Ejecutar la Aplicación
-
-* **PHP**: 7.4 o superior
-* **Servidor Web**: Apache o Nginx (o PHP built-in server)
-* **Base de Datos**: MySQL 5.7+ / MariaDB 10.3+
-* **Composer**: Para gestión de dependencias
-
-### Extensiones PHP Requeridas
-
-* `pdo_mysql`
-* `mbstring`
-* `json`
+| Requisito | Versión |
+|-----------|---------|
+| **PHP** | 8.0 o superior |
+| **MySQL/MariaDB** | 5.7+ / 10.3+ |
+| **Composer** | 2.x |
+| **Extensiones PHP** | pdo_mysql, mbstring, json, openssl |
 
 ---
 
@@ -62,10 +55,7 @@ composer install
 ### 3. Configurar la base de datos
 
 ```bash
-# Crear base de datos
 mysql -u root -p -e "CREATE DATABASE proyecto_imc"
-
-# Importar esquema
 mysql -u root -p proyecto_imc < database.sql
 ```
 
@@ -86,7 +76,7 @@ $password = '';
 php -S localhost:8000
 ```
 
-### 6. Acceder a la aplicación
+### 6. Acceder
 
 Abre tu navegador en: `http://localhost:8000`
 
@@ -98,114 +88,51 @@ Abre tu navegador en: `http://localhost:8000`
 
 ```
 StatTracker/
-├── src/                    # Clases principales (lógica de negocio)
-│   ├── Auth.php           # Autenticación (registro, login)
-│   ├── User.php           # Gestión de perfil y contraseñas
-│   └── Metrics.php        # Gestión de métricas de salud
+├── src/                    # Clases principales
+│   ├── Auth.php            # Autenticación (registro, login)
+│   ├── User.php            # Gestión de perfil
+│   ├── Metrics.php         # Métricas de salud
+│   ├── Security.php        # Validaciones centralizadas
+│   ├── CryptoFortress.php  # Criptografía avanzada
+│   ├── SessionManager.php  # Gestión segura de sesiones
+│   ├── SecurityFirewall.php # WAF
+│   ├── TwoFactorAuth.php   # Autenticación 2FA
+│   └── ...                 # Otras clases de seguridad
 ├── tests/                  # Tests unitarios y de integración
-│   ├── AuthTest.php       # Tests de autenticación
-│   ├── UserTest.php       # Tests de usuario
-│   ├── MetricsTest.php    # Tests de métricas
-│   └── ApiIntegrationTest.php
 ├── docs/                   # Documentación completa
-│   ├── manual-usuario.md  # Manual de usuario
-│   ├── coverage-analisis.md
-│   ├── system-test-report.md
-│   ├── entrevista-notas.md
-│   └── mockups/           # Diagramas Mermaid
-├── coverage/               # Informes de cobertura (generado)
+├── coverage/               # Informes de cobertura
 ├── css/                    # Estilos CSS
 ├── js/                     # JavaScript
 ├── uploads/                # Fotos de perfil
-├── database.sql           # Esquema de base de datos
-├── database_connection.php # Configuración de BD
-├── composer.json          # Dependencias de PHP
-├── phpunit.xml            # Configuración de PHPUnit
-└── README.md              # Este archivo
-
-# Archivos de interfaz:
-├── index.php              # Página de inicio/login
-├── register_page.php      # Página de registro
-├── dashboard.php          # Panel principal
-├── profile.php            # Página de perfil
-├── add_data.php           # Añadir métricas
-├── get_data.php           # Obtener métricas
-├── delete_data.php        # Eliminar métricas
-└── update_profile.php     # Actualizar perfil
+├── database.sql            # Esquema de base de datos
+└── *.php                   # Archivos de interfaz
 ```
 
 ---
 
-## 🏗️ Arquitectura
+## 🔒 Arquitectura de Seguridad
 
-StatTracker sigue una arquitectura **MVC simplificada**:
+StatTracker implementa **10 capas de defensa**:
 
-### Modelo (src/)
-* **Auth.php**: Lógica de autenticación
-* **User.php**: Lógica de gestión de usuarios
-* **Metrics.php**: Lógica de métricas de salud
-
-### Vista (archivos .php raíz)
-* Archivos PHP con HTML que renderizan la interfaz
-
-### Controlador (archivos de procesamiento)
-* Scripts PHP que procesan requests y llaman a los modelos
-
-### Base de Datos
-
-**Tablas principales:**
-
-```sql
-usuarios (id, nombre, apellidos, email, password, profile_pic, ...)
-metricas (id, user_id, peso, altura, imc, fecha_registro, ...)
+```
+CAPA 0:  CryptoFortress         → Verificación de integridad criptográfica
+CAPA 1:  ImpenetrableDefense    → Bloqueo de IPs + Anti-DDoS
+CAPA 2:  UltimateShield         → 100+ patrones de detección
+CAPA 3:  AdvancedProtection     → Host Header + HTTP Parameter Pollution
+CAPA 4:  SecurityFirewall       → WAF (SQL Injection, XSS, Path Traversal)
+CAPA 5:  SecurityHeaders        → CSP, HSTS, X-Frame-Options
+CAPA 6:  SessionManager         → Cookies seguras, fingerprinting
+CAPA 7:  ImpenetrableDefense    → Account lockout, honey accounts
+CAPA 8:  TwoFactorAuth          → 2FA/MFA con TOTP
+CAPA 9:  CryptoFortress         → Argon2id, AES-256-GCM
+CAPA 10: SupplyChainGuard       → Verificación de integridad de archivos
 ```
 
-Ver `database.sql` para el esquema completo.
-
----
-
-## 🔒 Seguridad
-
-### Medidas Implementadas
-
-* ✅ **Contraseñas cifradas**: Usando `password_hash()` (bcrypt)
-* ✅ **Prepared Statements**: Protección contra SQL injection
-* ✅ **Validación de inputs**: En servidor
-* ✅ **Sesiones seguras**: Configuración PHP adecuada
-* ✅ **Aislamiento de datos**: Cada usuario solo accede a lo suyo
-* ✅ **Verificación de permisos**: En todas las operaciones
-
-### Recomendaciones para Producción
-
-* Implementar tokens CSRF
-* Activar HTTPS
-* Configurar headers de seguridad (CSP, HSTS)
-* Implementar rate limiting
-* Logs de auditoría
-* Backups automáticos
-
-> 🔐 Para más detalles, consulta [SECURITY.md](SECURITY.md)
+> 🔐 Para documentación detallada, consulta [SECURITY.md](SECURITY.md) y [docs/seguridad-tecnica.md](docs/seguridad-tecnica.md)
 
 ---
 
 ## 🧪 Testing
-
-### Estrategia de Testing
-
-El proyecto implementa múltiples niveles de testing:
-
-#### Tests Unitarios (PHPUnit)
-
-**Cobertura**: ~85% de líneas
-
-* `AuthTest.php`: Registro, login, validaciones
-* `UserTest.php`: Perfil, cambio de contraseña
-* `MetricsTest.php`: CRUD de métricas, cálculo de IMC
-
-#### Tests de Integración
-
-* `ApiIntegrationTest.php`: Pruebas de endpoints completos
-* `DatabaseTest.php`: Conexión a base de datos
 
 ### Ejecutar Tests
 
@@ -219,41 +146,43 @@ vendor/bin/phpunit --testdox
 # Tests específicos
 vendor/bin/phpunit --filter Auth
 vendor/bin/phpunit --filter Metrics
-vendor/bin/phpunit --filter Integration
 
 # Generar cobertura HTML
 vendor/bin/phpunit --coverage-html coverage
 ```
 
----
-
-## 📊 Métricas del Proyecto
+### Métricas de Testing
 
 | Métrica | Valor |
 |---------|-------|
-| Líneas de código (src/) | ~350 |
-| Tests unitarios | 24+ |
+| Tests unitarios | 26+ |
 | Cobertura de código | 85%+ |
-| Clases principales | 3 |
-| Endpoints API | 8 |
 | Casos de prueba E2E | 20 |
 
 ---
 
-## 📚 Documentación Completa
+## 📚 Documentación
+
+### Índice Principal
 
 | Documento | Descripción |
 |-----------|-------------|
-| [Manual de Usuario](docs/manual-usuario.md) | Guía completa de uso de la aplicación |
-| [Mockups](docs/mockups/) | Diagramas visuales de las pantallas y flujos |
-| [Análisis de Cobertura](docs/coverage-analisis.md) | Informe detallado de cobertura de código |
-| [Informe de Pruebas](docs/system-test-report.md) | Resultados de pruebas E2E |
-| [Notas de Entrevista](docs/entrevista-notas.md) | Requisitos y decisiones del proyecto |
-| [Guía de Seguridad](SECURITY.md) | Medidas de seguridad implementadas |
-| [Instalación XAMPP](INSTALACION_XAMPP.md) | Guía paso a paso con XAMPP |
-| [Cumplimiento](CUMPLIMIENTO_REQUISITOS.md) | Verificación de requisitos |
+| **[docs/home.md](docs/home.md)** | 📋 **Índice central de documentación** |
+| [SECURITY.md](SECURITY.md) | Arquitectura de seguridad (10 capas) |
+| [docs/seguridad-tecnica.md](docs/seguridad-tecnica.md) | Detalles técnicos de seguridad |
+| [docs/manual-usuario.md](docs/manual-usuario.md) | Manual para usuarios finales |
+| [INSTALACION_XAMPP.md](INSTALACION_XAMPP.md) | Guía de instalación con XAMPP |
 
-> 💡 **Tip**: Si eres usuario final, empieza por el [Manual de Usuario](docs/manual-usuario.md). Si eres desarrollador, revisa los documentos técnicos.
+### Por Tema
+
+| Tema | Documento |
+|------|-----------|
+| 🔑 **Securización de contraseñas** | [docs/seguridad-tecnica.md#securización-de-contraseñas](docs/seguridad-tecnica.md#securización-de-contraseñas) |
+| 🔐 **Gestión de sesiones** | [docs/seguridad-tecnica.md#gestión-de-sesiones](docs/seguridad-tecnica.md#gestión-de-sesiones) |
+| 📱 **2FA/MFA** | [docs/seguridad-tecnica.md#autenticación-de-dos-factores-2fa](docs/seguridad-tecnica.md#autenticación-de-dos-factores-2fa) |
+| 🛡️ **WAF y protecciones** | [SECURITY.md#protecciones-implementadas](SECURITY.md#-protecciones-implementadas) |
+| 📊 **Cobertura de tests** | [docs/coverage-analisis.md](docs/coverage-analisis.md) |
+| 🧪 **Pruebas E2E** | [docs/system-test-report.md](docs/system-test-report.md) |
 
 ---
 
@@ -265,78 +194,43 @@ composer install              # Instalar dependencias
 php -S localhost:8000         # Servidor de desarrollo
 
 # Testing
-vendor/bin/phpunit            # Ejecutar todos los tests
+vendor/bin/phpunit            # Ejecutar tests
 vendor/bin/phpunit --testdox  # Salida legible
-vendor/bin/phpunit --coverage-html coverage  # Generar cobertura
+vendor/bin/phpunit --coverage-html coverage  # Cobertura
 
 # Base de Datos
 mysql -u root -p proyecto_imc < database.sql  # Importar esquema
-
-# Ver logs (si usas Apache)
-tail -f /var/log/apache2/error.log
 ```
 
 ---
 
-## 🤝 Contribuir
-
-### Proceso de Contribución
-
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-### Guía de Estilo
-
-* Seguir PSR-12 para código PHP
-* Escribir tests para nuevas funcionalidades
-* Mantener cobertura >80%
-* Documentar funciones públicas
-* Validar inputs en servidor
-
----
-
-## 🐛 Reportar Problemas
-
-Si encuentras un bug o tienes una sugerencia:
-
-1. Verifica que no exista un issue similar
-2. Crea un nuevo issue con:
-   * Descripción clara del problema
-   * Pasos para reproducir
-   * Comportamiento esperado vs actual
-   * Screenshots (si aplica)
-   * Versión de PHP y navegador
-
----
-
 ## 🔄 Historial de Versiones
+
+### v1.1 (Agosto 2025)
+* 🔐 10 capas de seguridad implementadas
+* 🔑 Autenticación 2FA con TOTP
+* 🛡️ WAF con 100+ patrones de detección
+* 📝 Documentación técnica de seguridad completa
 
 ### v1.0 (Enero 2025)
 * ✨ Implementación inicial del MVP
 * ✅ Sistema de autenticación completo
 * ✅ Gestión de métricas de salud
 * ✅ Tests unitarios (>85% cobertura)
-* ✅ Documentación completa
-* ✅ Mockups y diagramas
 
 ---
 
-## 🚀 Roadmap (Futuras Versiones)
+## 🚀 Roadmap
 
-### v1.1 (Planificado)
+### v1.2 (Planificado)
 * 📧 Recuperación de contraseña por email
 * 📊 Gráficos de evolución de métricas
 * 📱 Mejoras responsive para móviles
-* 🌐 Internacionalización (i18n)
 
 ### v2.0 (Futuro)
 * 📤 Exportación de datos (PDF, CSV)
 * 🔔 Notificaciones y recordatorios
-* 🎯 Objetivos y metas personalizadas
-* 📈 Estadísticas avanzadas
+* 🎯 Objetivos personalizados
 
 ---
 
@@ -350,28 +244,7 @@ Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producc
 
 ## 👥 Autores
 
-* **Equipo StatTracker** - *Desarrollo inicial* - IES Zaidín-Vergeles
-
----
-
-## 🙏 Agradecimientos
-
-* Profesor del módulo de Puesta en Producción Segura
-* IES Zaidín-Vergeles
-* Comunidad de PHP y PHPUnit
-* Stack Overflow y documentación oficial
-
----
-
-## 📞 Contacto y Soporte
-
-* **Documentación**: Consulta la carpeta `docs/`
-* **Issues**: Usa el sistema de issues de GitHub
-* **Wiki**: Para más información, consulta la wiki del proyecto
-
----
-
-**¿Necesitas ayuda?** Consulta el [Manual de Usuario](docs/manual-usuario.md) o revisa la documentación técnica en la carpeta `docs/`.
+* **Equipo StatTracker** - IES Zaidín-Vergeles
 
 ---
 
