@@ -145,6 +145,24 @@ $minPassword = Security::MIN_PASSWORD;
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($_GET['timeout'])): ?>
+                <div class="mb-4 p-4 text-sm text-amber-700 bg-amber-100 rounded-lg border border-amber-300 animate__animated animate__fadeIn" role="alert">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">timer_off</span>
+                        <span>Tu sesión se cerró automáticamente por inactividad. Por favor, inicia sesión de nuevo.</span>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['logout_message'])): ?>
+                <div class="mb-4 p-4 text-sm text-blue-700 bg-blue-100 rounded-lg border border-blue-300 animate__animated animate__fadeIn" role="alert">
+                    <?php 
+                    echo htmlspecialchars($_SESSION['logout_message']); 
+                    unset($_SESSION['logout_message']);
+                    ?>
+                </div>
+            <?php endif; ?>
+
             <?php if (isset($_GET['success'])): ?>
                 <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-300" role="alert">
                     <?php echo htmlspecialchars($_GET['success']); ?>
