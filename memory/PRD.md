@@ -128,6 +128,14 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 
 ## Historial de Versiones
 
+### v1.4 (Enero 2026) - ACTUAL
+- 🗄️ Base de datos MySQL configurada y funcional
+- 🔧 Corrección de tipo nullable en RateLimiter::$pdo
+- 🔧 Corrección de SessionManager para manejar campos faltantes
+- 🔧 WAF ajustado para ser menos agresivo con formularios POST
+- 🔑 Hash de contraseñas actualizado para usar CryptoFortress (Argon2id + pepper)
+- ✅ Login y registro verificados funcionalmente
+
 ### v1.3 (Agosto 2025)
 - ⏱️ Cierre automático de sesión por inactividad
 - 💬 Modal de advertencia antes del cierre
