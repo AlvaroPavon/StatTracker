@@ -296,4 +296,4 @@ Todos los criterios de evaluación han sido satisfechos:
 
 ---
 
-*Documento generado automáticamente - Noviembre 2025*
+*Documento actualizado - Agosto 2025*
