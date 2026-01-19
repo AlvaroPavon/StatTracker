@@ -10,8 +10,11 @@ Este documento proporciona información técnica detallada sobre la implementaci
 2. [Clases de Seguridad](#clases-de-seguridad)
 3. [Validaciones de Entrada](#validaciones-de-entrada)
 4. [Gestión de Sesiones](#gestión-de-sesiones)
-5. [Autenticación de Dos Factores (2FA)](#autenticación-de-dos-factores-2fa)
-6. [Tokens y Criptografía](#tokens-y-criptografía)
+5. [Cierre Automático de Sesión por Inactividad](#cierre-automático-de-sesión-por-inactividad)
+6. [Autenticación de Dos Factores (2FA)](#autenticación-de-dos-factores-2fa)
+7. [CAPTCHA Matemático](#simplecaptcha)
+8. [Sistema de Alertas de Login](#loginalertsystem)
+9. [Tokens y Criptografía](#tokens-y-criptografía)
 
 ---
 
@@ -162,6 +165,7 @@ StatTracker implementa múltiples clases de seguridad, cada una con responsabili
 | `destroy()` | Destruye sesión de forma segura |
 | `authenticate()` | Autentica usuario |
 | `isAuthenticated()` | Verifica autenticación |
+| `getInfo()` | Obtiene información de la sesión actual |
 
 ### SecurityFirewall
 
@@ -320,13 +324,189 @@ if (!hash_equals($security['fingerprint'], $currentFingerprint)) {
 }
 ```
 
-### Tiempos de Sesión
+### Tiempos de Sesión (Servidor)
 
 | Parámetro | Valor | Descripción |
 |-----------|-------|-------------|
 | SESSION_LIFETIME | 3600s (1h) | Tiempo máximo de vida |
-| MAX_IDLE_TIME | 1800s (30min) | Tiempo máximo de inactividad |
+| MAX_IDLE_TIME | 1800s (30min) | Tiempo máximo de inactividad (servidor) |
 | SESSION_REGENERATE_TIME | 300s (5min) | Regeneración automática de ID |
+
+---
+
+## Cierre Automático de Sesión por Inactividad
+
+StatTracker implementa un sistema de cierre automático de sesión para proteger contra accesos no autorizados cuando el usuario deja el equipo desatendido.
+
+### Configuración de Tiempos
+
+| Parámetro | Valor | Descripción |
+|-----------|-------|-------------|
+| **Timeout por inactividad (cliente)** | 15 minutos | Tiempo sin actividad antes de mostrar advertencia |
+| **Tiempo de advertencia** | 60 segundos | Tiempo para responder antes del cierre |
+| **Intervalo de verificación** | 10 segundos | Frecuencia de verificación de inactividad |
+| **Timeout del servidor** | 30 minutos | Timeout de respaldo en el servidor |
+| **Tiempo de vida máximo** | 1 hora | Sesión absoluta máxima |
+
+### Componentes del Sistema
+
+#### SessionTimeout.js (Frontend)
+
+**Ubicación**: `/js/session-timeout.js`
+
+**Responsabilidad**: Detectar inactividad del usuario en el navegador
+
+**Eventos monitoreados**:
+- `mousedown` - Clics del ratón
+- `mousemove` - Movimiento del ratón
+- `keydown` / `keypress` - Pulsaciones de teclado
+- `scroll` - Desplazamiento
+- `touchstart` - Eventos táctiles
+- `click` - Clics
+- `wheel` - Rueda del ratón
+
+**Métodos principales**:
+
+| Método | Descripción |
+|--------|-------------|
+| `constructor(options)` | Inicializa con configuración personalizable |
+| `registerActivity()` | Registra actividad del usuario |
+| `checkSession()` | Verifica el estado de la sesión |
+| `showWarning()` | Muestra modal de advertencia |
+| `hideWarning()` | Oculta modal de advertencia |
+| `extendSession()` | Envía ping al servidor para extender sesión |
+| `logout()` | Redirige al logout |
+| `getRemainingTime()` | Obtiene tiempo restante en segundos |
+| `pause()` / `resume()` | Pausa/reanuda el sistema |
+| `destroy()` | Destruye el sistema y limpia recursos |
+
+**Ejemplo de uso**:
+
+```javascript
+window.sessionTimeout = new SessionTimeout({
+    idleTimeout: 900,        // 15 minutos en segundos
+    warningTime: 60,         // 60 segundos de advertencia
+    checkInterval: 10,       // Verificar cada 10 segundos
+    logoutUrl: 'logout.php',
+    keepAliveUrl: 'keep_alive.php',
+    csrfToken: window.csrfToken,
+    onWarning: function(seconds) {
+        console.log('Sesión expira en ' + seconds + ' segundos');
+    },
+    onLogout: function(reason) {
+        console.log('Cerrando sesión por: ' + reason);
+    },
+    onActivity: function() {
+        // Callback cuando se detecta actividad
+    }
+});
+```
+
+#### keep_alive.php (Backend)
+
+**Ubicación**: `/keep_alive.php`
+
+**Responsabilidad**: Endpoint AJAX para extender la sesión sin recargar la página
+
+**Acciones soportadas**:
+
+| Acción | Descripción | Respuesta |
+|--------|-------------|-----------|
+| `extend` | Extiende la sesión | `remaining_idle`, `remaining_total`, `server_time` |
+| `status` | Devuelve estado de la sesión | `idle_seconds`, `age_seconds`, `remaining_idle`, `remaining_total` |
+| `ping` | Simple verificación de conexión | `pong: true`, `time` |
+
+**Ejemplo de respuesta (extend)**:
+
+```json
+{
+    "success": true,
+    "message": "Session extended",
+    "remaining_idle": 1800,
+    "remaining_total": 3200,
+    "server_time": "2025-08-15 10:30:00"
+}
+```
+
+**Seguridad del endpoint**:
+- Solo acepta método POST
+- Solo acepta peticiones AJAX (X-Requested-With)
+- Requiere autenticación
+- Registra extensiones en log de auditoría
+
+#### Modal de Advertencia
+
+Cuando queda 1 minuto para el cierre, se muestra un modal con:
+
+- **Icono animado** de reloj
+- **Cuenta regresiva** visible (60, 59, 58...)
+- **Botón "Continuar sesión"** - Extiende la sesión
+- **Botón "Cerrar sesión"** - Logout inmediato
+- **Sonido de alerta** sutil (si el navegador lo permite)
+
+**Estilos**:
+- Compatible con modo claro y oscuro
+- Animación de entrada suave
+- Backdrop con blur
+
+### Flujo Completo
+
+```
+1. Usuario inicia sesión
+   ↓
+2. SessionTimeout.js se inicializa (en dashboard.php y profile.php)
+   ↓
+3. Sistema monitorea actividad constantemente
+   ↓
+4. [Si hay actividad] → Reinicia contador de inactividad
+   ↓
+5. [Sin actividad por 14 minutos]
+   ↓
+6. Muestra modal de advertencia con cuenta regresiva de 60s
+   ↓
+7. [Usuario hace clic en "Continuar"]
+   ↓
+   7a. Envía AJAX a keep_alive.php
+   7b. Servidor actualiza last_activity
+   7c. Oculta modal
+   7d. Reinicia contador
+   ↓
+   [O bien]
+   ↓
+8. [Usuario no responde en 60s]
+   ↓
+9. Redirige a logout.php?reason=timeout
+   ↓
+10. Muestra mensaje en login: "Tu sesión se cerró por inactividad"
+```
+
+### Personalización
+
+**En el cliente** (dashboard.php, profile.php):
+
+```javascript
+new SessionTimeout({
+    idleTimeout: 600,    // Cambiar a 10 minutos
+    warningTime: 120,    // Advertencia 2 minutos antes
+});
+```
+
+**En el servidor** (SessionManager.php):
+
+```php
+private const MAX_IDLE_TIME = 1200; // 20 minutos
+```
+
+> **Importante**: El timeout del cliente debe ser menor o igual al del servidor para evitar desincronizaciones.
+
+### Logs de Auditoría
+
+El sistema registra en `/logs/security.log`:
+
+```json
+{"event": "SESSION_EXTENDED", "user_id": 1, "idle_seconds": 850, "timestamp": "..."}
+{"event": "LOGOUT", "user_id": 1, "method": "timeout", "ip": "192.168.1.1"}
+```
 
 ---
 
@@ -366,6 +546,155 @@ const ALLOWED_DRIFT = 1;     // ±1 paso de tiempo
 
 ---
 
+## SimpleCaptcha
+
+**Ubicación**: `/src/SimpleCaptcha.php`
+
+**Responsabilidad**: CAPTCHA matemático sin dependencias externas (no requiere reCAPTCHA, hCaptcha, etc.)
+
+### Configuración
+
+| Parámetro | Valor | Descripción |
+|-----------|-------|-------------|
+| `EXPIRY_TIME` | 300s (5 min) | Tiempo de validez del CAPTCHA |
+| `MAX_NUMBER` | 20 | Número máximo en operaciones |
+| Operaciones | suma, resta, multiplicación | Tipos de operaciones generadas |
+
+### Métodos
+
+| Método | Descripción |
+|--------|-------------|
+| `generate()` | Genera operación matemática y HTML |
+| `validate()` | Valida respuesta del usuario |
+| `isValid()` | Versión simplificada que retorna bool |
+| `generateImage()` | Alternativa: CAPTCHA de imagen (requiere GD) |
+
+### Uso en Formularios
+
+**En la página del formulario (PHP)**:
+
+```php
+use App\SimpleCaptcha;
+
+$captcha = SimpleCaptcha::generate();
+// $captcha['question'] = "¿Cuánto es 7 + 12?"
+// $captcha['html'] = HTML del campo de entrada
+```
+
+```html
+<!-- En el formulario -->
+<?php echo $captcha['html']; ?>
+```
+
+**En el procesamiento (PHP)**:
+
+```php
+use App\SimpleCaptcha;
+
+$result = SimpleCaptcha::validate();
+if (!$result['valid']) {
+    $_SESSION['error'] = $result['error'];
+    header("Location: form.php");
+    exit();
+}
+// Continuar con el procesamiento...
+```
+
+### Dónde se usa
+
+| Formulario | Comportamiento |
+|------------|----------------|
+| **Registro** | CAPTCHA siempre requerido |
+| **Login** | CAPTCHA requerido después de 3 intentos fallidos |
+
+### Seguridad del CAPTCHA
+
+- Respuesta cifrada con AES-256-CBC en la sesión
+- Incluye sal aleatoria para cada generación
+- Un solo uso (se invalida después de validar)
+- Tiempo de expiración de 5 minutos
+
+---
+
+## LoginAlertSystem
+
+**Ubicación**: `/src/LoginAlertSystem.php`
+
+**Responsabilidad**: Detección de logins sospechosos y alertas al usuario
+
+### Sistema de Puntuación
+
+Cada factor de riesgo suma puntos. Si el total alcanza el umbral (3 puntos), se considera sospechoso:
+
+| Factor | Descripción | Puntos |
+|--------|-------------|--------|
+| `new_device` | Dispositivo no reconocido (fingerprint diferente) | +2 |
+| `different_ip_range` | IP en rango diferente (primeros 2 octetos) | +2 |
+| `new_country` | País nuevo (si hay geolocalización) | +3 |
+| `unusual_time` | Hora fuera del patrón habitual del usuario | +1 |
+| `multiple_ips_recently` | 3+ IPs diferentes en las últimas 2 horas | +2 |
+| `user_agent_changed` | Cambio de navegador o sistema operativo | +1 |
+| `recent_failed_attempts` | Intentos fallidos recientes en la cuenta | +1 |
+
+**Umbral de sospecha**: 3+ puntos
+
+### Métodos Principales
+
+| Método | Descripción |
+|--------|-------------|
+| `analyzeLogin($userId, $email)` | Analiza un login y devuelve resultado |
+| `generateAlertMessage($analysis)` | Genera mensaje de alerta para el usuario |
+| `cleanup($days)` | Limpia registros antiguos (para cron) |
+
+### Ejemplo de Uso
+
+```php
+use App\LoginAlertSystem;
+
+// Después de login exitoso
+$analysis = LoginAlertSystem::analyzeLogin($userId, $email);
+
+if ($analysis['suspicious']) {
+    $_SESSION['security_alert'] = LoginAlertSystem::generateAlertMessage($analysis);
+}
+
+// $analysis contiene:
+// [
+//     'suspicious' => true/false,
+//     'reasons' => ['new_device', 'different_ip_range'],
+//     'score' => 4,
+//     'is_new_device' => true,
+//     'is_new_location' => true
+// ]
+```
+
+### Almacenamiento de Datos
+
+| Archivo | Contenido |
+|---------|-----------|
+| `/logs/known_devices.json` | Dispositivos conocidos por usuario (fingerprints) |
+| `/logs/login_history.json` | Historial de logins (últimos 50 por usuario) |
+
+### Fingerprint de Dispositivo
+
+Se genera un hash SHA-256 basado en:
+- User-Agent
+- Accept-Language
+- Accept-Encoding
+
+### Mensaje de Alerta
+
+Cuando se detecta login sospechoso, se muestra en el dashboard:
+
+```
+⚠️ Alerta de seguridad: nuevo dispositivo detectado, ubicación diferente a la habitual.
+Si no reconoces esta actividad, cambia tu contraseña inmediatamente.
+```
+
+Con enlace directo a cambio de contraseña.
+
+---
+
 ## Tokens y Criptografía
 
 ### Generación de Tokens
@@ -399,149 +728,56 @@ $plaintext = CryptoFortress::decrypt($encrypted, $key);
 
 ---
 
+## Resumen de Archivos de Seguridad
+
+### Clases PHP (/src/)
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `Auth.php` | Autenticación (registro, login) |
+| `User.php` | Gestión de perfil |
+| `Metrics.php` | Métricas de salud |
+| `Security.php` | Validaciones centralizadas |
+| `CryptoFortress.php` | Criptografía avanzada |
+| `SessionManager.php` | Gestión segura de sesiones |
+| `SecurityFirewall.php` | WAF |
+| `SecurityHeaders.php` | Headers HTTP |
+| `RateLimiter.php` | Control de tasa |
+| `InputSanitizer.php` | Sanitización de entrada |
+| `Honeypot.php` | Detección de bots (campos ocultos) |
+| `AdvancedProtection.php` | Protecciones adicionales |
+| `UltimateShield.php` | 100+ patrones de detección |
+| `ImpenetrableDefense.php` | Defensa avanzada |
+| `TwoFactorAuth.php` | 2FA/MFA con TOTP |
+| `SimpleCaptcha.php` | CAPTCHA matemático |
+| `LoginAlertSystem.php` | Alertas de login sospechoso |
+| `SecurityAudit.php` | Logging de seguridad |
+
+### Archivos JavaScript (/js/)
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `session-timeout.js` | Cierre automático por inactividad |
+| `form-validation.js` | Validación de formularios en cliente |
+
+### Endpoints PHP (raíz)
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `keep_alive.php` | Extender sesión (AJAX) |
+| `logout.php` | Cierre de sesión (normal y timeout) |
+| `security_init.php` | Inicialización de seguridad |
+
+---
+
 ## Referencias
 
 - [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+- [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 - [RFC 6238 - TOTP](https://tools.ietf.org/html/rfc6238)
 - [PHP password_hash documentation](https://www.php.net/manual/en/function.password-hash.php)
 
 ---
 
-## Nuevas Clases de Seguridad (v1.2)
-
-### SimpleCaptcha
-
-**Ubicación**: `/src/SimpleCaptcha.php`
-
-**Responsabilidad**: CAPTCHA matemático sin dependencias externas
-
-| Método | Descripción |
-|--------|-------------|
-| `generate()` | Genera operación matemática (suma, resta, multiplicación) |
-| `validate()` | Valida respuesta del usuario |
-| `generateImage()` | Alternativa: CAPTCHA de imagen (requiere GD) |
-
-**Configuración**:
-- Tiempo de expiración: 5 minutos
-- Números máximos: 1-20
-- Respuesta cifrada en sesión
-
-**Uso**:
-```php
-// En formulario
-$captcha = SimpleCaptcha::generate();
-echo $captcha['html'];
-
-// En procesamiento
-$result = SimpleCaptcha::validate();
-if (!$result['valid']) {
-    echo $result['error'];
-}
-```
-
-### LoginAlertSystem
-
-**Ubicación**: `/src/LoginAlertSystem.php`
-
-**Responsabilidad**: Detección de logins sospechosos
-
-| Detección | Descripción | Puntos |
-|-----------|-------------|--------|
-| `new_device` | Dispositivo no reconocido | +2 |
-| `different_ip_range` | IP en rango diferente | +2 |
-| `new_country` | País nuevo (si hay geoloc) | +3 |
-| `unusual_time` | Hora fuera del patrón habitual | +1 |
-| `multiple_ips_recently` | 3+ IPs en 2 horas | +2 |
-| `user_agent_changed` | Cambio de navegador/SO | +1 |
-| `recent_failed_attempts` | Intentos fallidos recientes | +1 |
-
-**Umbral de sospecha**: 3+ puntos = Login sospechoso
-
-**Uso**:
-```php
-$analysis = LoginAlertSystem::analyzeLogin($userId, $email);
-if ($analysis['suspicious']) {
-    $_SESSION['security_alert'] = LoginAlertSystem::generateAlertMessage($analysis);
-}
-```
-
----
-
-## Cierre Automático de Sesión por Inactividad
-
-### Sistema de Timeout de Sesión
-
-StatTracker implementa un sistema de cierre automático de sesión para proteger contra accesos no autorizados cuando el usuario deja el equipo desatendido.
-
-### Configuración de Tiempos
-
-| Parámetro | Valor | Descripción |
-|-----------|-------|-------------|
-| **Timeout por inactividad** | 15 minutos | Tiempo sin actividad antes de cerrar |
-| **Tiempo de advertencia** | 60 segundos | Alerta antes del cierre |
-| **Tiempo de vida máximo** | 1 hora | Sesión absoluta máxima |
-| **Regeneración de ID** | 5 minutos | Regeneración automática del session ID |
-
-### Componentes
-
-#### SessionTimeout.js (Frontend)
-
-**Ubicación**: `/js/session-timeout.js`
-
-Detecta inactividad del usuario monitoreando:
-- Movimiento del ratón
-- Pulsaciones de teclado
-- Clics
-- Scroll
-- Eventos táctiles
-
-**Flujo**:
-1. Usuario inactivo durante 14 minutos → Muestra modal de advertencia
-2. Usuario puede hacer clic en "Continuar sesión" → Extiende sesión
-3. Si no hay respuesta en 60 segundos → Cierra sesión automáticamente
-
-#### keep_alive.php (Backend)
-
-**Ubicación**: `/keep_alive.php`
-
-Endpoint AJAX para extender la sesión sin recargar la página.
-
-**Acciones**:
-- `extend`: Extiende la sesión
-- `status`: Devuelve estado de la sesión
-- `ping`: Verificación de conexión
-
-#### SessionManager (Backend)
-
-**Ubicación**: `/src/SessionManager.php`
-
-Gestiona validación de sesiones en el servidor:
-- Verifica tiempo de vida máximo
-- Verifica tiempo de inactividad
-- Valida fingerprint del navegador
-- Regenera ID de sesión periódicamente
-
-### Uso en Código
-
-```javascript
-// Inicializar en páginas protegidas
-window.sessionTimeout = new SessionTimeout({
-    idleTimeout: 900,      // 15 minutos
-    warningTime: 60,       // 60 segundos de advertencia
-    checkInterval: 10,     // Verificar cada 10 segundos
-    logoutUrl: 'logout.php',
-    keepAliveUrl: 'keep_alive.php',
-    csrfToken: window.csrfToken
-});
-```
-
-### Personalización
-
-El sistema se puede personalizar editando los valores en:
-- `SessionManager.php`: Tiempos del servidor
-- `session-timeout.js`: Tiempos del cliente (deben ser menores o iguales al servidor)
-
----
-
 **Última actualización**: Agosto 2025  
-**Versión**: 1.2
+**Versión**: 1.3
