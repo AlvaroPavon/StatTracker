@@ -1,324 +1,158 @@
-# Documentación del Proyecto StatTracker
+# 📚 Documentación del Proyecto StatTracker
 
-## 📚 Bienvenido a la Documentación de StatTracker
+## Bienvenido a la Documentación de StatTracker
 
-Esta carpeta contiene toda la documentación técnica y de usuario del proyecto StatTracker. Este archivo sirve como índice y guía de navegación para acceder a cada documento.
-
----
-
-## 📚 Documentos Disponibles
-
-### Para Usuarios Finales
-
-#### [Manual de Usuario](manual-usuario.md)
-
-**🎯 Público**: Usuarios finales de la aplicación
-
-**📄 Contenido**:
-
-* Introducción a StatTracker
-* Requisitos del sistema
-* Guía paso a paso de todas las funcionalidades
-* Preguntas frecuentes (FAQ)
-* Solución de problemas comunes
-* Interpretación del IMC
-* Glosario de términos
-
-**📌 Cuándo consultar**: 
-
-* Primera vez usando la aplicación
-* Dudas sobre cómo usar una funcionalidad
-* Problemas al registrar datos
-* Entender qué significa tu IMC
+Esta carpeta contiene toda la documentación técnica y de usuario del proyecto StatTracker. Este archivo sirve como **índice central** de navegación para acceder a cada documento.
 
 ---
 
-### Para Desarrolladores
+## 📋 Índice de Documentación
 
-#### [Notas de Entrevista con el Cliente](entrevista-notas.md)
+### 🏠 Documentos Raíz (nivel /app/)
 
-**🎯 Público**: Equipo de desarrollo, Project Managers
+| Documento | Descripción | Audiencia |
+|-----------|-------------|----------|
+| [README.md](../README.md) | Visión general, instalación rápida y estructura del proyecto | Todos |
+| [SECURITY.md](../SECURITY.md) | Arquitectura de seguridad completa (10 capas de defensa) | Desarrolladores, Seguridad |
+| [INSTALACION_XAMPP.md](../INSTALACION_XAMPP.md) | Guía paso a paso para instalar con XAMPP | Usuarios, Estudiantes |
+| [CUMPLIMIENTO_REQUISITOS.md](../CUMPLIMIENTO_REQUISITOS.md) | Verificación de requisitos académicos | Profesores, Evaluadores |
 
-**📄 Contenido**:
+### 📂 Documentos en /docs/
 
-* Contexto del proyecto
-* Requisitos funcionales y no funcionales identificados
-* Preguntas y respuestas de la entrevista inicial
-* Prioridades del cliente
-* Restricciones y limitaciones
-* Ambigüedades aclaradas
-
-**📌 Cuándo consultar**:
-
-* Entender el origen de los requisitos
-* Justificar decisiones de diseño
-* Planificar nuevas funcionalidades
-* Resolver ambigüedades en especificaciones
-
----
-
-#### [Mockups y Diagramas](mockups/)
-
-**🎯 Público**: Desarrolladores frontend, diseñadores, testers
-
-**📄 Contenido**:
-
-* Mockups de todas las pantallas (Mermaid)
-  * 01-login.mmd - Pantalla de inicio de sesión
-  * 02-registro.mmd - Pantalla de registro
-  * 03-dashboard.mmd - Dashboard principal
-  * 04-perfil.mmd - Página de perfil
-* Diagramas de flujo de usuario
-* Diagrama de requisitos
-* README de mockups con instrucciones
-
-**📌 Cuándo consultar**:
-
-* Implementar nuevas pantallas
-* Entender flujos de usuario
-* Diseñar tests E2E
-* Crear prototipos
-
-**💡 Cómo visualizar**:
-
-* GitHub renderiza automáticamente archivos .mmd
-* Localmente: usar extensión Mermaid en VS Code
-* Online: https://mermaid.live
+| Documento | Descripción | Audiencia |
+|-----------|-------------|----------|
+| [manual-usuario.md](manual-usuario.md) | Manual completo para usuarios finales | Usuarios finales |
+| [seguridad-tecnica.md](seguridad-tecnica.md) | Documentación técnica detallada de seguridad | Desarrolladores |
+| [entrevista-notas.md](entrevista-notas.md) | Requisitos y decisiones del proyecto | Desarrolladores, PMs |
+| [coverage-analisis.md](coverage-analisis.md) | Análisis de cobertura de código | QA, Desarrolladores |
+| [system-test-report.md](system-test-report.md) | Informe de pruebas E2E | QA, Testers |
+| [mockups/](mockups/) | Diagramas y mockups de interfaces | Frontend, Diseño |
 
 ---
 
-#### [Análisis de Cobertura de Código](coverage-analisis.md)
+## 🔍 Búsqueda Rápida por Tema
 
-**🎯 Público**: Desarrolladores, QA, Tech Leads
+### 🔐 Seguridad
 
-**📄 Contenido**:
+| Tema | Documento | Sección |
+|------|-----------|--------|
+| Arquitectura de 10 capas | [SECURITY.md](../SECURITY.md) | Arquitectura de Defensa |
+| **Securización de contraseñas** | [seguridad-tecnica.md](seguridad-tecnica.md#securización-de-contraseñas) | CryptoFortress |
+| Protección contra SQL Injection | [SECURITY.md](../SECURITY.md#1-sql-injection) | Protecciones Implementadas |
+| Protección contra XSS | [SECURITY.md](../SECURITY.md#2-xss-cross-site-scripting) | Protecciones Implementadas |
+| Protección CSRF | [SECURITY.md](../SECURITY.md#3-csrf) | Protecciones Implementadas |
+| Rate Limiting y Fuerza Bruta | [SECURITY.md](../SECURITY.md#4-fuerza-bruta) | Protecciones Implementadas |
+| Gestión de Sesiones | [seguridad-tecnica.md](seguridad-tecnica.md#sessionmanager) | SessionManager |
+| Autenticación 2FA/MFA | [seguridad-tecnica.md](seguridad-tecnica.md#twofactorauth) | TwoFactorAuth |
+| WAF (Firewall) | [SECURITY.md](../SECURITY.md#7-waf-web-application-firewall) | SecurityFirewall |
+| Headers de Seguridad | [SECURITY.md](../SECURITY.md#-headers-de-seguridad) | SecurityHeaders |
 
-* Métricas globales de cobertura (~85%)
-* Análisis detallado por clase:
-  * Auth.php
-  * User.php
-  * Metrics.php
-* Líneas/funciones NO cubiertas (con justificación)
-* Código muerto identificado
-* Refactorizaciones sugeridas
-* Recomendaciones de testing
-* Instrucciones para generar informes
+### 🔑 Autenticación y Usuarios
 
-**📌 Cuándo consultar**:
+| Tema | Documento | Sección |
+|------|-----------|--------|
+| Registro de usuarios | [manual-usuario.md](manual-usuario.md#primer-acceso-registro) | Guía de Uso |
+| Inicio de sesión | [manual-usuario.md](manual-usuario.md#iniciar-sesión) | Guía de Uso |
+| Cambio de contraseña | [manual-usuario.md](manual-usuario.md#cambiar-contraseña) | Gestión de Perfil |
+| Validaciones de contraseña | [seguridad-tecnica.md](seguridad-tecnica.md#validaciones-de-entrada) | Security.php |
 
-* Después de añadir nuevo código
-* Antes de un release
-* Durante code reviews
-* Planificar mejoras en testing
+### 📊 Métricas de Salud
 
-**🔗 Relacionado**:
+| Tema | Documento | Sección |
+|------|-----------|--------|
+| Añadir métricas | [manual-usuario.md](manual-usuario.md#añadir-un-nuevo-registro-de-salud) | Guía de Uso |
+| Cálculo del IMC | [manual-usuario.md](manual-usuario.md#interpretación-del-imc) | Interpretación |
+| Historial de datos | [manual-usuario.md](manual-usuario.md#visualizar-tu-historial) | Guía de Uso |
 
-* Ejecutar: `vendor/bin/phpunit --coverage-html coverage`
-* Ver: `coverage/index.html`
+### 🧪 Testing
 
----
+| Tema | Documento | Sección |
+|------|-----------|--------|
+| Ejecutar tests unitarios | [README.md](../README.md#-testing) | Testing |
+| Cobertura de código | [coverage-analisis.md](coverage-analisis.md) | Completo |
+| Casos de prueba E2E | [system-test-report.md](system-test-report.md#casos-de-prueba-ejecutados) | Casos de Prueba |
 
-#### [Informe de Pruebas de Sistema](system-test-report.md)
+### 🛠️ Instalación
 
-**🎯 Público**: QA, Testers, Product Owners, Desarrolladores
-
-**📄 Contenido**:
-
-* 20 casos de prueba E2E ejecutados
-* Resultados detallados (100% PASS)
-* Flujos completos de usuario testeados
-* Defectos encontrados (menores)
-* Sugerencias de mejora UX
-* Pruebas de compatibilidad (navegadores)
-* Pruebas de rendimiento básicas
-* Pruebas de seguridad
-* Scripts de automatización (Playwright/Selenium)
-* Recomendaciones para producción
-
-**📌 Cuándo consultar**:
-
-* Antes de desplegar a producción
-* Después de cambios importantes
-* Planificar automatización de tests
-* Validar nuevas funcionalidades
-* Reportar bugs
-
-**✅ Estado del Sistema**: APTO PARA PRODUCCIÓN
+| Tema | Documento | Sección |
+|------|-----------|--------|
+| Instalación rápida | [README.md](../README.md#-instalación-rápida) | Instalación |
+| Instalación con XAMPP | [INSTALACION_XAMPP.md](../INSTALACION_XAMPP.md) | Completo |
+| Solución de problemas | [INSTALACION_XAMPP.md](../INSTALACION_XAMPP.md#-solución-de-problemas) | FAQ |
 
 ---
 
-## 🗂️ Estructura de la Documentación
+## 🗂️ Estructura de Archivos de Documentación
 
 ```
-docs/
-├── README.md                      # Este archivo (índice)
-├── manual-usuario.md              # Manual completo para usuarios
-├── entrevista-notas.md            # Requisitos y decisiones
-├── coverage-analisis.md           # Análisis de cobertura
-├── system-test-report.md          # Informe de pruebas E2E
-└── mockups/                       # Diagramas visuales
-    ├── README.md                  # Índice de mockups
-    ├── 01-login.mmd               # Mockup: Login
-    ├── 02-registro.mmd            # Mockup: Registro
-    ├── 03-dashboard.mmd           # Mockup: Dashboard
-    └── 04-perfil.mmd              # Mockup: Perfil
+/app/
+├── README.md                      # Punto de entrada principal
+├── SECURITY.md                    # Arquitectura de seguridad (10 capas)
+├── INSTALACION_XAMPP.md           # Guía de instalación XAMPP
+├── CUMPLIMIENTO_REQUISITOS.md     # Verificación académica
+│
+└── docs/
+    ├── home.md                    # ← ESTÁS AQUÍ (Índice)
+    ├── manual-usuario.md          # Manual para usuarios finales
+    ├── seguridad-tecnica.md       # Documentación técnica de seguridad
+    ├── entrevista-notas.md        # Requisitos y decisiones
+    ├── coverage-analisis.md       # Análisis de cobertura
+    ├── system-test-report.md      # Informe de pruebas E2E
+    └── mockups/
+        ├── README.md              # Índice de mockups
+        ├── login-register.md      # Login y registro
+        ├── dashboard.md           # Dashboard principal
+        └── profile.md             # Gestión de perfil
 ```
 
 ---
 
-## 🚀 Guías Rápidas
+## 🚀 Guías Rápidas por Rol
 
-### Para Nuevos Desarrolladores
+### 👤 Para Usuarios Finales
 
-1. Leer [Notas de Entrevista](entrevista-notas.md) para contexto
-2. Revisar [Mockups](mockups/) para entender la UI
-3. Consultar [Análisis de Cobertura](coverage-analisis.md) para ver estado del código
-4. Leer [Informe de Pruebas](system-test-report.md) para conocer funcionalidades validadas
+1. **Empezar aquí**: [Manual de Usuario](manual-usuario.md)
+2. Si tienes problemas: [Solución de Problemas](manual-usuario.md#solución-de-problemas)
+3. FAQ: [Preguntas Frecuentes](manual-usuario.md#preguntas-frecuentes)
 
-### Para Nuevos Usuarios
+### 👨‍💻 Para Desarrolladores
 
-1. Empezar por [Manual de Usuario](manual-usuario.md)
-2. Seguir la sección "Primer Acceso: Registro"
-3. Consultar FAQ si tienes dudas
+1. **Contexto del proyecto**: [Notas de Entrevista](entrevista-notas.md)
+2. **Arquitectura de seguridad**: [SECURITY.md](../SECURITY.md)
+3. **Detalles técnicos de seguridad**: [seguridad-tecnica.md](seguridad-tecnica.md)
+4. **Mockups y flujos**: [mockups/](mockups/)
+5. **Estado del testing**: [Coverage](coverage-analisis.md)
 
-### Para QA/Testers
+### 🔒 Para Equipo de Seguridad
 
-1. Revisar [Informe de Pruebas](system-test-report.md) para casos de prueba existentes
-2. Consultar [Mockups](mockups/) para flujos a validar
-3. Verificar [Cobertura](coverage-analisis.md) para áreas sin tests
+1. **Arquitectura completa**: [SECURITY.md](../SECURITY.md)
+2. **Implementación técnica**: [seguridad-tecnica.md](seguridad-tecnica.md)
+3. **Clases de seguridad**: Ver sección de clases en seguridad-tecnica.md
 
-### Para Product Owners
+### ✅ Para QA/Testers
 
-1. Leer [Notas de Entrevista](entrevista-notas.md) para requisitos implementados
-2. Revisar [Informe de Pruebas](system-test-report.md) para estado del proyecto
-3. Consultar roadmap en el README principal
+1. **Casos de prueba**: [system-test-report.md](system-test-report.md)
+2. **Cobertura actual**: [coverage-analisis.md](coverage-analisis.md)
+3. **Flujos a validar**: [mockups/](mockups/)
 
----
+### 📋 Para Evaluadores/Profesores
 
-## 📋 Cumplimiento de Requisitos del Proyecto
-
-Según el documento de requisitos de la práctica:
-
-| Requisito | Estado | Documento |
-|-----------|--------|------------|
-| Manual de usuario con mockups | ✅ Completo | [manual-usuario.md](manual-usuario.md) + [mockups/](mockups/) |
-| Mockups con PlantUML/Mermaid | ✅ Completo | [mockups/*.mmd](mockups/) |
-| Documentación de requisitos (R001-R006) | ✅ Completo | [entrevista-notas.md](entrevista-notas.md) |
-| Código fuente | ✅ Completo | ../src/ |
-| Pruebas unitarias | ✅ Completo | ../tests/ |
-| Informe de cobertura | ✅ Completo | [coverage-analisis.md](coverage-analisis.md) + ../coverage/ |
-| Pruebas de sistema | ✅ Completo | [system-test-report.md](system-test-report.md) |
-| README con instrucciones | ✅ Completo | ../README.md |
-
-**Cobertura de líneas**: ~85% (Objetivo: >=70%) ✅
+1. **Cumplimiento de requisitos**: [CUMPLIMIENTO_REQUISITOS.md](../CUMPLIMIENTO_REQUISITOS.md)
+2. **Tests y cobertura**: [coverage-analisis.md](coverage-analisis.md)
+3. **Pruebas de sistema**: [system-test-report.md](system-test-report.md)
 
 ---
 
-## 🔍 Búsqueda Rápida de Información
+## 📊 Estado del Proyecto
 
-### ¿Cómo hago X?
-
-* **Registrarme en la app**: [Manual de Usuario - Registro](manual-usuario.md#primer-acceso-registro)
-* **Añadir métricas**: [Manual - Añadir Datos](manual-usuario.md#añadir-un-nuevo-registro-de-salud)
-* **Cambiar mi contraseña**: [Manual - Cambiar Contraseña](manual-usuario.md#cambiar-contraseña)
-* **Interpretar mi IMC**: [Manual - IMC](manual-usuario.md#interpretación-del-imc)
-
-### ¿Dónde está documentado X?
-
-* **Requisitos funcionales**: [Notas de Entrevista - RF](entrevista-notas.md#requisitos-funcionales-identificados)
-* **Casos de prueba**: [Informe de Pruebas - Casos](system-test-report.md#casos-de-prueba-ejecutados)
-* **Cobertura de Auth.php**: [Análisis - Auth](coverage-analisis.md#clase-auth-srcauthphp)
-* **Flujo de login**: [mockups/01-login.mmd](mockups/01-login.mmd)
-
-### ¿Cómo testeo X?
-
-* **Ejecutar tests unitarios**: `vendor/bin/phpunit` (ver [Análisis - Generar Cobertura](coverage-analisis.md#cómo-generar-el-informe-de-cobertura))
-* **Pruebas de sistema manual**: [Informe - TC-001 a TC-020](system-test-report.md#casos-de-prueba-ejecutados)
-* **Automatizar con Playwright**: [Informe - Automatización](system-test-report.md#automatización-de-pruebas)
+| Métrica | Valor | Estado |
+|---------|-------|--------|
+| Cobertura de código | ~85% | ✅ |
+| Tests unitarios | 26+ | ✅ |
+| Capas de seguridad | 10 | ✅ |
+| Documentación | Completa | ✅ |
 
 ---
 
-## 📝 Formato de los Documentos
-
-Todos los documentos están escritos en **Markdown** (.md):
-
-* ✅ Compatible con GitHub Wiki (renderizado automático)
-* ✅ Fácil de leer y editar
-* ✅ Soporta tablas, código, imágenes, enlaces
-* ✅ Estándar de la industria
-
----
-
-## 🔄 Mantenimiento de la Documentación
-
-### Cuándo Actualizar
-
-* **Manual de Usuario**: Cuando se añadan/modifiquen funcionalidades
-* **Mockups**: Cuando cambie el diseño/flujo de UI
-* **Análisis de Cobertura**: Después de cambios significativos en el código
-* **Informe de Pruebas**: Después de cada ciclo de testing mayor
-
-### Versionado
-
-La documentación debe seguir el versionado del código:
-
-* v1.0: Documentación actual (Enero 2025)
-* v1.1: Actualizaciones planificadas
-
----
-
-## 💡 Mejores Prácticas
-
-### Para Documentar Código
-
-1. Mantener sincronización con el código
-2. Actualizar tests junto con funcionalidades
-3. Documentar decisiones de diseño importantes
-4. Incluir ejemplos prácticos
-
-### Para Usar Esta Documentación
-
-1. **Usuarios**: Empezar por el Manual de Usuario
-2. **Desarrolladores**: Leer primero Notas de Entrevista y Mockups
-3. **QA**: Enfocarse en Informe de Pruebas y Cobertura
-4. **Todos**: El README.md principal es el punto de entrada
-
----
-
-## 📞 Contacto
-
-Si encuentras errores en la documentación o tienes sugerencias:
-
-1. Crea un issue en GitHub etiquetado como "documentation"
-2. Incluye el nombre del documento afectado
-3. Describe el problema o mejora sugerida
-
----
-
-## 🏆 Calidad de la Documentación
-
-Esta documentación cumple con:
-
-* ✅ Requisitos académicos del proyecto
-* ✅ Estándares de documentación técnica
-* ✅ Usabilidad para diferentes audiencias
-* ✅ Completitud y detalle adecuado
-* ✅ Mantenibilidad a largo plazo
-
----
-
-## 📚 Referencias Externas
-
-* [Markdown Guide](https://www.markdownguide.org/)
-* [Mermaid Documentation](https://mermaid.js.org/)
-* [PHPUnit Documentation](https://phpunit.de/)
-* [Playwright Documentation](https://playwright.dev/)
-
----
-
-_Esta documentación es parte del proyecto StatTracker, desarrollado para la práctica de Puesta en Producción Segura en el IES Zaidín-Vergeles._
-
----
-
-**Última actualización**: Enero 2025  
-**Versión de la documentación**: 1.0
+**Última actualización**: Agosto 2025  
+**Versión**: 1.1
