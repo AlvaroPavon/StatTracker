@@ -430,7 +430,7 @@ Tus sugerencias son bienvenidas. Si tienes ideas para mejorar StatTracker, conta
 ---
 
 **Versión**: 1.0  
-**Fecha de última actualización**: Enero 2025  
+**Fecha de última actualización**: Agosto 2025  
 **Autor**: Equipo StatTracker
 
 ---
