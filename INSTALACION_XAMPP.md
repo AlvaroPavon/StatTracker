@@ -84,6 +84,16 @@ $dbname = 'tu_nombre_de_bd';
 
 ## ❓ Solución de Problemas
 
+### Error 500: Internal Server Error
+**Causa:** Problema con `.htaccess`, dependencias faltantes, o error PHP
+**Solución:**
+1. Primero, usa la herramienta de diagnóstico:
+   - Accede a: http://localhost/stattracker/diagnostico.php
+   - Revisa qué componentes faltan o tienen error
+2. Si el error persiste, revisa el log de Apache:
+   - `C:\xampp\apache\logs\error.log`
+3. Verifica que ejecutaste `composer install`
+
 ### Error: "Class not found" o "autoload"
 **Causa:** No se ejecutó `composer install`
 **Solución:** 
@@ -112,8 +122,29 @@ ALTER TABLE usuarios ADD COLUMN apellidos VARCHAR(100) NOT NULL DEFAULT '' AFTER
 ### Página en blanco
 **Causa:** Error de PHP no mostrado
 **Solución:** 
-1. Revisa el archivo `C:\xampp\php\logs\php_error_log`
-2. O activa errores en `php.ini`: `display_errors = On`
+1. Usa la herramienta de diagnóstico: http://localhost/stattracker/diagnostico.php
+2. O revisa el archivo `C:\xampp\php\logs\php_error_log`
+3. O activa errores temporalmente en `php.ini`: `display_errors = On`
+
+### Extensiones PHP faltantes
+**Causa:** Extensiones deshabilitadas en php.ini
+**Solución:**
+1. Abre `C:\xampp\php\php.ini` con un editor de texto
+2. Busca y descomenta (quita el `;` del inicio) estas líneas:
+   ```
+   extension=pdo_mysql
+   extension=mbstring
+   extension=openssl
+   extension=sodium
+   ```
+3. Guarda el archivo
+4. Reinicia Apache desde XAMPP Control Panel
+
+### Error con la carpeta logs/ o uploads/
+**Causa:** Carpetas no existen o sin permisos
+**Solución:** 
+- Las carpetas se crean automáticamente al primer uso
+- Si no, créalas manualmente en el directorio del proyecto
 
 ---
 
