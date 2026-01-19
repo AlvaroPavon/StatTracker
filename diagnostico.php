@@ -53,9 +53,20 @@ echo "</ul>";
 echo "<h3>Opcionales (recomendadas):</h3><ul>";
 foreach ($optional_extensions as $ext) {
     $loaded = extension_loaded($ext);
-    $status = $loaded ? "<span class='ok'>✓ Cargada</span>" : "<span class='warning'>⚠ No cargada</span>";
+    $status = $loaded ? "<span class='ok'>✓ Cargada</span>" : "<span class='warning'>⚠ No cargada (funciona sin ella)</span>";
     echo "<li><strong>$ext</strong>: $status</li>";
 }
+echo "</ul>";
+
+// Verificar SHA3
+echo "<h3>Algoritmos de Hash:</h3><ul>";
+$sha3Available = in_array('sha3-512', hash_algos());
+if ($sha3Available) {
+    echo "<li><strong>SHA3-512</strong>: <span class='ok'>✓ Disponible</span></li>";
+} else {
+    echo "<li><strong>SHA3-512</strong>: <span class='warning'>⚠ No disponible (usará SHA-512)</span></li>";
+}
+echo "<li><strong>SHA-512</strong>: <span class='ok'>✓ Siempre disponible</span></li>";
 echo "</ul>";
 echo "</div>";
 
