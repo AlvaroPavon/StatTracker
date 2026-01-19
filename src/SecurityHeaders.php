@@ -141,13 +141,25 @@ class SecurityHeaders
     {
         $nonce = self::getNonce();
         
+        // Detectar si estamos en desarrollo (localhost)
+        $isDevelopment = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']) ||
+                        (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
+        
+        // En desarrollo, permitir unsafe-inline sin nonce para facilitar debugging
+        $scriptSrc = $isDevelopment 
+            ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
+            : "script-src 'self' 'nonce-{$nonce}' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+        
+        $styleSrc = $isDevelopment
+            ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net"
+            : "style-src 'self' 'nonce-{$nonce}' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net";
+        
         $policies = [
             // Por defecto: solo mismo origen
             "default-src 'self'",
             
-            // Scripts: mismo origen + nonce + CDNs específicos
-            // Idealmente eliminaríamos unsafe-inline pero Chart.js lo requiere
-            "script-src 'self' 'nonce-{$nonce}' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+            // Scripts
+            $scriptSrc,
             
             // Estilos: mismo origen + inline para Tailwind
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
