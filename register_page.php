@@ -13,8 +13,11 @@ use App\SessionManager;
 use App\Honeypot;
 use App\SimpleCaptcha;
 
+// Verificar si la BD está disponible
+$dbAvailable = isset($pdo) && $pdo !== null;
+
 // 2. Redirigir si el usuario ya está logueado
-if (SessionManager::isAuthenticated()) {
+if ($dbAvailable && SessionManager::isAuthenticated()) {
     header('Location: dashboard.php');
     exit;
 }
@@ -38,6 +41,9 @@ $maxNombre = Security::MAX_NOMBRE;
 $maxApellidos = Security::MAX_APELLIDOS;
 $maxEmail = Security::MAX_EMAIL;
 $maxPassword = Security::MAX_PASSWORD;
+
+// Error de BD
+$dbError = !$dbAvailable ? "⚠️ Base de datos no disponible. Verifica la configuración de MySQL." : null;
 $minPassword = Security::MIN_PASSWORD;
 ?>
 <!DOCTYPE html>
