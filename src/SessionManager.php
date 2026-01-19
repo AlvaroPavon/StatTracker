@@ -119,6 +119,12 @@ class SessionManager
         
         $security = $_SESSION['_security'];
         
+        // Si faltan campos requeridos, reinicializar la seguridad de sesión
+        if (!isset($security['created_at']) || !isset($security['last_activity'])) {
+            self::initializeSessionSecurity();
+            return true;
+        }
+        
         // 1. Verificar tiempo de vida máximo
         if (time() - $security['created_at'] > self::SESSION_LIFETIME) {
             SecurityAudit::log('SESSION_EXPIRED', $_SESSION['user_id'] ?? null, [
