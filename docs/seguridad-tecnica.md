@@ -467,5 +467,81 @@ if ($analysis['suspicious']) {
 
 ---
 
+## Cierre Automático de Sesión por Inactividad
+
+### Sistema de Timeout de Sesión
+
+StatTracker implementa un sistema de cierre automático de sesión para proteger contra accesos no autorizados cuando el usuario deja el equipo desatendido.
+
+### Configuración de Tiempos
+
+| Parámetro | Valor | Descripción |
+|-----------|-------|-------------|
+| **Timeout por inactividad** | 15 minutos | Tiempo sin actividad antes de cerrar |
+| **Tiempo de advertencia** | 60 segundos | Alerta antes del cierre |
+| **Tiempo de vida máximo** | 1 hora | Sesión absoluta máxima |
+| **Regeneración de ID** | 5 minutos | Regeneración automática del session ID |
+
+### Componentes
+
+#### SessionTimeout.js (Frontend)
+
+**Ubicación**: `/js/session-timeout.js`
+
+Detecta inactividad del usuario monitoreando:
+- Movimiento del ratón
+- Pulsaciones de teclado
+- Clics
+- Scroll
+- Eventos táctiles
+
+**Flujo**:
+1. Usuario inactivo durante 14 minutos → Muestra modal de advertencia
+2. Usuario puede hacer clic en "Continuar sesión" → Extiende sesión
+3. Si no hay respuesta en 60 segundos → Cierra sesión automáticamente
+
+#### keep_alive.php (Backend)
+
+**Ubicación**: `/keep_alive.php`
+
+Endpoint AJAX para extender la sesión sin recargar la página.
+
+**Acciones**:
+- `extend`: Extiende la sesión
+- `status`: Devuelve estado de la sesión
+- `ping`: Verificación de conexión
+
+#### SessionManager (Backend)
+
+**Ubicación**: `/src/SessionManager.php`
+
+Gestiona validación de sesiones en el servidor:
+- Verifica tiempo de vida máximo
+- Verifica tiempo de inactividad
+- Valida fingerprint del navegador
+- Regenera ID de sesión periódicamente
+
+### Uso en Código
+
+```javascript
+// Inicializar en páginas protegidas
+window.sessionTimeout = new SessionTimeout({
+    idleTimeout: 900,      // 15 minutos
+    warningTime: 60,       // 60 segundos de advertencia
+    checkInterval: 10,     // Verificar cada 10 segundos
+    logoutUrl: 'logout.php',
+    keepAliveUrl: 'keep_alive.php',
+    csrfToken: window.csrfToken
+});
+```
+
+### Personalización
+
+El sistema se puede personalizar editando los valores en:
+- `SessionManager.php`: Tiempos del servidor
+- `session-timeout.js`: Tiempos del cliente (deben ser menores o iguales al servidor)
+
+---
+
 **Última actualización**: Agosto 2025  
 **Versión**: 1.2
