@@ -478,7 +478,8 @@ class ImpenetrableDefense
         }
         
         // 2. Referer check (solo para POST y no en desarrollo)
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$isDevelopment) {
+        $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($requestMethod === 'POST' && !$isDevelopment) {
             $referer = $_SERVER['HTTP_REFERER'] ?? '';
             if (empty($referer)) {
                 $score -= 20;
