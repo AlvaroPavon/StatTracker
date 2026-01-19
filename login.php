@@ -17,6 +17,8 @@ use App\SecurityAudit;
 use App\SessionManager;
 use App\RateLimiter;
 use App\InputSanitizer;
+use App\SimpleCaptcha;
+use App\LoginAlertSystem;
 
 // 4. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -41,6 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['login_error'] = "Ha ocurrido un error. Por favor, inténtelo de nuevo.";
         header("Location: index.php");
         exit();
+    }
+
+    // 5.2 Validar CAPTCHA si es requerido (después de intentos fallidos)
+    if (isset($_SESSION['require_captcha']) && $_SESSION['require_captcha'] === true) {
+        $captchaResult = SimpleCaptcha::validate();
+        if (!$captchaResult['valid']) {
+            $_SESSION['login_error'] = $captchaResult['error'];
+            header("Location: index.php");
+            exit();
+        }
     }
 
     // 6. Sanitizar y obtener datos
@@ -70,8 +82,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // ÉXITO - Registrar intento exitoso
         $rateLimiter->recordAttempt(true);
         
+        // Limpiar flag de CAPTCHA requerido
+        unset($_SESSION['require_captcha']);
+        unset($_SESSION['failed_login_count']);
+        
+        // Analizar login para detectar actividad sospechosa
+        $loginAnalysis = LoginAlertSystem::analyzeLogin($result['id'], $email);
+        
         // Usar SessionManager para autenticación segura
         SessionManager::authenticate($result['id'], $result['nombre']);
+        
+        // Guardar alerta de seguridad si es necesario
+        if ($loginAnalysis['suspicious']) {
+            $_SESSION['security_alert'] = LoginAlertSystem::generateAlertMessage($loginAnalysis);
+        }
         
         // Activar pantalla de bienvenida
         $_SESSION['show_welcome_screen'] = true;
@@ -87,6 +111,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // ERROR - Registrar intento fallido
         $rateLimiter->recordAttempt(false);
         SecurityAudit::logLoginFailed($email, $result);
+        
+        // Incrementar contador de intentos fallidos
+        $_SESSION['failed_login_count'] = ($_SESSION['failed_login_count'] ?? 0) + 1;
+        
+        // Requerir CAPTCHA después de 3 intentos fallidos
+        if ($_SESSION['failed_login_count'] >= 3) {
+            $_SESSION['require_captcha'] = true;
+        }
         
         $_SESSION['login_error'] = $result;
         header("Location: index.php");
