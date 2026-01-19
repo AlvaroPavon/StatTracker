@@ -11,6 +11,7 @@ require __DIR__ . '/db.php';
 use App\Security;
 use App\SessionManager;
 use App\Honeypot;
+use App\SimpleCaptcha;
 
 // 2. Redirigir si el usuario ya está logueado
 if (SessionManager::isAuthenticated()) {
@@ -24,6 +25,11 @@ $csrf_token = Security::generateCsrfToken();
 // 4. Generar Honeypot
 $honeypot_html = Honeypot::generate();
 $js_check = Honeypot::generateJsCheck();
+
+// 5. Generar CAPTCHA si es requerido (después de intentos fallidos)
+$requireCaptcha = isset($_SESSION['require_captcha']) && $_SESSION['require_captcha'] === true;
+$captcha = $requireCaptcha ? SimpleCaptcha::generate() : null;
+$failedAttempts = $_SESSION['failed_login_count'] ?? 0;
 
 // Constantes de validación para el frontend
 $maxEmail = Security::MAX_EMAIL;
