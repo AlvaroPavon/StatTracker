@@ -151,8 +151,8 @@ class SecurityHeaders
             : "script-src 'self' 'nonce-{$nonce}' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
         
         $styleSrc = $isDevelopment
-            ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net"
-            : "style-src 'self' 'nonce-{$nonce}' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net";
+            ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://cdnjs.cloudflare.com"
+            : "style-src 'self' 'nonce-{$nonce}' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://cdnjs.cloudflare.com";
         
         $policies = [
             // Por defecto: solo mismo origen
@@ -161,8 +161,8 @@ class SecurityHeaders
             // Scripts
             $scriptSrc,
             
-            // Estilos: mismo origen + inline para Tailwind
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
+            // Estilos
+            $styleSrc,
             
             // Fuentes
             "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:",
