@@ -407,5 +407,65 @@ $plaintext = CryptoFortress::decrypt($encrypted, $key);
 
 ---
 
+## Nuevas Clases de Seguridad (v1.2)
+
+### SimpleCaptcha
+
+**Ubicación**: `/src/SimpleCaptcha.php`
+
+**Responsabilidad**: CAPTCHA matemático sin dependencias externas
+
+| Método | Descripción |
+|--------|-------------|
+| `generate()` | Genera operación matemática (suma, resta, multiplicación) |
+| `validate()` | Valida respuesta del usuario |
+| `generateImage()` | Alternativa: CAPTCHA de imagen (requiere GD) |
+
+**Configuración**:
+- Tiempo de expiración: 5 minutos
+- Números máximos: 1-20
+- Respuesta cifrada en sesión
+
+**Uso**:
+```php
+// En formulario
+$captcha = SimpleCaptcha::generate();
+echo $captcha['html'];
+
+// En procesamiento
+$result = SimpleCaptcha::validate();
+if (!$result['valid']) {
+    echo $result['error'];
+}
+```
+
+### LoginAlertSystem
+
+**Ubicación**: `/src/LoginAlertSystem.php`
+
+**Responsabilidad**: Detección de logins sospechosos
+
+| Detección | Descripción | Puntos |
+|-----------|-------------|--------|
+| `new_device` | Dispositivo no reconocido | +2 |
+| `different_ip_range` | IP en rango diferente | +2 |
+| `new_country` | País nuevo (si hay geoloc) | +3 |
+| `unusual_time` | Hora fuera del patrón habitual | +1 |
+| `multiple_ips_recently` | 3+ IPs en 2 horas | +2 |
+| `user_agent_changed` | Cambio de navegador/SO | +1 |
+| `recent_failed_attempts` | Intentos fallidos recientes | +1 |
+
+**Umbral de sospecha**: 3+ puntos = Login sospechoso
+
+**Uso**:
+```php
+$analysis = LoginAlertSystem::analyzeLogin($userId, $email);
+if ($analysis['suspicious']) {
+    $_SESSION['security_alert'] = LoginAlertSystem::generateAlertMessage($analysis);
+}
+```
+
+---
+
 **Última actualización**: Agosto 2025  
-**Versión**: 1.1
+**Versión**: 1.2
