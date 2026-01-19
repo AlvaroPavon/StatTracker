@@ -173,11 +173,28 @@ C:\xampp\htdocs\stattracker\
 - [ ] XAMPP instalado
 - [ ] Composer instalado
 - [ ] Proyecto copiado a `htdocs`
-- [ ] `composer install` ejecutado
+- [ ] `composer install` ejecutado ⚠️ **MUY IMPORTANTE**
 - [ ] Base de datos `proyecto_imc` creada
 - [ ] `database.sql` importado
 - [ ] Apache y MySQL iniciados
 - [ ] Acceso a http://localhost/stattracker/ funciona
+
+### 🔧 Herramienta de Diagnóstico
+
+Si tienes problemas, accede a:
+```
+http://localhost/stattracker/diagnostico.php
+```
+
+Esta herramienta verificará:
+- ✓ Versión de PHP
+- ✓ Extensiones PHP requeridas
+- ✓ Archivos críticos
+- ✓ Permisos de directorios
+- ✓ Autoloader de Composer
+- ✓ Configuración de sesiones
+
+⚠️ **IMPORTANTE:** Elimina `diagnostico.php` después de solucionar los problemas.
 
 ---
 
