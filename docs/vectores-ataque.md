@@ -905,4 +905,14 @@ Documentación: docs/seguridad-tecnica.md#cierre-automático-de-sesión-por-inac
 ---
 
 **Documento generado**: Agosto 2025  
+**Versión**: 1.3  
 **Para uso exclusivo en entorno de laboratorio autorizado**
+
+---
+
+## 📚 Documentación Relacionada
+
+- [Índice de documentación](home.md)
+- [Documentación técnica de seguridad](seguridad-tecnica.md)
+- [Verificación OWASP](verificacion-owasp.md)
+- [Manual de usuario](manual-usuario.md)
