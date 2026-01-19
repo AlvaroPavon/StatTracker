@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // 7. Rate Limiting avanzado (por IP y email)
     $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
-    $rateLimiter = new RateLimiter('login', $email . ':' . $clientIp);
+    $rateLimiter = new RateLimiter('login', $email . ':' . $clientIp, $pdo);
     $rateCheck = $rateLimiter->isAllowed();
     
     if (!$rateCheck['allowed']) {
