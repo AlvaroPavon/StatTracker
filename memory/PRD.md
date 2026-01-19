@@ -8,20 +8,21 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | Categoría | Estado |
 |-----------|--------|
 | **Tipo** | Aplicación PHP con seguridad avanzada |
-| **Backend** | PHP 8.0+ |
-| **Base de Datos** | MySQL/MariaDB |
+| **Backend** | PHP 8.2+ |
+| **Base de Datos** | MySQL/MariaDB ✅ FUNCIONAL |
 | **Testing** | PHPUnit (85%+ cobertura) |
 | **Dependencias** | Composer |
 | **CI/CD** | GitHub Actions |
 | **Documentación** | ✅ Completa |
-| **Versión** | 1.3 |
+| **Versión** | 1.4 |
 
 ---
 
-## Funcionalidades Implementadas
+## Funcionalidades Implementadas y Verificadas ✅
 
 ### Core (Aplicación)
-- ✅ Sistema de autenticación (registro, login, logout)
+- ✅ Sistema de autenticación (registro, login, logout) - **VERIFICADO**
+- ✅ Dashboard con gráfico de IMC - **VERIFICADO**
 - ✅ Gestión de perfil de usuario
 - ✅ Cambio de contraseña
 - ✅ Subida de foto de perfil
