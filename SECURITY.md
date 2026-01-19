@@ -400,4 +400,23 @@ javascript:alert('XSS')
 
 ---
 
-**Última actualización:** Enero 2025
+---
+
+## 📖 Documentación Relacionada
+
+| Documento | Descripción |
+|-----------|-------------|
+| [docs/seguridad-tecnica.md](docs/seguridad-tecnica.md) | Detalles técnicos de implementación |
+| [README.md](README.md) | Visión general del proyecto |
+| [docs/home.md](docs/home.md) | Índice central de documentación |
+
+### Acceso Rápido por Tema
+
+- **Securización de contraseñas**: [seguridad-tecnica.md#securización-de-contraseñas](docs/seguridad-tecnica.md#securización-de-contraseñas)
+- **Gestión de sesiones**: [seguridad-tecnica.md#gestión-de-sesiones](docs/seguridad-tecnica.md#gestión-de-sesiones)
+- **Autenticación 2FA**: [seguridad-tecnica.md#autenticación-de-dos-factores-2fa](docs/seguridad-tecnica.md#autenticación-de-dos-factores-2fa)
+- **Clases de seguridad**: [seguridad-tecnica.md#clases-de-seguridad](docs/seguridad-tecnica.md#clases-de-seguridad)
+
+---
+
+**Última actualización:** Agosto 2025
