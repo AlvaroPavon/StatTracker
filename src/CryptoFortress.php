@@ -139,8 +139,9 @@ class CryptoFortress
         }
         
         // Doble hash para mayor seguridad
-        $firstPass = hash(self::HASH_ALGO, $data, true);
-        return hash(self::HASH_ALGO, $firstPass);
+        $algo = self::getHashAlgo();
+        $firstPass = hash($algo, $data, true);
+        return hash($algo, $firstPass);
     }
 
     /**
@@ -151,7 +152,7 @@ class CryptoFortress
         // Derivar clave más fuerte
         $derivedKey = self::deriveKey($key, 64);
         
-        return hash_hmac(self::HASH_ALGO, $data, $derivedKey);
+        return hash_hmac(self::getHashAlgo(), $data, $derivedKey);
     }
 
     /**
