@@ -214,17 +214,30 @@ ls -lh tests/
 
 ---
 
-## 📝 Documentación Adicional Incluida
+## 📚 Documentación Adicional Incluida
 
 Además de los requisitos mínimos, el proyecto incluye:
 
-- ✅ `/docs/entrevista-notas.md` - Notas de la entrevista con el stakeholder
-- ✅ `/docs/system-test-report.md` - Informe de pruebas de sistema
-- ✅ `/docs/home.md` - Documentación general del proyecto
-- ✅ `.gitignore` bien configurado
-- ✅ `composer.json` con autoload PSR-4
-- ✅ `phpunit.xml` con configuración de cobertura
-- ✅ `database.sql` con esquema de BD
+| Documento | Descripción |
+|-----------|-------------|
+| `/docs/home.md` | **Índice central de toda la documentación** |
+| `/docs/seguridad-tecnica.md` | Detalles técnicos de seguridad |
+| `/docs/entrevista-notas.md` | Notas de la entrevista con el stakeholder |
+| `/docs/system-test-report.md` | Informe de pruebas de sistema |
+| `/SECURITY.md` | Arquitectura de seguridad (10 capas) |
+| `.gitignore` | Bien configurado |
+| `composer.json` | Autoload PSR-4 |
+| `phpunit.xml` | Configuración de cobertura |
+| `database.sql` | Esquema de BD |
+
+### Acceso Rápido a Temas
+
+Para encontrar información sobre cualquier tema, consulta el índice central en [docs/home.md](docs/home.md)
+
+Ejemplos de búsqueda rápida:
+- **Securización de contraseñas**: `docs/seguridad-tecnica.md#securización-de-contraseñas`
+- **Gestión de sesiones**: `docs/seguridad-tecnica.md#gestión-de-sesiones`
+- **2FA/MFA**: `docs/seguridad-tecnica.md#autenticación-de-dos-factores-2fa`
 
 ---
 
