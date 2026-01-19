@@ -625,6 +625,28 @@ try {
 <!-- Cursor Spotlight Script -->
 <script src="js/cursor-spotlight.js"></script>
 
+<!-- Session Timeout Script -->
+<script src="js/session-timeout.js"></script>
+<script>
+    // Inicializar sistema de timeout de sesión
+    document.addEventListener('DOMContentLoaded', function() {
+        window.sessionTimeout = new SessionTimeout({
+            idleTimeout: 900,      // 15 minutos de inactividad
+            warningTime: 60,       // Advertencia 60 segundos antes
+            checkInterval: 10,     // Verificar cada 10 segundos
+            logoutUrl: 'logout.php',
+            keepAliveUrl: 'keep_alive.php',
+            csrfToken: window.csrfToken,
+            onWarning: function(seconds) {
+                console.log('Sesión expira en ' + seconds + ' segundos');
+            },
+            onLogout: function(reason) {
+                console.log('Cerrando sesión por: ' + reason);
+            }
+        });
+    });
+</script>
+
 <!-- Welcome Screen Script -->
 <script src="js/welcome-screen.js"></script>
 
