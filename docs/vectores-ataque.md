@@ -835,29 +835,44 @@ $user_id = SessionManager::getUserId();  // Nunca del input del usuario
 
 ## 🔴 Posibles Debilidades (Para Investigar)
 
-### 1. Información en Errores
+### ~~1. Información en Errores~~
 ```
-⚠️ Verificar que los errores de PHP no se muestren en producción
-```
-
-### 2. Enumeración de Usuarios en Registro
-```
-⚠️ El registro indica si un email ya existe (necesario para UX pero revela información)
+✅ CORREGIDO - Errores de PHP nunca se muestran en producción
+display_errors = 0
 ```
 
-### 3. Falta de CAPTCHA
+### ~~2. Enumeración de Usuarios en Registro~~
 ```
-⚠️ No hay CAPTCHA en formularios (aunque hay honeypot y rate limiting)
-```
-
-### 4. 2FA No Obligatorio
-```
-⚠️ 2FA es opcional - un atacante con credenciales válidas puede entrar
+✅ CORREGIDO - El registro ahora muestra mensaje genérico:
+"Se ha enviado un email de verificación. Por favor, revise su bandeja de entrada."
+(No revela si el email ya existe)
 ```
 
-### 5. No Hay Notificación de Login Sospechoso
+### ~~3. Falta de CAPTCHA~~
 ```
-⚠️ No se notifica al usuario si alguien intenta acceder desde ubicación inusual
+✅ IMPLEMENTADO - SimpleCaptcha.php
+- CAPTCHA matemático en registro (siempre)
+- CAPTCHA en login (después de 3 intentos fallidos)
+- No requiere servicios externos (reCAPTCHA)
+```
+
+### ~~4. 2FA No Obligatorio~~
+```
+⚠️ PENDIENTE - 2FA sigue siendo opcional
+Recomendación: Considerar forzar 2FA para cuentas de administrador
+```
+
+### ~~5. No Hay Notificación de Login Sospechoso~~
+```
+✅ IMPLEMENTADO - LoginAlertSystem.php
+Detecta:
+- Dispositivo nuevo
+- Cambio de ubicación (IP diferente)
+- Hora inusual de acceso
+- Múltiples IPs en poco tiempo
+- Cambio de navegador/SO
+
+Muestra alerta en el dashboard con opción de cambiar contraseña
 ```
 
 ---
