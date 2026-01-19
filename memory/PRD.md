@@ -1,7 +1,7 @@
 # StatTracker - Security Lab Application
 
 ## Descripción del Proyecto
-Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como **laboratorio de seguridad**. Implementa 10 capas de defensa contra todo tipo de ataques.
+Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como **laboratorio de seguridad**. Implementa 10+ capas de defensa contra todo tipo de ataques.
 
 ## Estado Actual
 
@@ -14,6 +14,7 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | **Dependencias** | Composer |
 | **CI/CD** | GitHub Actions |
 | **Documentación** | ✅ Completa |
+| **Versión** | 1.3 |
 
 ---
 
@@ -28,7 +29,7 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - ✅ Historial de métricas
 - ✅ Eliminación de métricas
 
-### Seguridad (10 Capas)
+### Seguridad (10+ Capas)
 - ✅ WAF (Web Application Firewall)
 - ✅ CSP (Content Security Policy)
 - ✅ SRI (Subresource Integrity)
@@ -49,6 +50,11 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - ✅ Global Rate Limiting (anti-DDoS)
 - ✅ IP Range Blocking (bloqueo de TOR, proxies)
 
+### Nuevas Funcionalidades (v1.2-1.3)
+- ✅ **CAPTCHA matemático** (SimpleCaptcha) - En registro y login
+- ✅ **Alertas de login sospechoso** (LoginAlertSystem) - Detecta dispositivos nuevos, ubicaciones, etc.
+- ✅ **Cierre automático por inactividad** (SessionTimeout.js) - 15 minutos con advertencia
+
 ---
 
 ## Clases de Seguridad
@@ -65,7 +71,7 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | `SecurityHeaders` | Headers HTTP |
 | `RateLimiter` | Control de tasa |
 | `InputSanitizer` | Sanitización de entrada |
-| `Honeypot` | Detección de bots |
+| `Honeypot` | Detección de bots (campos ocultos) |
 | `AdvancedProtection` | Protecciones adicionales |
 | `ErrorHandler` | Manejo de errores |
 | `UltimateShield` | Patrones de detección |
@@ -76,6 +82,14 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | `ImpenetrableDefense` | Defensa avanzada |
 | `TwoFactorAuth` | 2FA/MFA |
 | `SecurityAudit` | Logging de seguridad |
+| `SimpleCaptcha` | **CAPTCHA matemático** (v1.2) |
+| `LoginAlertSystem` | **Alertas de login sospechoso** (v1.2) |
+
+### Archivos JavaScript
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `session-timeout.js` | **Cierre automático por inactividad** (v1.3) |
+| `form-validation.js` | Validación de formularios |
 
 ---
 
@@ -90,6 +104,8 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | `/docs/home.md` | **Índice central de documentación** |
 | `/docs/seguridad-tecnica.md` | Detalles técnicos de seguridad |
 | `/docs/manual-usuario.md` | Manual para usuarios |
+| `/docs/verificacion-owasp.md` | Verificación OWASP ASVS |
+| `/docs/vectores-ataque.md` | Guía de pentesting |
 | `/docs/coverage-analisis.md` | Análisis de cobertura |
 | `/docs/system-test-report.md` | Informe de pruebas E2E |
 | `/docs/entrevista-notas.md` | Requisitos y decisiones |
@@ -97,13 +113,38 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 
 ---
 
-## GitHub Actions Workflows
+## Configuración de Tiempos de Sesión
 
-- `php-ci.yml` - CI principal con tests
-- `release-production.yml` - Releases de producción
-- `security-audit.yml` - Auditoría de seguridad
-- `owasp-scan.yml` - Escaneo OWASP ZAP
-- `supply-chain-security.yml` - Seguridad de cadena de suministro
+| Parámetro | Valor | Ubicación |
+|-----------|-------|-----------|
+| Timeout inactividad (cliente) | 15 min | `session-timeout.js` |
+| Advertencia antes de cierre | 60 seg | `session-timeout.js` |
+| Timeout inactividad (servidor) | 30 min | `SessionManager.php` |
+| Vida máxima de sesión | 1 hora | `SessionManager.php` |
+| Regeneración de ID | 5 min | `SessionManager.php` |
+
+---
+
+## Historial de Versiones
+
+### v1.3 (Agosto 2025)
+- ⏱️ Cierre automático de sesión por inactividad
+- 💬 Modal de advertencia antes del cierre
+- 🔄 Detección de actividad (mouse, teclado, scroll, touch)
+- 📡 Endpoint keep_alive para extender sesión
+
+### v1.2 (Agosto 2025)
+- 🔒 CAPTCHA matemático en registro y login
+- 🚨 Sistema de alertas de login sospechoso
+- 🛡️ Prevención mejorada de enumeración de usuarios
+
+### v1.1 (Agosto 2025)
+- 🔐 10 capas de seguridad implementadas
+- 🔑 Autenticación 2FA con TOTP
+- 🛡️ WAF con 100+ patrones de detección
+
+### v1.0 (Enero 2025)
+- ✨ Implementación inicial del MVP
 
 ---
 
@@ -118,8 +159,9 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 ├── logs/                   # Logs de seguridad
 ├── uploads/                # Archivos subidos
 ├── css/                    # Estilos
-├── js/                     # JavaScript
+├── js/                     # JavaScript (incluye session-timeout.js)
 ├── *.php                   # Puntos de entrada
+├── keep_alive.php          # Endpoint para extender sesión
 ├── composer.json           # Dependencias
 ├── phpunit.xml             # Configuración de tests
 └── database.sql            # Esquema de BD
@@ -129,5 +171,5 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 
 ## Última Actualización
 - **Fecha:** Agosto 2025
-- **Versión:** 1.1
-- **Cambios:** Documentación completa actualizada y centralizada
+- **Versión:** 1.3
+- **Cambios:** Sistema de cierre automático por inactividad implementado
