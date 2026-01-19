@@ -359,8 +359,11 @@ class UltimateShield
         }
         
         // Verificar extensiones de archivo prohibidas
-        if (preg_match('/\.(' . implode('|', self::FORBIDDEN_EXTENSIONS) . ')(\?|$)/i', $decoded)) {
-            $threats[] = "FORBIDDEN_EXTENSION:$context";
+        // SOLO para parámetros, NO para URI/QUERY normales (que naturalmente tienen .php)
+        if ($context !== 'URI' && $context !== 'QUERY' && $context !== 'REFERER') {
+            if (preg_match('/\.(' . implode('|', self::FORBIDDEN_EXTENSIONS) . ')(\?|$)/i', $decoded)) {
+                $threats[] = "FORBIDDEN_EXTENSION:$context";
+            }
         }
         
         return $threats;
