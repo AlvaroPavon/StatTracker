@@ -206,6 +206,12 @@ mysql -u root -p proyecto_imc < database.sql  # Importar esquema
 
 ## 🔄 Historial de Versiones
 
+### v1.3 (Agosto 2025)
+* ⏱️ **Cierre automático de sesión por inactividad** (15 minutos)
+* 💬 Modal de advertencia antes del cierre con opción de extender
+* 🔄 Detección de actividad (mouse, teclado, scroll, touch)
+* 📡 Endpoint keep_alive para extender sesión sin recargar
+
 ### v1.2 (Agosto 2025)
 * 🔒 **CAPTCHA matemático** en registro y login (después de intentos fallidos)
 * 🚨 **Sistema de alertas de login sospechoso** (dispositivo nuevo, ubicación, hora inusual)
