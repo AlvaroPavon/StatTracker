@@ -172,12 +172,13 @@ Los usuarios pueden eliminar registros específicos de su historial:
    * Nombre: Tu nombre
    * Apellidos: Tus apellidos
    * Email: Tu correo electrónico
-   * Contraseña: Una contraseña segura (mínimo 8 caracteres recomendado)
-   * Confirmar contraseña: Repite la contraseña
-4. Haz clic en **"Registrarse"**
-5. Si el registro es exitoso, serás redirigido a la página de inicio de sesión
+   * Contraseña: Una contraseña segura (mínimo 8 caracteres, con mayúsculas, minúsculas y números)
+4. **Resuelve la verificación de seguridad (CAPTCHA matemático)**
+   * Ejemplo: "¿Cuánto es 7 + 12?" → Escribe "19"
+5. Haz clic en **"Registrarse"**
+6. Si el registro es exitoso, serás redirigido automáticamente al dashboard
 
-> **Nota**: Si el email ya está registrado, recibirás un mensaje de error indicándolo.
+> **Nota**: El CAPTCHA matemático ayuda a proteger contra bots y registros automatizados.
 
 ### Iniciar Sesión
 
