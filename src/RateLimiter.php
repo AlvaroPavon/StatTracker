@@ -45,7 +45,7 @@ class RateLimiter
 
     private string $action;
     private string $identifier;
-    private \PDO $pdo;
+    private ?\PDO $pdo;
     private bool $useDatabase;
 
     public function __construct(
