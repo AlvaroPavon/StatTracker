@@ -47,13 +47,15 @@ ALTER TABLE metricas AUTO_INCREMENT = 1;
 
 -- Usuario de prueba principal (ID=1). 
 -- Contraseña: 'Password123' (cumple requisitos de seguridad)
--- Hash generado con password_hash('Password123', PASSWORD_DEFAULT)
+-- IMPORTANTE: Este hash fue generado con CryptoFortress::hashPassword() que incluye "pepper"
+-- Para regenerar: cd /app && php -r "require 'vendor/autoload.php'; echo App\CryptoFortress::hashPassword('Password123');"
 INSERT INTO usuarios (id, nombre, apellidos, email, password, profile_pic) VALUES 
-(1, 'Test', 'User', 'test@example.com', '$2y$10$wKz0b9lM9pLz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.', NULL); 
+(1, 'Test', 'User', 'test@example.com', '$argon2id$v=19$m=65536,t=4,p=4$TTNQR20xRFhkNnpPdzdQdg$/grb9q2sNxqjjJLL3oT4peQR608nmclvRdMbA1WxCR8', NULL); 
 
 -- Usuario de prueba sin datos de métricas (ID=2)
+-- Contraseña: 'Password123'
 INSERT INTO usuarios (id, nombre, apellidos, email, password, profile_pic) VALUES 
-(2, 'Second', 'Test User', 'second@example.com', '$2y$10$wKz0b9lM9pLz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.Lz4mR0qV8mK.', NULL); 
+(2, 'Second', 'Test User', 'second@example.com', '$argon2id$v=19$m=65536,t=4,p=4$TTNQR20xRFhkNnpPdzdQdg$/grb9q2sNxqjjJLL3oT4peQR608nmclvRdMbA1WxCR8', NULL); 
 
 -- Dato inicial de prueba para el usuario 1. (80 kg / 1.00m^2 = 80.0 IMC)
 INSERT INTO metricas (user_id, peso, altura, imc, fecha_registro) VALUES 
