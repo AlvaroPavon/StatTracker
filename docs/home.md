@@ -23,7 +23,8 @@ Esta carpeta contiene toda la documentación técnica y de usuario del proyecto 
 |-----------|-------------|----------|
 | [manual-usuario.md](manual-usuario.md) | Manual completo para usuarios finales | Usuarios finales |
 | [seguridad-tecnica.md](seguridad-tecnica.md) | Documentación técnica detallada de seguridad | Desarrolladores |
-| [verificacion-owasp.md](verificacion-owasp.md) | **Verificación de cumplimiento OWASP ASVS** | Seguridad, Evaluadores |
+| [verificacion-owasp.md](verificacion-owasp.md) | Verificación de cumplimiento OWASP ASVS | Seguridad, Evaluadores |
+| [vectores-ataque.md](vectores-ataque.md) | **🎯 Guía de vectores de ataque y pentesting** | Pentesters, Seguridad |
 | [entrevista-notas.md](entrevista-notas.md) | Requisitos y decisiones del proyecto | Desarrolladores, PMs |
 | [coverage-analisis.md](coverage-analisis.md) | Análisis de cobertura de código | QA, Desarrolladores |
 | [system-test-report.md](system-test-report.md) | Informe de pruebas E2E | QA, Testers |
