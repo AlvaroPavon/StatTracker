@@ -3,7 +3,7 @@
 ## Información General
 
 **Proyecto**: StatTracker  
-**Fecha del análisis**: Noviembre 2025  
+**Fecha del análisis**: Agosto 2025  
 **Herramienta de cobertura**: PHPUnit + Xdebug/PCOV  
 **Versión de PHP**: 7.4+  
 **Framework de testing**: PHPUnit 9.6
