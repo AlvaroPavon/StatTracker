@@ -17,6 +17,7 @@ use App\SecurityAudit;
 use App\SessionManager;
 use App\RateLimiter;
 use App\InputSanitizer;
+use App\SimpleCaptcha;
 
 // 4. Comprobar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -39,6 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Simular un error genérico
         $_SESSION['register_error'] = "Ha ocurrido un error. Por favor, inténtelo de nuevo.";
+        header("Location: register_page.php");
+        exit();
+    }
+
+    // 5.2 Validar CAPTCHA
+    $captchaResult = SimpleCaptcha::validate();
+    if (!$captchaResult['valid']) {
+        $_SESSION['register_error'] = $captchaResult['error'];
+        // Preservar datos del formulario (excepto contraseña)
+        $_SESSION['register_form_data'] = [
+            'nombre' => $_POST['nombre'] ?? '',
+            'apellidos' => $_POST['apellidos'] ?? '',
+            'email' => $_POST['email'] ?? ''
+        ];
         header("Location: register_page.php");
         exit();
     }
@@ -76,6 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Registrar evento
         SecurityAudit::log('REGISTER', $result, ['email' => substr($email, 0, 3) . '***']);
+
+        // Limpiar datos del formulario guardados
+        unset($_SESSION['register_form_data']);
 
         // Redirigir al dashboard
         header("Location: dashboard.php");
