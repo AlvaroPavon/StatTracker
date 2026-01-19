@@ -55,8 +55,11 @@ try {
     // NUNCA mostrar detalles del error de BD al usuario
     error_log("DB Connection Error: " . $e->getMessage());
     
-    // Mensaje genérico
-    throw new \PDOException("Error de conexión. Inténtelo más tarde.", 0);
+    // Establecer $pdo como null para indicar que la BD no está disponible
+    $pdo = null;
+    
+    // No lanzar excepción - dejar que las páginas manejen $pdo === null
+    // Las páginas que requieren BD verificarán si $pdo es null
 }
 
 // Limpiar variables sensibles de memoria
