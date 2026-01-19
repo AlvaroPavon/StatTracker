@@ -833,7 +833,7 @@ $user_id = SessionManager::getUserId();  // Nunca del input del usuario
 
 ---
 
-## 🔴 Posibles Debilidades (Para Investigar)
+## 🔴 Posibles Debilidades (Estado Actual)
 
 ### ~~1. Información en Errores~~
 ```
@@ -843,9 +843,8 @@ display_errors = 0
 
 ### ~~2. Enumeración de Usuarios en Registro~~
 ```
-✅ CORREGIDO - El registro ahora muestra mensaje genérico:
-"Se ha enviado un email de verificación. Por favor, revise su bandeja de entrada."
-(No revela si el email ya existe)
+✅ MITIGADO - El registro muestra mensajes genéricos
+El sistema no revela explícitamente si un email ya existe
 ```
 
 ### ~~3. Falta de CAPTCHA~~
@@ -854,6 +853,7 @@ display_errors = 0
 - CAPTCHA matemático en registro (siempre)
 - CAPTCHA en login (después de 3 intentos fallidos)
 - No requiere servicios externos (reCAPTCHA)
+Documentación: docs/seguridad-tecnica.md#simplecaptcha
 ```
 
 ### ~~4. 2FA No Obligatorio~~
@@ -866,13 +866,24 @@ Recomendación: Considerar forzar 2FA para cuentas de administrador
 ```
 ✅ IMPLEMENTADO - LoginAlertSystem.php
 Detecta:
-- Dispositivo nuevo
-- Cambio de ubicación (IP diferente)
+- Dispositivo nuevo (fingerprint diferente)
+- Cambio de ubicación (IP en rango diferente)
 - Hora inusual de acceso
 - Múltiples IPs en poco tiempo
 - Cambio de navegador/SO
 
 Muestra alerta en el dashboard con opción de cambiar contraseña
+Documentación: docs/seguridad-tecnica.md#loginalertsystem
+```
+
+### ~~6. Sesión Abierta Indefinidamente~~
+```
+✅ IMPLEMENTADO - SessionTimeout.js + SessionManager.php
+- Cierre automático después de 15 minutos de inactividad
+- Advertencia 60 segundos antes del cierre
+- Opción de extender sesión sin recargar página
+- Endpoint keep_alive.php para mantener sesión activa
+Documentación: docs/seguridad-tecnica.md#cierre-automático-de-sesión-por-inactividad
 ```
 
 ---
