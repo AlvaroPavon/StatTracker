@@ -48,7 +48,7 @@
     
     # Permissions Policy
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
-end IfModule>
+</IfModule>
 
 # ======================= Prevenir listado de directorios =======================
 
@@ -67,25 +67,6 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-# ======================= Configuración de PHP (si se permite) =======================
-
-<IfModule mod_php.c>
-    # Ocultar versión de PHP
-    php_flag expose_php Off
-    
-    # Desactivar funciones peligrosas
-    php_admin_value disable_functions "exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source"
-    
-    # Limitar tamaño de uploads
-    php_value upload_max_filesize 2M
-    php_value post_max_size 3M
-    
-    # Configuración de sesión
-    php_value session.cookie_httponly 1
-    php_value session.cookie_samesite "Strict"
-    php_value session.use_only_cookies 1
-</IfModule>
-
 # ======================= Compresión (mejora rendimiento) =======================
 
 <IfModule mod_deflate.c>
@@ -103,3 +84,10 @@ Options -Indexes
     ExpiresByType text/css "access plus 1 week"
     ExpiresByType application/javascript "access plus 1 week"
 </IfModule>
+
+# ======================= PHP Error handling (para desarrollo) =======================
+# Descomenta las siguientes líneas si quieres ver errores durante desarrollo
+
+# php_flag display_errors On
+# php_flag display_startup_errors On
+# php_value error_reporting E_ALL
