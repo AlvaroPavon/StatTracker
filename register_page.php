@@ -188,6 +188,9 @@ $minPassword = Security::MIN_PASSWORD;
                 <p class="text-xs text-gray-500 mt-1">Debe contener mayúsculas, minúsculas y números</p>
             </label>
 
+            <!-- CAPTCHA matemático -->
+            <?php echo $captcha['html']; ?>
+
             <button class="glass-button flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold mt-4 w-full
                         transition-all duration-300" type="submit">
                 <span class="truncate relative z-10">Registrarse</span>
