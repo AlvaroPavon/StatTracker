@@ -331,12 +331,18 @@ Actualmente, la aplicación no permite editar registros existentes. Si cometiste
 
 ### ¿Mis datos están seguros?
 
-Sí, StatTracker implementa medidas de seguridad:
+Sí, StatTracker implementa múltiples medidas de seguridad:
 
-* Contraseñas cifradas con algoritmos de hash seguros (bcrypt)
-* Sesiones seguras
-* Validación de datos en servidor
-* Protección contra inyección SQL mediante prepared statements
+* **Contraseñas cifradas** con algoritmos de hash seguros (Argon2id/bcrypt)
+* **Sesiones seguras** con fingerprinting y regeneración automática de ID
+* **Cierre automático por inactividad** (15 minutos)
+* **CAPTCHA matemático** para prevenir ataques automatizados
+* **Detección de logins sospechosos** (dispositivos nuevos, ubicaciones diferentes)
+* **Protección contra inyección SQL** mediante prepared statements
+* **Protección contra XSS** mediante escape de salida
+* **Protección CSRF** con tokens únicos
+* **Rate limiting** para prevenir ataques de fuerza bruta
+* **WAF (Web Application Firewall)** con 100+ patrones de detección
 * Solo tú puedes ver y modificar tus datos
 
 ### ¿Qué hago si olvidé mi contraseña?
