@@ -172,6 +172,17 @@ $minPassword = Security::MIN_PASSWORD;
                         minlength="<?php echo $minPassword; ?>" maxlength="<?php echo $maxPassword; ?>" autocomplete="current-password" required />
                 </label>
                 
+                <?php if ($requireCaptcha && $captcha): ?>
+                <!-- CAPTCHA requerido después de intentos fallidos -->
+                <div class="mt-2 p-3 bg-yellow-100/50 dark:bg-yellow-900/30 rounded-lg border border-yellow-300 dark:border-yellow-700">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
+                        <span class="material-symbols-outlined align-middle text-base">warning</span>
+                        Verificación adicional requerida (<?php echo $failedAttempts; ?> intentos fallidos)
+                    </p>
+                    <?php echo $captcha['html']; ?>
+                </div>
+                <?php endif; ?>
+                
                 <button class="glass-button flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-5 text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark
                         transition-all duration-300"
                         type="submit">
