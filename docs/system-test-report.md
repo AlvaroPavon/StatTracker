@@ -3,7 +3,7 @@
 ## Información General
 
 **Proyecto**: StatTracker  
-**Fecha de pruebas**: Noviembre 2025  
+**Fecha de pruebas**: Agosto 2025  
 **Tipo de pruebas**: Pruebas de Sistema / End-to-End (E2E)  
 **Entorno**: Entorno de desarrollo/staging  
 **Herramientas**: Navegador web, pruebas manuales y automatizadas
