@@ -380,9 +380,14 @@ class CryptoFortress
             $result['errors'][] = 'AES-256-GCM not available';
         }
         
-        if (!in_array(self::HASH_ALGO, hash_algos())) {
+        if (!in_array(self::getHashAlgo(), hash_algos())) {
             $result['valid'] = false;
-            $result['errors'][] = 'SHA3-512 not available';
+            $result['errors'][] = 'No secure hash algorithm available';
+        }
+        
+        // Advertencia si SHA3-512 no está disponible
+        if (!in_array(self::HASH_ALGO_PRIMARY, hash_algos())) {
+            $result['warnings'][] = 'SHA3-512 not available - using SHA-512';
         }
         
         // Verificar random_bytes funciona
