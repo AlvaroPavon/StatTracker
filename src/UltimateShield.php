@@ -466,7 +466,27 @@ class UltimateShield
             return true;
         }
         
-        // Verificar patrones en body
+        // Para POST de formularios normales, ser más permisivo
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (strpos($contentType, 'application/x-www-form-urlencoded') !== false ||
+            strpos($contentType, 'multipart/form-data') !== false) {
+            // Solo verificar patrones más peligrosos en formularios
+            $dangerousPatterns = [
+                '/UNION(\s+)SELECT/i',
+                '/UNION(\s+)ALL(\s+)SELECT/i',
+                '/<script[^>]*>/i',
+                '/javascript\s*:/i',
+                '/on(click|load|error)\s*=/i',
+            ];
+            foreach ($dangerousPatterns as $pattern) {
+                if (@preg_match($pattern, $body)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Para otros tipos de contenido, verificación completa
         foreach (self::ATTACK_PATTERNS as $pattern) {
             if (@preg_match($pattern, $body)) {
                 return true;
