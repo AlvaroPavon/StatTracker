@@ -40,6 +40,17 @@ class CryptoFortress
     // Salt adicional para operaciones (único por instalación)
     private static ?string $installationSalt = null;
 
+    /**
+     * Obtiene el algoritmo de hash disponible
+     */
+    private static function getHashAlgo(): string
+    {
+        if (in_array(self::HASH_ALGO_PRIMARY, hash_algos())) {
+            return self::HASH_ALGO_PRIMARY;
+        }
+        return self::HASH_ALGO_FALLBACK;
+    }
+
     // ==================== HASHING DE CONTRASEÑAS ====================
 
     /**
