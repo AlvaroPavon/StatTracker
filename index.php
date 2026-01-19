@@ -151,6 +151,15 @@ $dbError = !$dbAvailable ? "⚠️ Base de datos no disponible. Verifica la conf
                 </div>
             <?php endif; ?>
 
+            <?php if ($dbError): ?>
+                <div class="mb-4 p-4 text-sm text-orange-700 bg-orange-100 rounded-lg border border-orange-300 animate__animated animate__fadeIn" role="alert">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">warning</span>
+                        <span><?php echo htmlspecialchars($dbError); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if (isset($_GET['timeout'])): ?>
                 <div class="mb-4 p-4 text-sm text-amber-700 bg-amber-100 rounded-lg border border-amber-300 animate__animated animate__fadeIn" role="alert">
                     <div class="flex items-center gap-2">
