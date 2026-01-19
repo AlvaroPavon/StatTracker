@@ -465,15 +465,20 @@ class ImpenetrableDefense
         $score = 100; // Puntuación de confianza (100 = totalmente confiable)
         $reasons = [];
         
+        // En modo desarrollo/pruebas, ser menos estricto
+        $isDevelopment = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1', 'localhost']) ||
+                        (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
+        
         // 1. User-Agent score
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (strlen($ua) < 20) {
-            $score -= 30;
+            $penalty = $isDevelopment ? 10 : 30;
+            $score -= $penalty;
             $reasons[] = 'short_user_agent';
         }
         
-        // 2. Referer check
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // 2. Referer check (solo para POST y no en desarrollo)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$isDevelopment) {
             $referer = $_SERVER['HTTP_REFERER'] ?? '';
             if (empty($referer)) {
                 $score -= 20;
@@ -482,14 +487,14 @@ class ImpenetrableDefense
         }
         
         // 3. Accept headers
-        if (empty($_SERVER['HTTP_ACCEPT'])) {
+        if (empty($_SERVER['HTTP_ACCEPT']) && !$isDevelopment) {
             $score -= 15;
             $reasons[] = 'no_accept_header';
         }
         
-        // 4. Cookie support
-        if (empty($_COOKIE)) {
-            $score -= 10;
+        // 4. Cookie support (menos penalización en primera petición)
+        if (empty($_COOKIE) && !$isDevelopment) {
+            $score -= 5; // Reducido de 10 a 5
             $reasons[] = 'no_cookies';
         }
         
