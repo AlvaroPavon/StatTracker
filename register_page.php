@@ -141,6 +141,16 @@ $minPassword = Security::MIN_PASSWORD;
         </div>
 
         <?php 
+        if ($dbError): ?>
+            <div class="mb-4 p-4 text-sm text-orange-700 bg-orange-100 rounded-lg border border-orange-300 animate__animated animate__fadeIn" role="alert">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">warning</span>
+                    <span><?php echo htmlspecialchars($dbError); ?></span>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php 
         if (isset($_SESSION['register_error'])): ?>
             <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300 animate__animated animate__shakeX" role="alert">
                 <?php 
