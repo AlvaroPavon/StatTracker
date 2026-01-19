@@ -206,6 +206,12 @@ mysql -u root -p proyecto_imc < database.sql  # Importar esquema
 
 ## 🔄 Historial de Versiones
 
+### v1.2 (Agosto 2025)
+* 🔒 **CAPTCHA matemático** en registro y login (después de intentos fallidos)
+* 🚨 **Sistema de alertas de login sospechoso** (dispositivo nuevo, ubicación, hora inusual)
+* 🛡️ Prevención mejorada de enumeración de usuarios
+* 📝 Documentación actualizada
+
 ### v1.1 (Agosto 2025)
 * 🔐 10 capas de seguridad implementadas
 * 🔑 Autenticación 2FA con TOTP
