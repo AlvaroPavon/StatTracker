@@ -13,7 +13,9 @@ class CryptoFortress
     // ==================== CONFIGURACIÓN ====================
     
     // Algoritmo de hash principal (más fuerte disponible)
-    private const HASH_ALGO = 'sha3-512';
+    // SHA3-512 si está disponible, sino SHA-512
+    private const HASH_ALGO_PRIMARY = 'sha3-512';
+    private const HASH_ALGO_FALLBACK = 'sha512';
     
     // Algoritmo de cifrado simétrico
     private const CIPHER_ALGO = 'aes-256-gcm';
