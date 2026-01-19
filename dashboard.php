@@ -269,6 +269,31 @@ try {
 </aside>
 <main class="flex-1 flex-col overflow-y-auto">
    <div class="p-4 md:p-8">
+   
+        <?php if ($securityAlert): ?>
+        <!-- Alerta de seguridad por login sospechoso -->
+        <div id="security-alert" class="mb-6 p-4 bg-amber-100/80 dark:bg-amber-900/50 border border-amber-400 dark:border-amber-600 rounded-xl animate__animated animate__fadeInDown">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-2xl">shield</span>
+                <div class="flex-1">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-200">Alerta de Seguridad</h3>
+                    <p class="text-amber-700 dark:text-amber-300 text-sm mt-1"><?php echo Security::escapeHtml($securityAlert); ?></p>
+                    <div class="mt-3 flex gap-2">
+                        <a href="profile.php#change-password" class="text-xs font-medium text-amber-800 dark:text-amber-200 underline hover:no-underline">
+                            Cambiar contraseña
+                        </a>
+                        <button onclick="document.getElementById('security-alert').remove()" class="text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline">
+                            Descartar
+                        </button>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('security-alert').remove()" class="text-amber-500 hover:text-amber-700 dark:hover:text-amber-300">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
+   
         <header class="flex flex-wrap items-center justify-between gap-4 pb-6
                        animate__animated animate__fadeInDown">
             <div class="flex min-w-72 flex-col gap-1">
