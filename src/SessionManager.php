@@ -121,7 +121,14 @@ class SessionManager
         
         // Si faltan campos requeridos, reinicializar la seguridad de sesión
         if (!isset($security['created_at']) || !isset($security['last_activity'])) {
-            self::initializeSessionSecurity();
+            $_SESSION['_security'] = [
+                'created_at' => time(),
+                'last_activity' => time(),
+                'last_regeneration' => time(),
+                'fingerprint' => self::generateFingerprint(),
+                'ip' => self::getClientIp(),
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+            ];
             return true;
         }
         
