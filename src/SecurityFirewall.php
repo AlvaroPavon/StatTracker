@@ -95,19 +95,19 @@ class SecurityFirewall
         '/&&/',
         '/\$\(/',
         '/`[^`]+`/',
-        '/\bwget\b/i',
-        '/\bcurl\b/i',
-        '/\bnc\b/',
-        '/\bnetcat\b/i',
-        '/\btelnet\b/i',
-        '/\bperl\b/i',
-        '/\bpython\b/i',
-        '/\bruby\b/i',
-        '/\bphp\b/i',
-        '/\bbash\b/i',
-        '/\bsh\b/',
-        '/\/bin\//i',
-        '/\/usr\//i',
+        '/\bwget\s+/i',           // wget seguido de espacio
+        '/\bcurl\s+/i',           // curl seguido de espacio (comando, no User-Agent)
+        '/\bnc\s+-/i',            // netcat con flags
+        '/\bnetcat\s+/i',
+        '/\btelnet\s+/i',
+        '/\bperl\s+-/i',          // perl con flags
+        '/\bpython[23]?\s+-/i',   // python con flags
+        '/\bruby\s+-/i',
+        '/\bphp\s+-r/i',          // php -r (ejecución directa)
+        '/\bbash\s+-c/i',         // bash -c
+        '/\bsh\s+-c/i',           // sh -c
+        '/\/bin\/(?:ba)?sh/i',    // /bin/sh o /bin/bash
+        '/\/usr\/bin\//i',        // /usr/bin/
     ];
     
     // Patrones de LFI/RFI
