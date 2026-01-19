@@ -445,6 +445,14 @@ Sí, el sistema calcula automáticamente el IMC cuando introduces tu peso y altu
 
 **Hash**: Técnica de cifrado unidireccional usada para proteger contraseñas.
 
+**CAPTCHA**: Sistema de verificación para distinguir humanos de bots. En StatTracker se usa un CAPTCHA matemático (resolver una operación simple).
+
+**Timeout de sesión**: Cierre automático de sesión después de un periodo de inactividad para proteger la cuenta.
+
+**Alerta de seguridad**: Notificación que aparece cuando se detecta actividad inusual en tu cuenta (dispositivo nuevo, ubicación diferente, etc.).
+
+**2FA (Autenticación de dos factores)**: Capa adicional de seguridad que requiere un código temporal además de la contraseña.
+
 ---
 
 ## Contacto y Soporte
