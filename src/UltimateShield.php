@@ -220,6 +220,22 @@ class UltimateShield
     {
         $ua = strtolower($userAgent);
         
+        // En localhost, ser más permisivo (para desarrollo)
+        $isLocalhost = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']) ||
+                      (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
+        
+        if ($isLocalhost) {
+            // En localhost, solo bloquear las herramientas más agresivas
+            $aggressiveTools = ['sqlmap', 'nikto', 'acunetix', 'havij', 'hydra', 'metasploit'];
+            foreach ($aggressiveTools as $tool) {
+                if (strpos($ua, $tool) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // En producción, verificación completa
         foreach (self::HACKING_TOOLS as $tool) {
             if (strpos($ua, $tool) !== false) {
                 return true;
