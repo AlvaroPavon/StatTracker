@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
-## 📖 Visión General
+## 📖 Visión General 
 
 **StatTracker** es una aplicación web moderna y segura para el registro, seguimiento y gestión de estadísticas de salud personales. Permite a los usuarios monitorizar sus métricas corporales (peso, altura, IMC) a lo largo del tiempo de manera sencilla y efectiva.
 
