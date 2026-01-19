@@ -156,6 +156,7 @@ $minPassword = Security::MIN_PASSWORD;
                     transition-all duration-300"
                     placeholder="Ej: María" type="text" name="nombre" id="reg_nombre" 
                     maxlength="<?php echo $maxNombre; ?>" autocomplete="given-name" 
+                    value="<?php echo Security::escapeHtml($formData['nombre'] ?? ''); ?>"
                     pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" title="Solo letras, espacios y guiones" required />
             </label>
             <label class="flex flex-col w-full">
@@ -164,6 +165,7 @@ $minPassword = Security::MIN_PASSWORD;
                     transition-all duration-300"
                     placeholder="Ej: García López" type="text" name="apellidos" id="reg_apellidos" 
                     maxlength="<?php echo $maxApellidos; ?>" autocomplete="family-name"
+                    value="<?php echo Security::escapeHtml($formData['apellidos'] ?? ''); ?>"
                     pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-]+" title="Solo letras, espacios y guiones" required />
             </label>
 
@@ -172,7 +174,9 @@ $minPassword = Security::MIN_PASSWORD;
                 <input class="glass-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 h-12 placeholder:text-gray-400 p-3 text-base font-normal
                     transition-all duration-300"
                     placeholder="correo@ejemplo.com" type="email" name="email" id="reg_email" 
-                    maxlength="<?php echo $maxEmail; ?>" autocomplete="email" required />
+                    maxlength="<?php echo $maxEmail; ?>" autocomplete="email" 
+                    value="<?php echo Security::escapeHtml($formData['email'] ?? ''); ?>"
+                    required />
             </label>
             <label class="flex flex-col w-full">
                 <p class="text-base font-medium leading-normal pb-2">Contraseña <span class="text-xs text-gray-500">(<?php echo $minPassword; ?>-<?php echo $maxPassword; ?> caracteres)</span></p>
