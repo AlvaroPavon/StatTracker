@@ -1,7 +1,7 @@
 <?php
 /**
  * Clase UltimateShield - Capa de seguridad de máximo nivel
- * Implementa TODAS las protecciones conocidas contra ataques web
+ * Implementa las protecciones conocidas contra ataques web
  * @package App
  */
 
@@ -16,19 +16,13 @@ class UltimateShield
         // Añadir IPs conocidas de atacantes aquí
     ];
     
-    // Países bloqueados (códigos ISO) - opcional
-    private const BLOCKED_COUNTRIES = [
-        // 'CN', 'RU', 'KP' // Ejemplo: China, Rusia, Corea del Norte
-    ];
-    
     // Extensiones de archivo NUNCA permitidas
     private const FORBIDDEN_EXTENSIONS = [
-        'php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'phar',
-        'exe', 'bat', 'cmd', 'sh', 'bash', 'zsh', 'ps1',
-        'jsp', 'jspx', 'asp', 'aspx', 'asa', 'asax', 'ascx', 'ashx', 'asmx',
+        'php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'phar','exe', 'bat', 'cmd', 'sh', 'bash', 'zsh', 'ps1',
+        'jsp', 'jspx',  'asp', 'aspx', 'asa', 'asax', 'ascx', 'ashx', 'asmx',
         'cgi', 'pl', 'py', 'rb', 'js', 'vbs', 'wsf', 'wsh',
         'htaccess', 'htpasswd', 'ini', 'config', 'conf',
-        'sql', 'db', 'sqlite', 'mdb',
+        'sql', 'db',  'sqlite', 'mdb',
         'swf', 'jar', 'class',
         'dll', 'so', 'dylib'
     ];

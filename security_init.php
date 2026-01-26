@@ -40,7 +40,7 @@ if (!$cryptoCheck['valid']) {
     exit('System security check failed');
 }
 
-// ==================== FASE 0.5: Defensa Impenetrable ====================
+// ==================== 1: Defensa Impenetrable ====================
 
 // Verificar IP en rangos bloqueados
 $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
@@ -56,12 +56,12 @@ if (!ImpenetrableDefense::checkGlobalRateLimit()) {
     exit('Too many requests');
 }
 
-// ==================== FASE 0.6: Manejador de Errores Seguro ====================
+// ==================== 2: Manejador de Errores Seguro ====================
 
 // Inicializar manejador de errores (PRIMERO)
 ErrorHandler::init();
 
-// ==================== FASE 0.7: Análisis de Comportamiento ====================
+// ==================== 3: Análisis de Comportamiento ====================
 
 // Analizar comportamiento del usuario
 $behaviorAnalysis = ImpenetrableDefense::analyzeUserBehavior();
@@ -72,7 +72,7 @@ if ($behaviorAnalysis['score'] < 20) {
     exit('Access denied');
 }
 
-// ==================== FASE 1: Configuración inicial ====================
+// ==================== 4: Configuración inicial ====================
 
 // Zona horaria
 date_default_timezone_set('Europe/Madrid');
@@ -93,7 +93,7 @@ ini_set('session.cookie_samesite', 'Strict');
 ini_set('session.use_strict_mode', 1);
 ini_set('session.use_only_cookies', 1);
 
-// ==================== FASE 2: UltimateShield - Máxima Protección ====================
+// ==================== 5: UltimateShield - Máxima Protección ====================
 
 // Iniciar sesión primero para UltimateShield
 if (session_status() === PHP_SESSION_NONE) {
@@ -122,7 +122,7 @@ error_reporting(E_ALL);
 // Limitar información expuesta
 ini_set('expose_php', 0);
 
-// ==================== FASE 2: Validaciones Pre-WAF ====================
+// ==================== 6: Validaciones Pre-WAF ====================
 
 // Verificar Host Header Injection
 if (!AdvancedProtection::validateHostHeader()) {
@@ -142,7 +142,7 @@ if (!AdvancedProtection::checkRequestTiming()) {
     exit('Request Timeout');
 }
 
-// ==================== FASE 3: WAF - Análisis de petición ====================
+// ==================== 7: WAF - Análisis de petición ====================
 
 // Analizar la petición entrante con el Web Application Firewall
 $firewallResult = SecurityFirewall::analyze();
@@ -161,17 +161,17 @@ if (!$firewallResult['safe']) {
     // exit;
 }
 
-// ==================== FASE 4: Headers de Seguridad ====================
+// ==================== 8: Headers de Seguridad ====================
 
 // Aplicar TODOS los headers de seguridad HTTP
 SecurityHeaders::apply();
 
-// ==================== FASE 5: Sesión Segura ====================
+// ==================== 9: Sesión Segura ====================
 
 // Iniciar sesión con todas las protecciones
 SessionManager::start();
 
-// ==================== FASE 6: Validaciones Post-Sesión ====================
+// ==================== 10: Validaciones Post-Sesión ====================
 
 // Verificar que la sesión es válida si el usuario está autenticado
 if (isset($_SESSION['user_id'])) {
@@ -202,7 +202,7 @@ if (AdvancedProtection::detectAnonymousProxy()) {
     // Podríamos añadir verificación adicional aquí
 }
 
-// ==================== FASE 7: Funciones Helper Globales ====================
+// ==================== 11: Funciones Helper Globales ====================
 
 /**
  * Verifica CSRF en peticiones POST - OBLIGATORIO

@@ -1,7 +1,6 @@
 <?php
 /**
- * Clase SecurityHeaders - Headers de seguridad HTTP MÁXIMOS
- * Implementa TODAS las protecciones HTTP conocidas
+ * Gestiona la configuración de cabeceras HTTP de seguridad.
  * @package App
  */
 
@@ -16,7 +15,7 @@ class SecurityHeaders
     private static ?string $cspNonce = null;
 
     /**
-     * Aplica TODOS los headers de seguridad posibles
+     * headers de seguridad posibles
      */
     public static function apply(): void
     {
@@ -38,9 +37,9 @@ class SecurityHeaders
         // No enviar referrer a otros dominios
         header('Referrer-Policy: same-origin');
         
-        // ==================== Permissions Policy (MÁXIMO RESTRICTIVO) ====================
+        // ==================== Configuración de Permissions-Policy ====================
         
-        // Deshabilitar TODAS las APIs sensibles
+        // Deshabilitar las APIs sensibles
         $permissions = [
             'accelerometer=()',
             'ambient-light-sensor=()',
@@ -83,7 +82,7 @@ class SecurityHeaders
         // COEP deshabilitado porque rompe CDNs externos
         // header('Cross-Origin-Embedder-Policy: require-corp');
         
-        // ==================== Content Security Policy ESTRICTO ====================
+        // ==================== Content Security Policy ====================
         
         $csp = self::buildStrictCSP();
         header('Content-Security-Policy: ' . $csp);
