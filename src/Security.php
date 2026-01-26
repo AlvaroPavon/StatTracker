@@ -101,7 +101,8 @@ class Security
     }
 
     /**
-     * Valida contraseña con requisitos de complejidad
+     * Valida contraseña con requisitos de complejidad, diccionario y filtraciones
+     * ACTUALIZADA: Incluye comprobación contra RockYou-60k y HaveIBeenPwned y carácter especial
      */
     public static function validatePassword(string $password): array
     {
@@ -119,17 +120,37 @@ class Security
             return ['valid' => false, 'error' => 'La contraseña no puede exceder ' . self::MAX_PASSWORD . ' caracteres.', 'value' => ''];
         }
         
-        // Requisitos de complejidad
+        // 1. Letra minúscula
         if (!preg_match('/[a-z]/', $password)) {
             return ['valid' => false, 'error' => 'La contraseña debe contener al menos una letra minúscula.', 'value' => ''];
         }
         
+        // 2. Letra mayúscula
         if (!preg_match('/[A-Z]/', $password)) {
             return ['valid' => false, 'error' => 'La contraseña debe contener al menos una letra mayúscula.', 'value' => ''];
         }
         
+        // 3. Número
         if (!preg_match('/[0-9]/', $password)) {
             return ['valid' => false, 'error' => 'La contraseña debe contener al menos un número.', 'value' => ''];
+        }
+
+        // 4. Carácter Especial (NUEVO REQUISITO)
+        // [^a-zA-Z0-9] busca cualquier cosa que NO sea letra ni número
+        if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+            return ['valid' => false, 'error' => 'La contraseña debe contener al menos un carácter especial (ej: ! @ # $ % & *).', 'value' => ''];
+        }
+
+        // --- VALIDACIONES AVANZADAS ---
+        
+        // 5. Validación de Diccionario (RockYou-60k)
+        if (self::isCommonPassword($password)) {
+            return ['valid' => false, 'error' => 'Esta contraseña es demasiado común y fácil de adivinar (Diccionario).', 'value' => ''];
+        }
+
+        // 6. Validación de Filtración HIBP
+        if (self::isLeakedPassword($password)) {
+            return ['valid' => false, 'error' => 'Esta contraseña ha aparecido en filtraciones de datos públicas. Por su seguridad, elija otra.', 'value' => ''];
         }
         
         return ['valid' => true, 'error' => '', 'value' => $password];
@@ -430,5 +451,81 @@ class Security
     {
         SecurityAudit::auditInput($input, $userId);
         return InputSanitizer::sanitizeArray($input);
+    }
+
+    // ==================== NUEVAS FUNCIONES DE SEGURIDAD ====================
+
+    /**
+     * Verifica si la contraseña está en el diccionario RockYoy-60k.txt.
+     * Lee línea a línea para no consumir memoria RAM.
+     */
+    public static function isCommonPassword(string $password): bool
+    {
+        // 1. Lista de emergencia por si el archivo no existe
+        $emergencyList = ['Password123', 'Admin123', '12345678', 'StatTracker2025'];
+        
+        if (in_array($password, $emergencyList)) {
+            return true;
+        }
+
+        // 2. Ruta al diccionario (ajustada a tu estructura)
+        $dictFile = __DIR__ . '/../config/RockYoy-60k.txt';
+        
+        if (file_exists($dictFile)) {
+            $handle = @fopen($dictFile, "r");
+            if ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    // Importante: trim() elimina espacios y saltos de línea del .txt
+                    if (trim($line) === $password) {
+                        fclose($handle);
+                        return true;
+                    }
+                }
+                fclose($handle);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Consulta API de HaveIBeenPwned usando k-Anonymity.
+     * NO envía la contraseña, solo el prefijo del hash.
+     * Tiene un timeout de 2 segundos para no bloquear la web si internet va lento.
+     */
+    public static function isLeakedPassword(string $password): bool
+    {
+        // 1. Generar hash SHA-1
+        $hash = strtoupper(sha1($password));
+        $prefix = substr($hash, 0, 5);
+        $suffix = substr($hash, 5);
+
+        // 2. Configurar petición HTTP segura y rápida
+        $url = "https://api.pwnedpasswords.com/range/" . $prefix;
+        
+        $opts = [
+            'http' => [
+                'method' => 'GET',
+                'header' => "User-Agent: StatTracker-Security\r\n",
+                'timeout' => 2, // Esperar máximo 2 segundos
+                'ignore_errors' => true
+            ]
+        ];
+
+        $context = stream_context_create($opts);
+
+        // 3. Ejecutar petición (con supresión de errores @ para Fail-Open)
+        $response = @file_get_contents($url, false, $context);
+
+        if ($response === false) {
+            return false; // Si falla la conexión, asumimos que es segura
+        }
+
+        // 4. Buscar el sufijo en la respuesta
+        if (strpos($response, $suffix) !== false) {
+            return true;
+        }
+
+        return false;
     }
 }
