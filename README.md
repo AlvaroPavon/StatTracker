@@ -6,7 +6,7 @@
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Security](https://img.shields.io/badge/security-10%20layers-red)
 
-## 📖 Visión General
+## 📖 Visión General 
 
 **StatTracker** es una aplicación web moderna y **ultra-segura** para el registro, seguimiento y gestión de estadísticas de salud personales. Diseñada como laboratorio de seguridad, implementa **10 capas de defensa** contra ataques.
 
