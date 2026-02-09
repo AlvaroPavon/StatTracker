@@ -10,11 +10,12 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 | **Tipo** | Aplicación PHP con seguridad avanzada |
 | **Backend** | PHP 8.2+ |
 | **Base de Datos** | MySQL/MariaDB ✅ FUNCIONAL |
+| **WAF** | ModSecurity + OWASP CRS 3.3.4 ✅ ACTIVO |
 | **Testing** | PHPUnit (85%+ cobertura) |
 | **Dependencias** | Composer |
 | **CI/CD** | GitHub Actions |
 | **Documentación** | ✅ Completa |
-| **Versión** | 1.4 |
+| **Versión** | 1.5 |
 
 ---
 
@@ -30,8 +31,9 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 - ✅ Historial de métricas
 - ✅ Eliminación de métricas
 
-### Seguridad (10+ Capas)
-- ✅ WAF (Web Application Firewall)
+### Seguridad (10+ Capas + WAF Externo)
+- ✅ **ModSecurity WAF** con OWASP CRS 3.3.4 - **NUEVO v1.5**
+- ✅ WAF interno (Web Application Firewall PHP)
 - ✅ CSP (Content Security Policy)
 - ✅ SRI (Subresource Integrity)
 - ✅ Honeypots
