@@ -130,7 +130,15 @@ Aplicación PHP (StatTracker) para monitorizar métricas físicas que sirve como
 
 ## Historial de Versiones
 
-### v1.4 (Enero 2026) - ACTUAL
+### v1.5 (Febrero 2026) - ACTUAL
+- 🛡️ **ModSecurity WAF** instalado y configurado con Apache
+- 📋 **OWASP Core Rule Set (CRS) v3.3.4** integrado
+- 🔍 **Falso positivo identificado:** Regla 920350 (IP numérica como host)
+- ✏️ **Regla de exclusión creada:** SecRuleRemoveById 920350
+- 🚫 **Protección contra exfiltración** de datos configurada
+- 📄 **Informe completo:** `/app/docs/waf/INFORME-WAF-MODSECURITY.md`
+
+### v1.4 (Enero 2026)
 - 🗄️ Base de datos MySQL configurada y funcional
 - 🔧 Corrección de tipo nullable en RateLimiter::$pdo
 - 🔧 Corrección de SessionManager para manejar campos faltantes
