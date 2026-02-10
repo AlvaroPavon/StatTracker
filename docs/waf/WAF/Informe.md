@@ -83,7 +83,7 @@ Incluye protección contra:
 ### 2.4 Capturas de Pantalla - WAF Funcionando
 
 **Figura 1:** Aplicación StatTracker funcionando normalmente con WAF activo
-![Aplicación Funcionando](WAF/01-login-funcionando.jpeg)
+![Aplicación Funcionando](../WAF/01-login-funcionando.jpeg)
 
 ---
 
@@ -256,7 +256,7 @@ Message: Warning. detected SQLi using libinjection with fingerprint 's&sos'
 ```
 
 **Captura de pantalla:**
-![SQL Injection Bloqueado](WAF/04-sql-injection-bloqueado.jpeg)
+![SQL Injection Bloqueado](../WAF/04-sql-injection-bloqueado.jpeg)
 
 ---
 
@@ -284,7 +284,7 @@ Message: Warning. Pattern match "(?i)<script[^>]*>[\s\S]*?" at ARGS:name.
 ```
 
 **Captura de pantalla:**
-![XSS Bloqueado](WAF/02-xss-bloqueado.jpeg)
+![XSS Bloqueado](../WAF/02-xss-bloqueado.jpeg)
 
 ---
 
@@ -314,7 +314,7 @@ Message: Access denied with code 403 (phase 2).
 ```
 
 **Captura de pantalla:**
-![Path Traversal Bloqueado](WAF/03-path-traversal-bloqueado.jpeg)
+![Path Traversal Bloqueado](../WAF/03-path-traversal-bloqueado.jpeg)
 
 ---
 
@@ -409,5 +409,5 @@ grep "id \"" /var/log/apache2/modsec_audit.log | sort | uniq -c
 
 ### D. Logs
 
-![Path Traversal Bloqueado](WAF/modsec_logs_extracto.txt)
+![Path Traversal Bloqueado](../WAF/modsec_logs_extracto.txt)
 
