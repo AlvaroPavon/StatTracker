@@ -409,5 +409,5 @@ grep "id \"" /var/log/apache2/modsec_audit.log | sort | uniq -c
 
 ### D. Logs
 
-![Path Traversal Bloqueado](../WAF/modsec_logs_extracto.txt)
+![Logs](../WAF/modsec_logs_extracto.txt)
 
