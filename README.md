@@ -16,6 +16,7 @@
 |-----------|----------------|
 | **Funcionalidad** | 📈 Registro de métricas • 📊 Cálculo automático de IMC • 📁 Historial completo • 👤 Gestión de perfil |
 | **Seguridad** | 🔐 Contraseñas con Argon2id • 🛡️ WAF integrado • 🔒 Rate Limiting • 🚫 Anti-DDoS • 🔑 2FA/MFA |
+| **API Móvil** | 📱 API REST con JWT • 🔌 Endpoints para apps móviles • 🔄 Sync en tiempo real |
 | **Calidad** | ✅ 85%+ cobertura de tests • 📝 Documentación completa • 🏗️ Arquitectura MVC |
 
 ### 🎯 ¿Para quién es esta aplicación?
@@ -88,6 +89,11 @@ Abre tu navegador en: `http://localhost:8000`
 
 ```
 StatTracker/
+├── api/                    # 🆕 API REST para app móvil
+│   ├── index.php           # Entry point de la API
+│   ├── controllers/        # Controladores (Auth, Metrics, Profile)
+│   ├── middleware/         # JWT Middleware
+│   └── config/             # Configuración (JWT, CORS)
 ├── src/                    # Clases principales
 │   ├── Auth.php            # Autenticación (registro, login)
 │   ├── User.php            # Gestión de perfil
@@ -198,6 +204,9 @@ vendor/bin/phpunit            # Ejecutar tests
 vendor/bin/phpunit --testdox  # Salida legible
 vendor/bin/phpunit --coverage-html coverage  # Cobertura
 
+# API (App Móvil)
+php api/test.php              # Test rápido de la API
+
 # Base de Datos
 mysql -u root -p proyecto_imc < database.sql  # Importar esquema
 ```
@@ -234,14 +243,19 @@ mysql -u root -p proyecto_imc < database.sql  # Importar esquema
 
 ## 🚀 Roadmap
 
-### v1.2 (Planificado)
+### v1.4 (Actual) - 🆕
+* 📱 **API REST para aplicación móvil**
+* 🔐 Autenticación con JWT
+* 🔄 Endpoints completos (auth, métricas, perfil)
+
+### v1.5 (Planificado)
 * 📧 Recuperación de contraseña por email
 * 📊 Gráficos de evolución de métricas
 * 📱 Mejoras responsive para móviles
 
 ### v2.0 (Futuro)
 * 📤 Exportación de datos (PDF, CSV)
-* 🔔 Notificaciones y recordatorios
+* 🔔 Notificaciones push
 * 🎯 Objetivos personalizados
 
 ---
