@@ -42,7 +42,7 @@ $request = explode('?', $request)[0];
 $request = rtrim($request, '/');
 
 // Identificar ruta base de la API
-$basePath = '/api';
+$basePath = '/proyecto_imc/api';
 if (strpos($request, $basePath) !== 0) {
     http_response_code(404);
     echo json_encode(['error' => 'Endpoint no encontrado']);
@@ -98,7 +98,7 @@ if (preg_match('#^(metrics)/(\d+)$#', $path, $matches)) {
 // Ejecutar ruta matcheada
 if (isset($routes[$route])) {
     [$controllerName, $action] = $routes[$route];
-    $controllerClass = $controllerName . 'Controller';
+    $controllerClass = $controllerName;
     
     require_once __DIR__ . '/controllers/' . $controllerClass . '.php';
     $controllerInstance = new $controllerClass();

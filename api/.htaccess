@@ -1,6 +1,6 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    # RewriteBase /proyecto_imc/api/
     
     # Redirigir todo a index.php
     RewriteCond %{REQUEST_FILENAME} !-f

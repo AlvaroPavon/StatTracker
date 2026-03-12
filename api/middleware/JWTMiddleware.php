@@ -80,7 +80,8 @@ class JWTMiddleware {
      * Genera la firma del token
      */
     private static function generateSignature(string $header, string $payload, string $secret): string {
-        return hash_hmac('sha256', "$header.$payload", $secret, true);
+        $rawSignature = hash_hmac('sha256', "$header.$payload", $secret, true);
+        return self::base64UrlEncode($rawSignature); // ¡Aquí convertimos el binario a texto seguro!
     }
 
     /**

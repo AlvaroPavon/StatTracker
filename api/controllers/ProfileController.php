@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../../database_connection.php';
+require_once __DIR__ . '/../../src/CryptoFortress.php';
 
 class ProfileController {
     private $db;
@@ -130,18 +131,14 @@ class ProfileController {
         $stmt->execute([$this->user['user_id']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!password_verify($currentPassword, $user['password'])) {
+        if (!\App\CryptoFortress::verifyPassword($currentPassword, $user['password'])) {
             http_response_code(401);
             echo json_encode(['error' => 'Contraseña actual incorrecta']);
             return;
         }
 
-        // Hash nueva contraseña con Argon2id
-        $passwordHash = password_hash($newPassword, PASSWORD_ARGON2ID, [
-            'memory_cost' => 65536,
-            'time_cost' => 4,
-            'threads' => 4
-        ]);
+        // Hash nueva contraseña con CryptoFortress
+        $passwordHash = \App\CryptoFortress::hashPassword($newPassword);
 
         $stmt = $this->db->prepare('UPDATE usuarios SET password = ? WHERE id = ?');
         

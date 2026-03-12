@@ -34,23 +34,10 @@ class DashboardViewModel(
                 if (response.isSuccessful && response.body()?.success == true) {
                     _uiState.value = DashboardUiState.Success(response.body()?.metrics ?: emptyList())
                 } else {
-                    _uiState.value = DashboardUiState.Error("Error al cargar métricas")
+                    _uiState.value = DashboardUiState.Error("Error al cargar las métricas")
                 }
             } catch (e: Exception) {
-                _uiState.value = DashboardUiState.Error("Error de red")
-            }
-        }
-    }
-    
-    fun deleteMetric(id: Int) {
-        viewModelScope.launch {
-            try {
-                val response = repository.deleteMetric(id)
-                if (response.isSuccessful) {
-                    loadMetrics() // Recargar lista
-                }
-            } catch (e: Exception) {
-                // Manejar error silenciosamente o con toast
+                _uiState.value = DashboardUiState.Error("Error de red: ${e.localizedMessage}")
             }
         }
     }

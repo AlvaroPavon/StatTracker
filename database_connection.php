@@ -50,6 +50,21 @@ try {
     if ($checkColumn->rowCount() === 0) {
         $pdo->exec("ALTER TABLE usuarios ADD COLUMN apellidos VARCHAR(100) NOT NULL DEFAULT '' AFTER nombre");
     }
+
+    $checkCreated = $pdo->query("SHOW COLUMNS FROM usuarios LIKE 'created_at'");
+    if ($checkCreated->rowCount() === 0) {
+        $pdo->exec("ALTER TABLE usuarios ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+    }
+
+    $checkUpdated = $pdo->query("SHOW COLUMNS FROM usuarios LIKE 'updated_at'");
+    if ($checkUpdated->rowCount() === 0) {
+        $pdo->exec("ALTER TABLE usuarios ADD COLUMN updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+    }
+
+    $checkMetricasCreated = $pdo->query("SHOW COLUMNS FROM metricas LIKE 'created_at'");
+    if ($checkMetricasCreated->rowCount() === 0) {
+        $pdo->exec("ALTER TABLE metricas ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+    }
     
 } catch (\PDOException $e) {
     // NUNCA mostrar detalles del error de BD al usuario

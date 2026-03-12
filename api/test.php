@@ -7,7 +7,7 @@
 echo "=== StatTracker API Test ===\n\n";
 
 // Configuración base
-$baseUrl = 'http://localhost:8000';
+$baseUrl = 'http://localhost:8080/proyecto_imc';
 $email = 'test@example.com';
 $password = 'Password123';
 

@@ -4,10 +4,9 @@ package com.stattracker.mobile.util
  * Constantes de configuración de la aplicación
  */
 object Constants {
-    // API Base URL
-    // Para emulator Android: usar 10.0.2.2 en vez de localhost
-    // Para dispositivo físico: usar la IP de tu máquina (ej: 192.168.1.XX)
-    const val BASE_URL = "http://10.0.2.2:8000"
+    // API Base URL para XAMPP
+    // La ruta debe llegar hasta la carpeta 'public' del proyecto
+    const val BASE_URL = "http://10.0.2.2:8080/proyecto_imc/"
     
     // Preferences
     const val PREF_NAME = "stattracker_prefs"

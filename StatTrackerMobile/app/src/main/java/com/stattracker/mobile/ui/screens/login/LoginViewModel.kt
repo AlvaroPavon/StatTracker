@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 sealed class LoginUiState {
     object Idle : LoginUiState()
@@ -35,15 +36,32 @@ class LoginViewModel(
             _uiState.value = LoginUiState.Loading
             try {
                 val response = repository.login(LoginRequest(email, password))
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val loginResponse = response.body()!!
-                    tokenManager.saveAuthData(
-                        token = loginResponse.token ?: "",
-                        name = loginResponse.user?.nombre ?: ""
-                    )
-                    _uiState.value = LoginUiState.Success(loginResponse.token ?: "")
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    if (loginResponse?.success == true) {
+                        tokenManager.saveAuthData(
+                            token = loginResponse.token ?: "",
+                            name = loginResponse.user?.nombre ?: ""
+                        )
+                        _uiState.value = LoginUiState.Success(loginResponse.token ?: "")
+                    } else {
+                        // Aquí el servidor respondió con 200 pero success false
+                        _uiState.value = LoginUiState.Error("Credenciales inválidas o cuenta no activa")
+                    }
                 } else {
-                    _uiState.value = LoginUiState.Error("Credenciales inválidas")
+                    // Aquí el servidor respondió con error (401, 404, 500...)
+                    val errorJson = response.errorBody()?.string()
+                    val errorMessage = try {
+                        JSONObject(errorJson!!).getString("message")
+                    } catch (e: Exception) {
+                        when(response.code()) {
+                            401 -> "Email o contraseña incorrectos"
+                            404 -> "Servicio no encontrado (Verifica la URL en Constants.kt)"
+                            500 -> "Error interno del servidor (Revisa los logs de XAMPP)"
+                            else -> "Error ${response.code()}: ${response.message()}"
+                        }
+                    }
+                    _uiState.value = LoginUiState.Error(errorMessage)
                 }
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error("Error de conexión: ${e.localizedMessage}")

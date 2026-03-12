@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../config/jwt.php';
 require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../../database_connection.php';
+require_once __DIR__ . '/../../src/CryptoFortress.php';
 
 class AuthController {
     private $db;
@@ -56,12 +57,8 @@ class AuthController {
             return;
         }
 
-        // Hash de contraseña con Argon2id (compatible con el proyecto original)
-        $passwordHash = password_hash($password, PASSWORD_ARGON2ID, [
-            'memory_cost' => 65536,
-            'time_cost' => 4,
-            'threads' => 4
-        ]);
+        // Hash de contraseña con CryptoFortress (estándar de seguridad del proyecto)
+        $passwordHash = \App\CryptoFortress::hashPassword($password);
 
         // Insertar usuario
         $stmt = $this->db->prepare(
@@ -104,7 +101,7 @@ class AuthController {
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!$user || !\App\CryptoFortress::verifyPassword($password, $user['password'])) {
             http_response_code(401);
             echo json_encode(['error' => 'Credenciales inválidas']);
             return;

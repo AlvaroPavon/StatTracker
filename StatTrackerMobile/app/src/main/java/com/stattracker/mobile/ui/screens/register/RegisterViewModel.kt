@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 sealed class RegisterUiState {
     object Idle : RegisterUiState()
@@ -33,13 +34,24 @@ class RegisterViewModel(
             _uiState.value = RegisterUiState.Loading
             try {
                 val response = repository.register(RegisterRequest(nombre, "", email, password))
-                if (response.isSuccessful && response.body()?.success == true) {
-                    _uiState.value = RegisterUiState.Success
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body?.success == true) {
+                        _uiState.value = RegisterUiState.Success
+                    } else {
+                        _uiState.value = RegisterUiState.Error(body?.message ?: "Error en el registro")
+                    }
                 } else {
-                    _uiState.value = RegisterUiState.Error("Error al registrar: El email podría estar en uso")
+                    val errorJson = response.errorBody()?.string()
+                    val message = try {
+                        JSONObject(errorJson!!).getString("message")
+                    } catch (e: Exception) {
+                        "Error ${response.code()}: ${response.message()}"
+                    }
+                    _uiState.value = RegisterUiState.Error(message)
                 }
             } catch (e: Exception) {
-                _uiState.value = RegisterUiState.Error("Error de red")
+                _uiState.value = RegisterUiState.Error("Error de red: ${e.localizedMessage}")
             }
         }
     }
