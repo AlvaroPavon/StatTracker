@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-02-23 Mon 10:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Propuesta de Actividad: Implementación y Auditoría de Seguridad API REST</title>
+<meta name="author" content="Departamento de Informática" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/code-copy.css"/>
+<link rel="stylesheet" type="text/css" href="src/readtheorg_theme/css/search.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/search.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/code-copy.js"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Propuesta de Actividad: Implementación y Auditoría de Seguridad API REST</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0da3f62">1. Descripción de la Actividad</a></li>
+<li><a href="#org93ed8b9">2. Requerimientos Técnicos</a>
+<ul>
+<li><a href="#orgf371396">2.1. Desarrollo</a>
+<ul>
+<li><a href="#org0b8c2d5">2.1.1. Formato de datos</a></li>
+<li><a href="#orge2af487">2.1.2. Autenticación</a></li>
+<li><a href="#org7d61518">2.1.3. Documentación</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orge9945e0">3. Fase de Auditoría de Seguridad (OWASP)</a></li>
+<li><a href="#org3533c93">4. Guía de Referencia y Recursos</a></li>
+<li><a href="#orgdf99949">5. Entregables y Documentación</a>
+<ul>
+<li><a href="#org474ff8a">5.1. El Código Fuente</a></li>
+<li><a href="#orgb84a9d9">5.2. Documento de Pruebas (Security Report)</a></li>
+<li><a href="#org73ab564">5.3. Interfaz API</a></li>
+</ul>
+</li>
+<li><a href="#org22ca951">6. Criterios de Evaluación</a></li>
+<li><a href="#orgfa1f10b">7. Notas</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0da3f62" class="outline-2">
+<h2 id="org0da3f62"><span class="section-number-2">1.</span> Descripción de la Actividad</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+El objetivo de esta práctica es evolucionar la aplicación web
+desarrollada previamente, dotándola de una interfaz de programación de
+aplicaciones (API JSON). Esta API servirá como puente de comunicación
+para una futura aplicación móvil.
+</p>
+
+<p>
+Una vez implementada, el foco principal será la seguridad. Debereis
+actuar como auditores de vuestro propio código, siguiendo los
+estándares internacionales de OWASP.
+</p>
+</div>
+</div>
+<div id="outline-container-org93ed8b9" class="outline-2">
+<h2 id="org93ed8b9"><span class="section-number-2">2.</span> Requerimientos Técnicos</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgf371396" class="outline-3">
+<h3 id="orgf371396"><span class="section-number-3">2.1.</span> Desarrollo</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Implementar endpoints para las operaciones CRUD principales de la
+aplicación.
+</p>
+
+<ul class="org-ul">
+<li>Ver datos registrados</li>
+<li>Registrar nuevos datos</li>
+</ul>
+</div>
+<div id="outline-container-org0b8c2d5" class="outline-4">
+<h4 id="org0b8c2d5"><span class="section-number-4">2.1.1.</span> Formato de datos</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+JSON.
+</p>
+</div>
+</div>
+<div id="outline-container-orge2af487" class="outline-4">
+<h4 id="orge2af487"><span class="section-number-4">2.1.2.</span> Autenticación</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+Uso de tokens (ej. JWT) u OAuth2.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d61518" class="outline-4">
+<h4 id="org7d61518"><span class="section-number-4">2.1.3.</span> Documentación</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<p>
+Para que la aplicación móvil pueda integrarse correctamente, se puede
+documentar la API siguiendo el estándar OpenAPI 3.0.
+</p>
+
+<p>
+Pasos a seguir:
+</p>
+
+<ol class="org-ol">
+<li>Instalación de Dependencias: Dependiendo del framework
+(ej. springdoc-openapi para Spring Boot, swagger-jsdoc para
+Node.js/Express, o drf-spectacular para Django), instalar la
+librería necesaria.</li>
+
+<li>Definición de Schemas: Cada modelo de datos (User, Product, etc.)
+debe tener su esquema definido para que el cliente móvil conozca
+los tipos de datos (string, integer, boolean).</li>
+
+<li>Anotación de Endpoints:</li>
+
+<li>Summary/Description: Explicar qué hace el endpoint.</li>
+
+<li>Responses: Definir los códigos de estado HTTP (200 OK, 201 Created,
+401 Unauthorized, 403 Forbidden, 500 Error).</li>
+
+<li>Security: Marcar qué rutas requieren el token JWT/OAuth2.</li>
+</ol>
+
+<p>
+Ejemplo de estructura de un Endpoint en Swagger:
+</p>
+
+<pre class="example" id="org8f22bee">
+/auth/login:
+post:
+summary: Autenticación de usuario
+responses:
+200:
+description: Token generado con éxito
+401:
+description: Credenciales inválidas
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orge9945e0" class="outline-2">
+<h2 id="orge9945e0"><span class="section-number-2">3.</span> Fase de Auditoría de Seguridad (OWASP)</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Los alumnos deberán evaluar la seguridad de su API basándose en la
+OWASP Web Security Testing Guide (WSTG) y el API Security Top 10.
+</p>
+
+<p>
+Puntos clave a testear:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/03-Identity_Management_Testing/04-Testing_for_Account_Enumeration_and_Guessable_User_Account">WSTG-IDNT-04</a>: Prueba de robustez de la autenticación.</li>
+
+<li><a href="https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/05-Authorization_Testing/02-Testing_for_Bypassing_Authorization_Schema">WSTG-AUTH-02</a>: Prueba de controles de autorización (IDOR).</li>
+
+<li><a href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/03-Testing_for_Sensitive_Information_Sent_via_Unencrypted_Channels">WSTG-CRYP-03</a>: Seguridad en el transporte (Uso de TLS/HTTPS).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3533c93" class="outline-2">
+<h2 id="org3533c93"><span class="section-number-2">4.</span> Guía de Referencia y Recursos</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Para realizar las pruebas, se deben consultar los siguientes
+documentos oficiales:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://owasp.org/www-project-web-security-testing-guide/">OWASP Web Security Testing Guide (WSTG) v4.2</a></li>
+
+<li><a href="https://owasp.org/www-project-api-security/">OWASP API Security Top 10</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgdf99949" class="outline-2">
+<h2 id="orgdf99949"><span class="section-number-2">5.</span> Entregables y Documentación</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Los alumnos deben entregar enlace al repositorio o un archivo comprimido:
+</p>
+</div>
+<div id="outline-container-org474ff8a" class="outline-3">
+<h3 id="org474ff8a"><span class="section-number-3">5.1.</span> El Código Fuente</h3>
+<div class="outline-text-3" id="text-5-1">
+<ul class="org-ul">
+<li>Implementación de la API.</li>
+
+<li>Archivo de configuración del entorno.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgb84a9d9" class="outline-3">
+<h3 id="orgb84a9d9"><span class="section-number-3">5.2.</span> Documento de Pruebas (Security Report)</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+Debe seguir el siguiente formato de tabla para cada vulnerabilidad
+probada:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">ID Control (WSTG)</th>
+<th scope="col" class="org-left">Descripción de la Prueba</th>
+<th scope="col" class="org-left">Resultado (Pass/Fail)</th>
+<th scope="col" class="org-left">Observaciones/Mitigación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">WSTG-CONF-05</td>
+<td class="org-left">Revisar cabeceras HTTP</td>
+<td class="org-left">Pass</td>
+<td class="org-left">Se incluye HSTS</td>
+</tr>
+
+<tr>
+<td class="org-left">WSTG-AUTH-03</td>
+<td class="org-left">Bypass de sesión</td>
+<td class="org-left">Fail</td>
+<td class="org-left">Token expira en 24h</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org73ab564" class="outline-3">
+<h3 id="org73ab564"><span class="section-number-3">5.3.</span> Interfaz API</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+Se debe incluir una captura de pantalla de la interfaz Swagger UI
+funcionando y el archivo de definición en formato JSON o YAML
+(openapi.json).
+</p>
+
+<p>
+Se evaluará que:
+</p>
+
+<ul class="org-ul">
+<li>Todos los endpoints aparezcan en la interfaz.</li>
+
+<li>Se hayan definido los modelos de error (4xx y 5xx).</li>
+
+<li>Se pueda probar la API directamente desde el "Try it out" de
+Swagger, incluyendo el paso de autenticación.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org22ca951" class="outline-2">
+<h2 id="org22ca951"><span class="section-number-2">6.</span> Criterios de Evaluación</h2>
+<div class="outline-text-2" id="text-6">
+<ul class="org-ul">
+<li>Funcionalidad (40%): La API responde correctamente a las peticiones
+del cliente móvil.</li>
+
+<li>Seguridad (40%): Calidad de la auditoría y corrección de
+vulnerabilidades detectadas.</li>
+
+<li>Documentación (20%): Claridad en el reporte de pruebas y uso
+correcto del formato Markdown si es el caso.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfa1f10b" class="outline-2">
+<h2 id="orgfa1f10b"><span class="section-number-2">7.</span> Notas</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+Resumen rápido de documentación de API REST según la tecnología:
+</p>
+
+<ul class="org-ul">
+<li>Node.js (Express): Suelen usar swagger-ui-express y
+swagger-jsdoc. Escriben comentarios JSDoc encima de sus rutas y la
+librería genera el JSON.</li>
+
+<li>Java (Spring Boot): Basta con añadir la dependencia de
+springdoc-openapi-ui. Al arrancar la app, la documentación se genera
+automáticamente en /swagger-ui.html analizando los @RestController.</li>
+
+<li>Python (FastAPI): Es nativo. FastAPI genera la documentación en
+/docs automáticamente mientras definen las funciones.</li>
+
+<li>PHP (Laravel): Utilizan el paquete L5-Swagger (basado en
+swagger-php).</li>
+</ul>
+
+<p>
+Alternativas a Swagger
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/furudo-erika/awesome-swagger-alternatives">https://github.com/furudo-erika/awesome-swagger-alternatives</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2026-02-23 Mon 00:00</p>
+<p class="author">Author: Departamento de Informática</p>
+<p class="date">Created: 2026-02-23 Mon 10:04</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
