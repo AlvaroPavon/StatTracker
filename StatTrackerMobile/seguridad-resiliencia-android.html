@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-06 Mon 11:53 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Implementación de Medidas de Seguridad y Resiliencia (OWASP MASTG)</title>
+<meta name="author" content="Fernando Raya" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/code-copy.css"/>
+<link rel="stylesheet" type="text/css" href="src/readtheorg_theme/css/search.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/search.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/code-copy.js"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Implementación de Medidas de Seguridad y Resiliencia (OWASP MASTG)</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org57bcba5">1. Objetivo</a></li>
+<li><a href="#orged78042">2. Requisitos técnicos: Niveles de resiliencia (MSTG-RESILIENCE)</a>
+<ul>
+<li><a href="#org694ed44">2.1. Nivel 1: Detección de root y entorno inseguro (MSTG-RES-1)</a></li>
+<li><a href="#orgcea9fc9">2.2. Nivel 2: Anti-Debugging y Prevención de Análisis Dinámico (MSTG-RES-2)</a></li>
+<li><a href="#org7fb62d2">2.3. Nivel 3: Verificación de integridad y firma (MSTG-RES-3)</a></li>
+<li><a href="#orgc86aaf3">2.4. Nivel 4: Ofuscación de código y empaquetado (MSTG-RES-4)</a></li>
+<li><a href="#org5036677">2.5. Nivel 5: Respuesta dinámica y resiliencia UX (MSTG-RES-5)</a></li>
+</ul>
+</li>
+<li><a href="#orge5491b0">3. Evaluación</a></li>
+<li><a href="#org0f986b4">4. Entrega</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org57bcba5" class="outline-2">
+<h2 id="org57bcba5"><span class="section-number-2">1.</span> Objetivo</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+El alumno deberá fortalecer una aplicación Android integrando
+controles de la categoría <b>MSTG-RESILIENCE</b> de OWASP. El objetivo es
+implementar mecanismos de defensa activa que dificulten el análisis
+dinámico y la manipulación (tampering) de la aplicación en tiempo de
+ejecución.
+</p>
+</div>
+</div>
+<div id="outline-container-orged78042" class="outline-2">
+<h2 id="orged78042"><span class="section-number-2">2.</span> Requisitos técnicos: Niveles de resiliencia (MSTG-RESILIENCE)</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Para cada nivel, se debe implementar la lógica correspondiente y
+documentar su efectividad.
+</p>
+</div>
+<div id="outline-container-org694ed44" class="outline-3">
+<h3 id="org694ed44"><span class="section-number-3">2.1.</span> Nivel 1: Detección de root y entorno inseguro (MSTG-RES-1)</h3>
+<div class="outline-text-3" id="text-2-1">
+<dl class="org-dl">
+<dt>Control</dt><dd>La aplicación debe detectar si se ejecuta en un
+dispositivo con privilegios de root.</dd>
+
+<dt>Implementación</dt><dd><ul class="org-ul">
+<li>Por ejemplo, comprobar existencia de binarios en
+`/system/xbin/su`.</li>
+
+<li>Integrar la librería <i>RootBeer</i> para una detección multivariable.</li>
+</ul></dd>
+
+<dt>Política</dt><dd>Si se detecta root, la app debe informar al usuario y
+finalizar la ejecución de forma segura.</dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-orgcea9fc9" class="outline-3">
+<h3 id="orgcea9fc9"><span class="section-number-3">2.2.</span> Nivel 2: Anti-Debugging y Prevención de Análisis Dinámico (MSTG-RES-2)</h3>
+<div class="outline-text-3" id="text-2-2">
+<dl class="org-dl">
+<dt>Control</dt><dd>La aplicación debe evitar ser depurada por herramientas
+externas.</dd>
+
+<dt>Implementación</dt><dd><ul class="org-ul">
+<li>Configurar <code>android:debuggable="false"</code> en el manifiesto de
+release.</li>
+<li><p>
+Implementar chequeo dinámico en el `onCreate` de la actividad
+principal:
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #b6a0ff;">if</span> (<span style="color: #00bcff;">android</span>.<span style="color: #00bcff;">os</span>.Debug.isDebuggerConnected()) { System.exit(0); }
+</pre>
+</div></li>
+</ul></dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-org7fb62d2" class="outline-3">
+<h3 id="org7fb62d2"><span class="section-number-3">2.3.</span> Nivel 3: Verificación de integridad y firma (MSTG-RES-3)</h3>
+<div class="outline-text-3" id="text-2-3">
+<dl class="org-dl">
+<dt>Control</dt><dd>La aplicación debe detectar si su código o recursos
+han sido modificados (<i>Anti-Tampering</i>).</dd>
+
+<dt>Implementación</dt><dd><ul class="org-ul">
+<li>Implementar un método que verifique el <i>Hash</i> del certificado de
+firma de la APK en tiempo de ejecución.</li>
+
+<li>Comparar con el valor hardcodeado original para detectar
+re-empaquetado.</li>
+</ul></dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-orgc86aaf3" class="outline-3">
+<h3 id="orgc86aaf3"><span class="section-number-3">2.4.</span> Nivel 4: Ofuscación de código y empaquetado (MSTG-RES-4)</h3>
+<div class="outline-text-3" id="text-2-4">
+<dl class="org-dl">
+<dt>Control</dt><dd>El código debe ser difícil de leer tras la ingeniería
+inversa.</dd>
+
+<dt>Implementación</dt><dd><ul class="org-ul">
+<li>Habilitar <code>minifyEnabled true</code> en <code>build.gradle</code>.</li>
+
+<li>Configurar <code>proguard-rules.pro</code> para proteger nombres de clases y
+métodos críticos sin romper dependencias.</li>
+</ul></dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-org5036677" class="outline-3">
+<h3 id="org5036677"><span class="section-number-3">2.5.</span> Nivel 5: Respuesta dinámica y resiliencia UX</h3>
+<div class="outline-text-3" id="text-2-5">
+<dl class="org-dl">
+<dt>Control</dt><dd>La aplicación debe reaccionar de forma proactiva a las
+amenazas detectadas.</dd>
+
+<dt>Implementación</dt><dd><ul class="org-ul">
+<li>Asegurar un <i>cierre controlado</i>. No debe haber <i>crashes</i> técnicos,
+sino mensajes claros de seguridad al usuario.</li>
+
+<li>(Opcional) Implementar detección de emuladores para evitar el
+análisis en entornos controlados.</li>
+</ul></dd>
+</dl>
+</div>
+</div>
+</div>
+<div id="outline-container-orge5491b0" class="outline-2">
+<h2 id="orge5491b0"><span class="section-number-2">3.</span> Evaluación</h2>
+<div class="outline-text-2" id="text-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Criterio</th>
+<th scope="col" class="org-left">Excelente (10)</th>
+<th scope="col" class="org-left">Adecuado (5)</th>
+<th scope="col" class="org-left">Insuficiente (0)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><b><b>MSTG-RES-1/2</b></b> (40%)</td>
+<td class="org-left">Bloqueo efectivo de Root/Debug con gestión de salida.</td>
+<td class="org-left">Detección básica fácil de saltar.</td>
+<td class="org-left">Sin protección.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>MSTG-RES-3/4</b></b> (40%)</td>
+<td class="org-left">Código ofuscado e integridad verificada (Firma).</td>
+<td class="org-left">Solo ofuscación básica o errores de firma.</td>
+<td class="org-left">Sin protección estática.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Resiliencia/UX</b></b> (20%)</td>
+<td class="org-left">Cierre controlado y mensajes claros de seguridad.</td>
+<td class="org-left">Cierre brusco (crash) sin mensaje.</td>
+<td class="org-left">Permite acceso inseguro.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org0f986b4" class="outline-2">
+<h2 id="org0f986b4"><span class="section-number-2">4.</span> Entrega</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>Archivo APK resultante y código fuente (`.zip` o enlace a
+Repo).</li>
+
+<li>Informe <i>README.md</i> o <code>.pdf</code> con evidencias (capturas de pantalla)
+de las protecciones funcionando en entornos de prueba (ej. ADB o
+Genymotion con root).</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2024-05-22 Wed 00:00</p>
+<p class="author">Author: Fernando Raya</p>
+<p class="email">Email: <a href="mailto:fraya@ieszaidinvergeles.org">fraya@ieszaidinvergeles.org</a></p>
+<p class="date">Created: 2026-04-06 Mon 11:53</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

@@ -23,11 +23,17 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // MSTG-RES-4: Habilitar ofuscación y reducción de código
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            // Ofuscación parcial en debug para probar resiliencia si se desea
+            isMinifyEnabled = false
         }
     }
     
@@ -93,6 +99,9 @@ dependencies {
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // MSTG-RES-1: Detección de Root
+    implementation("com.scottyab:rootbeer-lib:0.1.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")
