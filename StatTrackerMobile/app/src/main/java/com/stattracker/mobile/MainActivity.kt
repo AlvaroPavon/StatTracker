@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.stattracker.mobile.ui.navigation.SetupNavGraph
 import com.stattracker.mobile.ui.theme.StatTrackerMobileTheme
 import com.stattracker.mobile.util.Constants
 import com.stattracker.mobile.util.SecurityCheck
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
@@ -21,25 +25,17 @@ class MainActivity : ComponentActivity() {
         
         // --- MSTG-RESILIENCE IMPLEMENTATION ---
         
-        // MSTG-RES-2: Anti-Debugging
-        if (SecurityCheck.isDebuggerConnected()) {
-            Toast.makeText(this, "Depurador detectado. Por seguridad la app se cerrará.", Toast.LENGTH_LONG).show()
-            finishAffinity()
-            exitProcess(0)
-        }
+        // MSTG-RES-2: Anti-Debugging y comprobación periódica
+        startSecurityChecks()
 
         // MSTG-RES-1: Detección de Root
         if (SecurityCheck.isDeviceRooted(this)) {
-            Toast.makeText(this, "Dispositivo rooteado detectado. Entorno inseguro.", Toast.LENGTH_LONG).show()
-            finishAffinity()
-            exitProcess(0)
+            showSecurityError("Dispositivo rooteado detectado. Entorno inseguro.")
         }
 
         // MSTG-RES-3: Verificación de Integridad
         if (!SecurityCheck.checkAppIntegrity(this)) {
-            Toast.makeText(this, "La aplicación ha sido manipulada.", Toast.LENGTH_LONG).show()
-            finishAffinity()
-            exitProcess(0)
+            showSecurityError("La aplicación ha sido manipulada.")
         }
 
         setContent {
@@ -56,5 +52,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun startSecurityChecks() {
+        lifecycleScope.launch {
+            while (isActive) {
+                if (SecurityCheck.isDebuggerConnected()) {
+                    showSecurityError("Depurador detectado. Por seguridad la app se cerrará.")
+                }
+                delay(5000) // Comprobar cada 5 segundos
+            }
+        }
+    }
+
+    private fun showSecurityError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        finishAffinity()
+        exitProcess(0)
     }
 }

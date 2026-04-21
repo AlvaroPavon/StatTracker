@@ -20,12 +20,13 @@ object SecurityCheck {
 
     // MSTG-RES-2: Anti-Debugging
     fun isDebuggerConnected(): Boolean {
-        return android.os.Debug.isDebuggerConnected()
+        return android.os.Debug.isDebuggerConnected() || 
+               (android.os.Debug.waitingForDebugger())
     }
 
     // MSTG-RES-3: Verificación de Integridad (Firma)
-    // Nota: Reemplazar el HASH_ORIGINAL por el real de tu firma tras la primera compilación
-    private const val EXPECTED_SIGNATURE_HASH = "PON_AQUI_TU_HASH_REAL" 
+    // El hash debe ser el SHA-256 de la firma de producción codificado en Base64
+    private const val EXPECTED_SIGNATURE_HASH = "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=" // Ejemplo de hash real
 
     fun checkAppIntegrity(context: Context): Boolean {
         try {
@@ -46,17 +47,15 @@ object SecurityCheck {
                 for (signature in signatures) {
                     val md = MessageDigest.getInstance("SHA-256")
                     md.update(signature.toByteArray())
-                    val currentHash = Base64.encodeToString(md.digest(), Base64.DEFAULT).trim()
+                    val currentHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP).trim()
                     
-                    android.util.Log.d("SecurityCheck", "Signature Hash: $currentHash")
-                    
-                    // if (currentHash == EXPECTED_SIGNATURE_HASH) return true
+                    if (currentHash == EXPECTED_SIGNATURE_HASH) return true
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("SecurityCheck", "Error verificando integridad: ${e.message}")
+            // No loguear errores sensibles en producción
             return false
         }
-        return true // Temporalmente true hasta configurar el hash real
+        return false
     }
 }
