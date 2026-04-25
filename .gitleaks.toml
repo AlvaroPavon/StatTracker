@@ -1,0 +1,24 @@
+title = "gitleaks config"
+
+[allowlist]
+description = "global allow lists"
+regexes = [
+  '''219-09-9999''',
+  '''078-05-1120''',
+  '''(9[0-9]{2}|666)-\d{2}-\d{4}''',
+]
+paths = [
+  '''gitleaks.toml''',
+  '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket)$''',
+  '''(go.mod|go.sum)$''',
+  '''vendor''',
+]
+
+[[rules]]
+description = "Discord API key"
+id = "discord-api-token"
+regex = '''(?i)(?:discord)(?:[0-9a-z\-_\t .]{0,20})(?:[\s|']|[\s|"]){0,3}(?:=|>|:=|\|\|:|<=|=>|:)(?:'|\"|\s|=|\x60){0,5}([a-f0-9]{64})(?:['|\"|\n|\r|\s|\x60]|$)'''
+secretGroup = 1
+keywords = [
+  "discord",
+]
