@@ -192,6 +192,45 @@ vendor/bin/phpunit --coverage-html coverage
 
 ---
 
+## 📂 Implementación y Evidencias de Seguridad (Carpeta `archivos`)
+
+La carpeta `archivos/` contiene los reportes y evidencias en formato PDF de las distintas prácticas de seguridad aplicadas al repositorio. A continuación se detalla cómo se ha implementado en el proyecto cada una de las medidas documentadas en estos archivos:
+
+### 1. Firma de Commits (GPG/SSH)
+* **Evidencia:** `Firma de commits.pdf`
+* **Cómo se añadió:** Se configuró el control de versiones para requerir y verificar la firma de los commits, garantizando la identidad del autor.
+  * Se generó una clave GPG o SSH en el entorno de desarrollo local.
+  * Se subió la clave pública a los ajustes de la cuenta de GitHub (Settings > SSH and GPG keys).
+  * Se habilitó la firma automática localmente con el comando: `git config --global commit.gpgsign true`.
+
+### 2. Configuraciones de Seguridad de GitHub
+* **Evidencia:** `Github.pdf`
+* **Cómo se añadió:** Se activaron herramientas nativas de protección directamente desde los ajustes del repositorio en GitHub (Settings > Code security and analysis):
+  * **Dependabot:** Para recibir alertas y crear PRs automáticos actualizando dependencias vulnerables.
+  * **Secret scanning:** El escáner integrado de GitHub está activo para detectar credenciales expuestas públicamente.
+
+### 3. Escaneo de Secretos con Gitleaks
+* **Evidencia:** `Gitleaks.pdf`
+* **Cómo se añadió:** Se automatizó la prevención de fugas de credenciales mediante GitHub Actions y configuración local.
+  * Se creó el flujo de trabajo `.github/workflows/gitleaks.yml` que se ejecuta en cada `push` y `pull_request`.
+  * Se añadió el archivo `.gitleaks.toml` en la raíz del proyecto para definir reglas personalizadas sobre qué ignorar o detectar.
+
+### 4. Protección de Ramas (Branch Protection Rules)
+* **Evidencia:** `Protección de ramas (Branch protection rules).pdf`
+* **Cómo se añadió:** Se configuraron restricciones estrictas sobre la rama `main` desde GitHub (Settings > Branches > Branch protection rules):
+  * **Bloqueo de commits directos:** Obliga a utilizar ramas secundarias y Pull Requests.
+  * **Revisiones requeridas:** Se requiere al menos la aprobación de un revisor antes de fusionar.
+  * **Comprobaciones de estado (Status checks):** Los workflows (Gitleaks, Semgrep, Tests) deben pasar exitosamente antes del merge.
+  * **Firmas obligatorias:** Se activó la opción *Require signed commits*.
+
+### 5. Análisis Estático de Código (SAST) con Semgrep
+* **Evidencia:** `Semgrep.pdf`
+* **Cómo se añadió:** Se integró Semgrep en el ciclo de CI/CD para detectar vulnerabilidades en el código PHP en fases tempranas.
+  * Se implementó el pipeline de automatización en `.github/workflows/semgrep.yml`.
+  * Se configuran reglas de seguridad (p/ci) que evalúan el código en cada push, deteniendo la integración si se detectan inyecciones SQL, XSS, u otras vulnerabilidades críticas.
+
+---
+
 ## 💻 Comandos Útiles
 
 ```bash
