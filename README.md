@@ -278,6 +278,6 @@ Este proyecto fue desarrollado como parte de la práctica de **Puesta en Producc
 
 **⭐ Si este proyecto te ha sido útil, considera darle una estrella ⭐**
 
-Hecho con ❤️ por el equipo StatTracker
+Hecho con ❤️ por el equipo StatTracker 
 
 </div>
