@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.stattracker.mobile.data.model.LoginRequest
 import com.stattracker.mobile.data.repository.StatTrackerRepository
 import com.stattracker.mobile.data.repository.TokenManager
+import com.stattracker.mobile.util.ApiErrorParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 sealed class LoginUiState {
     object Idle : LoginUiState()
@@ -28,7 +28,7 @@ class LoginViewModel(
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _uiState.value = LoginUiState.Error("Email y contraseña son obligatorios")
+            _uiState.value = LoginUiState.Error("Email y contrasena son obligatorios")
             return
         }
 
@@ -38,33 +38,28 @@ class LoginViewModel(
                 val response = repository.login(LoginRequest(email, password))
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
-                    if (loginResponse?.success == true) {
+                    if (loginResponse?.success == true && !loginResponse.token.isNullOrBlank()) {
                         tokenManager.saveAuthData(
-                            token = loginResponse.token ?: "",
+                            token = loginResponse.token,
                             name = loginResponse.user?.nombre ?: ""
                         )
-                        _uiState.value = LoginUiState.Success(loginResponse.token ?: "")
+                        _uiState.value = LoginUiState.Success(loginResponse.token)
                     } else {
-                        // Aquí el servidor respondió con 200 pero success false
-                        _uiState.value = LoginUiState.Error("Credenciales inválidas o cuenta no activa")
+                        _uiState.value = LoginUiState.Error("Credenciales invalidas o cuenta no activa")
                     }
                 } else {
-                    // Aquí el servidor respondió con error (401, 404, 500...)
-                    val errorJson = response.errorBody()?.string()
-                    val errorMessage = try {
-                        JSONObject(errorJson!!).getString("message")
-                    } catch (e: Exception) {
-                        when(response.code()) {
-                            401 -> "Email o contraseña incorrectos"
-                            404 -> "Servicio no encontrado (Verifica la URL en Constants.kt)"
-                            500 -> "Error interno del servidor (Revisa los logs de XAMPP)"
-                            else -> "Error ${response.code()}: ${response.message()}"
-                        }
-                    }
+                    val errorMessage = ApiErrorParser.parse(
+                        response = response,
+                        fallbackByCode = mapOf(
+                            401 to "Email o contrasena incorrectos",
+                            404 to "Servicio no encontrado. Verifica la URL base",
+                            500 to "Error interno del servidor"
+                        )
+                    )
                     _uiState.value = LoginUiState.Error(errorMessage)
                 }
             } catch (e: Exception) {
-                _uiState.value = LoginUiState.Error("Error de conexión: ${e.localizedMessage}")
+                _uiState.value = LoginUiState.Error("Error de conexion: ${e.localizedMessage}")
             }
         }
     }

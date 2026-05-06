@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stattracker.mobile.data.model.RegisterRequest
 import com.stattracker.mobile.data.repository.StatTrackerRepository
+import com.stattracker.mobile.util.ApiErrorParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 sealed class RegisterUiState {
     object Idle : RegisterUiState()
@@ -30,6 +30,11 @@ class RegisterViewModel(
             return
         }
 
+        if (password.length < 8) {
+            _uiState.value = RegisterUiState.Error("La contrasena debe tener al menos 8 caracteres")
+            return
+        }
+
         viewModelScope.launch {
             _uiState.value = RegisterUiState.Loading
             try {
@@ -42,12 +47,13 @@ class RegisterViewModel(
                         _uiState.value = RegisterUiState.Error(body?.message ?: "Error en el registro")
                     }
                 } else {
-                    val errorJson = response.errorBody()?.string()
-                    val message = try {
-                        JSONObject(errorJson!!).getString("message")
-                    } catch (e: Exception) {
-                        "Error ${response.code()}: ${response.message()}"
-                    }
+                    val message = ApiErrorParser.parse(
+                        response = response,
+                        fallbackByCode = mapOf(
+                            400 to "Datos de registro invalidos",
+                            409 to "El email ya esta registrado"
+                        )
+                    )
                     _uiState.value = RegisterUiState.Error(message)
                 }
             } catch (e: Exception) {

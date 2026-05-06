@@ -8,6 +8,17 @@ val stattrackerBaseUrl = providers.gradleProperty("stattrackerBaseUrl")
     .orElse("http://192.168.5.34/")
     .get()
 
+val stattrackerDebugSignatureHashes = providers.gradleProperty("stattrackerDebugSignatureHashes")
+    .orElse("")
+    .get()
+
+val stattrackerReleaseSignatureHashes = providers.gradleProperty("stattrackerReleaseSignatureHashes")
+    .orElse("")
+    .get()
+
+fun String.toBuildConfigString(): String =
+    "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
 android {
     namespace = "com.stattracker.mobile"
     compileSdk = 34
@@ -24,7 +35,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "STATTRACKER_BASE_URL", "\"$stattrackerBaseUrl\"")
+        buildConfigField("String", "STATTRACKER_BASE_URL", stattrackerBaseUrl.toBuildConfigString())
     }
 
     buildTypes {
@@ -32,6 +43,7 @@ android {
             // MSTG-RES-4: Habilitar ofuscación y reducción de código
             isMinifyEnabled = true
             isShrinkResources = true
+            buildConfigField("String", "EXPECTED_SIGNATURE_HASHES", stattrackerReleaseSignatureHashes.toBuildConfigString())
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -40,6 +52,7 @@ android {
         debug {
             // Ofuscación parcial en debug para probar resiliencia si se desea
             isMinifyEnabled = false
+            buildConfigField("String", "EXPECTED_SIGNATURE_HASHES", stattrackerDebugSignatureHashes.toBuildConfigString())
         }
     }
     
