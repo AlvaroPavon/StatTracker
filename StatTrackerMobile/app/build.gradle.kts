@@ -4,6 +4,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val stattrackerBaseUrl = providers.gradleProperty("stattrackerBaseUrl")
+    .orElse("http://192.168.5.34/")
+    .get()
+
 android {
     namespace = "com.stattracker.mobile"
     compileSdk = 34
@@ -19,6 +23,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "STATTRACKER_BASE_URL", "\"$stattrackerBaseUrl\"")
     }
 
     buildTypes {
@@ -48,6 +54,7 @@ android {
     
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     composeOptions {

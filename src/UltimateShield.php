@@ -220,9 +220,16 @@ class UltimateShield
     {
         $ua = strtolower($userAgent);
         
-        // En localhost, ser más permisivo (para desarrollo)
-        $isLocalhost = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']) ||
-                      (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
+        // En localhost o LAN privada, ser mas permisivo para desarrollo,
+        // despliegues de laboratorio y checks de salud con curl.
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        $hostHeader = $_SERVER['HTTP_HOST'] ?? '';
+        $hostName = explode(':', $hostHeader)[0];
+        $isPrivateLan = (bool) preg_match('/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $remoteAddr) ||
+                        (bool) preg_match('/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $hostName);
+        $isLocalhost = in_array($remoteAddr, ['127.0.0.1', '::1']) ||
+                      strpos($hostHeader, 'localhost') !== false ||
+                      $isPrivateLan;
         
         if ($isLocalhost) {
             // En localhost, solo bloquear las herramientas más agresivas

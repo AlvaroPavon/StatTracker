@@ -21,9 +21,29 @@ Para mantener el proyecto simple pero profesional, se ha utilizado un enfoque de
 5. La respuesta actualiza el `UiState` del ViewModel.
 6. La View se recompone automáticamente al detectar el cambio en el estado.
 
+## 3.1. Integracion con Proxmox
+La API desplegada en Proxmox queda disponible en:
+
+```text
+http://192.168.5.34/api
+```
+
+La aplicacion Android toma la URL base desde `BuildConfig.STATTRACKER_BASE_URL`, generada en Gradle. El valor por defecto es:
+
+```text
+http://192.168.5.34/
+```
+
+Las rutas Retrofit ya incluyen `api/...`, por lo que no se debe poner `/api` al final de la URL base. Para otro entorno:
+
+```bash
+./gradlew :app:assembleDebug -PstattrackerBaseUrl=http://10.0.2.2:8000/
+```
+
 ## 4. Gestión de Seguridad
 - El token JWT se almacena de forma asíncrona mediante DataStore Preferences.
 - Las llamadas a endpoints protegidos incluyen el token en el header `Authorization`.
+- El interceptor HTTP solo registra cuerpos completos en builds `debug`; en `release` queda desactivado para no exponer credenciales o JWT en logs.
 
 ---
 *Documento generado por OpenClaw para soporte del proyecto final.*

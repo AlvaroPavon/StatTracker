@@ -1,6 +1,7 @@
 package com.stattracker.mobile.util
 
 import android.content.Context
+import com.stattracker.mobile.BuildConfig
 import com.stattracker.mobile.data.api.StatTrackerApi
 import com.stattracker.mobile.data.repository.StatTrackerRepository
 import com.stattracker.mobile.data.repository.TokenManager
@@ -20,7 +21,11 @@ object ServiceLocator {
 
     private fun provideRetrofit(): Retrofit {
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
         
         val client = OkHttpClient.Builder()

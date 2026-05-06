@@ -38,12 +38,19 @@ app/src/main/java/com/stattracker/mobile/
 
 ### API Base URL
 
-Editar `app/src/main/java/com/stattracker/mobile/util/Constants.kt`:
+La URL base por defecto apunta a la VM de Proxmox:
 
-```kotlin
-const val BASE_URL = "http://10.0.2.2:8000"  // Emulator
-// o
-const val BASE_URL = "http://TU_IP:8000"     // Dispositivo real
+```text
+http://192.168.5.34/
+```
+
+`StatTrackerApi` ya anade el prefijo `api/`, por lo que la URL base debe ser la raiz web, no `/api`.
+
+Para compilar contra otro entorno se puede sobreescribir con una propiedad Gradle:
+
+```bash
+./gradlew :app:assembleDebug -PstattrackerBaseUrl=http://10.0.2.2:8000/
+./gradlew :app:assembleDebug -PstattrackerBaseUrl=http://192.168.5.34/
 ```
 
 ## 📦 Dependencias Principales
@@ -72,8 +79,8 @@ El token JWT se guarda en DataStore y se incluye automáticamente en todas las p
 ## 🏃 Ejecutar
 
 1. Abrir proyecto en Android Studio
-2. Configurar `BASE_URL` en Constants.kt
-3. Asegurar que la API está corriendo (`php -S localhost:8000`)
+2. Verificar o sobreescribir `stattrackerBaseUrl`
+3. Asegurar que la API esta corriendo en Proxmox (`http://192.168.5.34/api`)
 4. Run → Emulator o dispositivo físico
 
 ## 📱 Screenshots
@@ -82,8 +89,8 @@ _(Espacio para capturas)_
 
 ## 🐛 Conocido
 
-- En emulator Android, usar `10.0.2.2` en vez de `localhost`
-- En dispositivo físico, usar la IP de tu máquina
+- En emulator Android, usar `-PstattrackerBaseUrl=http://10.0.2.2:8000/` en vez de `localhost`
+- En dispositivo fisico, usar la IP de la VM o del servidor accesible desde la misma red
 
 ## 📄 Licencia
 

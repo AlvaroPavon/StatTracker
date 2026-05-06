@@ -2,6 +2,14 @@
 
 ## En 3 minutos
 
+En Proxmox, usar como URL base:
+
+```text
+http://192.168.5.34/api
+```
+
+Para desarrollo local con el servidor embebido de PHP, usar `http://localhost:8000/api`.
+
 ### 1. Iniciar el servidor
 
 ```bash

@@ -54,6 +54,18 @@ Authorization: Bearer <tu_token_jwt>
 
 ## 🚀 Uso
 
+En la VM de Proxmox la API queda disponible en:
+
+```text
+http://192.168.5.34/api
+```
+
+Tambien se mantiene la ruta legacy para compatibilidad con clientes antiguos:
+
+```text
+http://192.168.5.34/proyecto_imc/api
+```
+
 ### 1. Registrar usuario
 ```bash
 curl -X POST http://localhost:8000/api/auth/register \

@@ -41,9 +41,19 @@ $request = $_SERVER['REQUEST_URI'];
 $request = explode('?', $request)[0];
 $request = rtrim($request, '/');
 
-// Identificar ruta base de la API
-$basePath = '/proyecto_imc/api';
-if (strpos($request, $basePath) !== 0) {
+// Identificar ruta base de la API. En Proxmox la app se sirve en la raiz
+// (/api), pero se mantiene /proyecto_imc/api para compatibilidad.
+$basePaths = ['/api', '/proyecto_imc/api'];
+$basePath = null;
+
+foreach ($basePaths as $candidateBasePath) {
+    if ($request === $candidateBasePath || strpos($request, $candidateBasePath . '/') === 0) {
+        $basePath = $candidateBasePath;
+        break;
+    }
+}
+
+if ($basePath === null) {
     http_response_code(404);
     echo json_encode(['error' => 'Endpoint no encontrado']);
     exit;

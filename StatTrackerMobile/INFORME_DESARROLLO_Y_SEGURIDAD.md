@@ -57,7 +57,7 @@ El objetivo de este desarrollo ha sido fortalecer la aplicación StatTracker Mob
 ## 3. Conectividad y Resiliencia de Red
 Para garantizar la comunicación con el servidor XAMPP en el entorno de pruebas:
 1.  **Protección de Tráfico**: Se ha configurado el uso de `CleartextTraffic` controlado en el manifiesto para permitir la conexión con la IP local durante la fase de desarrollo.
-2.  **Configuración de IP Local**: Adaptación de `BASE_URL` a `http://192.168.137.1:8080/proyecto_imc/` para permitir el acceso desde dispositivos físicos a través del Hotspot de Windows.
+2.  **Configuracion de servidor Proxmox**: `BASE_URL` se genera desde `BuildConfig.STATTRACKER_BASE_URL`, con valor por defecto `http://192.168.5.34/`. Puede cambiarse por entorno con `-PstattrackerBaseUrl=...` sin editar codigo fuente.
 3.  **Sanitización de Endpoints**: Corrección de la estructura de rutas para evitar errores 404, asegurando que la aplicación sea resiliente ante cambios en la estructura de carpetas del servidor Apache.
 
 ---
